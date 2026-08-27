@@ -1,0 +1,11 @@
+{
+  "name": "courier-eats-sync",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "echo 'No build required'"
+  },
+  "dependencies": {
+    "square": "^38.0.0"
+  }
+}
