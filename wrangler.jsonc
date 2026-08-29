@@ -3,9 +3,11 @@
   "name": "courier-eats-sync",
   "main": "src/worker.ts",
   "compatibility_date": "2026-08-28",
+  "compatibility_flags": ["nodejs_compat"],
   "observability": {
     "enabled": true
   },
+  "analytics_engine_datasets": ["courier_eats_metrics"],
   "secrets": {
     "required": [
       "SQUARE_ACCESS_TOKEN",
@@ -13,6 +15,29 @@
     ]
   },
   "vars": {
-    "CATALOG_AUTO_FIX_ENABLED": "false"
+    "CATALOG_AUTO_FIX_ENABLED": "false",
+    "ENVIRONMENT": "production"
+  },
+  "build": {
+    "command": "npm run build",
+    "cwd": "./",
+    "watch_paths": ["src/**/*.ts"]
+  },
+  "triggers": {
+    "crons": ["0 */6 * * *"]
+  },
+  "env": {
+    "development": {
+      "vars": {
+        "ENVIRONMENT": "development",
+        "CATALOG_AUTO_FIX_ENABLED": "true"
+      }
+    },
+    "staging": {
+      "vars": {
+        "ENVIRONMENT": "staging",
+        "CATALOG_AUTO_FIX_ENABLED": "false"
+      }
+    }
   }
 }
