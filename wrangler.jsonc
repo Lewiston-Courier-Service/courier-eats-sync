@@ -1,4 +1,5 @@
 // Courier Eats Cloudflare Worker configuration
+// Fresh deployment trigger: 2026-08-29
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "courier-eats-sync",
