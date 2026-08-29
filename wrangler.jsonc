@@ -11,9 +11,6 @@
     "CATALOG_AUTO_FIX_ENABLED": "false",
     "ENVIRONMENT": "production"
   },
-  "triggers": {
-    "crons": ["0 */6 * * *"]
-  },
   "env": {
     "development": {
       "vars": {
