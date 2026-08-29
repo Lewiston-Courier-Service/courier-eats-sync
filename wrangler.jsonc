@@ -1,3 +1,4 @@
+// Courier Eats Cloudflare Worker configuration
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "courier-eats-sync",
