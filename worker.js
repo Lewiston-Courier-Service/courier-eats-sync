@@ -311,10 +311,11 @@ export default {
 
       return json({ error: "Not found" }, 404);
     } catch (error) {
+      console.error("Worker error:", error);
       return json(
         {
           error: "Worker error",
-          message: error?.message || String(error)
+          message: "Internal server error"
         },
         500
       );
