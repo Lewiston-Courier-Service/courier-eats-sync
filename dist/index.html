@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Courier Eats | Local Food Delivery</title>
+
+  <meta
+    name="description"
+    content="Order from local restaurants through Courier Eats."
+  >
+  <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+
+  <header class="topbar">
+
+    <div class="brand">
+      <div class="logo">CE</div>
+      Courier Eats
+    </div>
+
+    <div>
+      Local Delivery
+    </div>
+
+  </header>
+
+
+  <div
+    id="orderComplete"
+    class="order-complete"
+  >
+    Thank you. Your Courier Eats order has been submitted.
+  </div>
+
+
+  <section class="hero">
+
+    <div class="hero-inner">
+
+      <h1>
+        What are you hungry for?
+      </h1>
+
+      <p>
+        Browse local restaurants, view live Square menus,
+        add your favorites to your cart, and securely
+        checkout online.
+      </p>
+
+      <div class="search-wrap">
+
+        <input
+          id="restaurantSearch"
+          type="search"
+          placeholder="Search restaurants..."
+          autocomplete="off"
+        >
+
+      </div>
+
+
+      <div class="categories">
+
+        <button class="category-button active" data-category="All">
+          All
+        </button>
+
+        <button class="category-button" data-category="Breakfast">
+          Breakfast
+        </button>
+
+        <button class="category-button" data-category="Lunch">
+          Lunch
+        </button>
+
+        <button class="category-button" data-category="Dinner">
+          Dinner
+        </button>
+
+        <button class="category-button" data-category="Bakery">
+          Bakery
+        </button>
+
+        <button class="category-button" data-category="Pizza">
+          Pizza
+        </button>
+
+        <button class="category-button" data-category="World Food">
+          World Food
+        </button>
+
+        <button class="category-button" data-category="Seafood">
+          Seafood
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <main class="main">
+
+    <div class="section-heading">
+
+      <h2>
+        Local Restaurants
+      </h2>
+
+      <p>
+        Choose a restaurant to view its live menu.
+      </p>
+
+    </div>
+
+
+    <div id="restaurantList">
+
+      <div class="message">
+        Loading restaurants...
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <button
+    id="cartButton"
+    class="cart-button"
+    type="button"
+  >
+    Cart (0)
+  </button>
+
+
+  <div
+    id="cartOverlay"
+    class="cart-overlay"
+  >
+
+    <div class="cart-panel">
+
+      <div class="cart-header">
+
+        <h2>
+          Your Cart
+        </h2>
+
+        <button
+          id="cartClose"
+          class="cart-close"
+          type="button"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div
+        id="cartRestaurant"
+        class="cart-restaurant"
+      ></div>
+
+
+      <div id="cartItems"></div>
+
+
+      <div class="cart-total">
+
+        <span>
+          Total
+        </span>
+
+        <span id="cartTotal">
+          $0.00
+        </span>
+
+      </div>
+
+
+      <button
+        id="checkoutButton"
+        class="checkout-button"
+        type="button"
+      >
+        Checkout with Square
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <footer>
+
+    <strong>
+      Courier Eats
+    </strong>
+
+    <p>
+      Local restaurant ordering and delivery.
+    </p>
+
+  </footer>
+  <script src="/app.js"></script>
+
+</body>
+</html>
