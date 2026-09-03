@@ -1,6 +1,6 @@
 {
   "name": "courier-eats",
-  "main": "worker.js",
+  "main": "worker-entry.js",
   "compatibility_date": "2026-08-29",
   "assets": {
     "directory": "./dist",
@@ -11,7 +11,10 @@
   },
   "vars": {
     "DISPATCH_MODE": "internal",
-    "THIRD_PARTY_URL": ""
+    "THIRD_PARTY_URL": "",
+    "SQUARE_RESTAURANT_CONNECTOR_ENABLED": "false",
+    "SQUARE_OAUTH_REDIRECT_URL": "https://courier-eats.lew-courier.workers.dev/api/connect/square/callback",
+    "SQUARE_RESTAURANT_WEBHOOK_NOTIFICATION_URL": "https://courier-eats.lew-courier.workers.dev/api/webhooks/square-restaurants"
   },
   "d1_databases": [
     {
