@@ -3,213 +3,220 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Courier Eats | Local Food Delivery</title>
-
-  <meta
-    name="description"
-    content="Order from local restaurants through Courier Eats."
-  >
+  <title>Courier Eats | Local Delivery</title>
+  <meta name="description" content="Order from local restaurants or request retail pickup delivery through Courier Eats and Lewiston Courier Service.">
   <link rel="stylesheet" href="/styles.css">
 </head>
-
 <body>
-
   <header class="topbar">
-
     <div class="brand">
       <div class="logo">CE</div>
-      Courier Eats
+      <span>Courier Eats</span>
     </div>
-
-    <div>
-      Local Delivery
-    </div>
-
+    <div class="topbar-note">Powered by Lewiston Courier Service</div>
   </header>
 
-
-  <div
-    id="orderComplete"
-    class="order-complete"
-  >
+  <div id="orderComplete" class="order-complete">
     Thank you. Your Courier Eats order has been submitted.
   </div>
 
-
   <section class="hero">
-
     <div class="hero-inner">
+      <h1>What can we pick up for you?</h1>
+      <p>Order from local restaurants or book a retail pickup from stores such as Walmart, Home Depot, Lowe's, Tractor Supply, and Target.</p>
 
-      <h1>
-        What are you hungry for?
-      </h1>
-
-      <p>
-        Browse local restaurants, view live Square menus,
-        add your favorites to your cart, and securely
-        checkout online.
-      </p>
-
-      <div class="search-wrap">
-
-        <input
-          id="restaurantSearch"
-          type="search"
-          placeholder="Search restaurants..."
-          autocomplete="off"
-        >
-
+      <div class="service-switcher" role="tablist" aria-label="Courier Eats services">
+        <button id="restaurantServiceButton" class="service-button active" type="button">🍽️ Restaurants</button>
+        <button id="retailServiceButton" class="service-button" type="button">🛍️ Retail Pickup</button>
       </div>
-
-
-      <div class="categories">
-
-        <button class="category-button active" data-category="All">
-          All
-        </button>
-
-        <button class="category-button" data-category="Breakfast">
-          Breakfast
-        </button>
-
-        <button class="category-button" data-category="Lunch">
-          Lunch
-        </button>
-
-        <button class="category-button" data-category="Dinner">
-          Dinner
-        </button>
-
-        <button class="category-button" data-category="Bakery">
-          Bakery
-        </button>
-
-        <button class="category-button" data-category="Pizza">
-          Pizza
-        </button>
-
-        <button class="category-button" data-category="World Food">
-          World Food
-        </button>
-
-        <button class="category-button" data-category="Seafood">
-          Seafood
-        </button>
-
-      </div>
-
     </div>
-
   </section>
 
-
   <main class="main">
-
-    <div class="section-heading">
-
-      <h2>
-        Local Restaurants
-      </h2>
-
-      <p>
-        Choose a restaurant to view its live menu.
-      </p>
-
-    </div>
-
-
-    <div id="restaurantList">
-
-      <div class="message">
-        Loading restaurants...
+    <section id="restaurantService" class="service-panel active">
+      <div class="section-heading">
+        <h2>Local Restaurants</h2>
+        <p>Search restaurants, choose a category, and open the restaurant's live Square menu.</p>
       </div>
 
-    </div>
+      <div class="search-wrap restaurant-search-wrap">
+        <input id="restaurantSearch" type="search" placeholder="Search restaurants..." autocomplete="off">
+      </div>
 
+      <div class="categories">
+        <button class="category-button active" data-category="All">All</button>
+        <button class="category-button" data-category="Breakfast">Breakfast</button>
+        <button class="category-button" data-category="Lunch">Lunch</button>
+        <button class="category-button" data-category="Dinner">Dinner</button>
+        <button class="category-button" data-category="Bakery">Bakery</button>
+        <button class="category-button" data-category="Pizza">Pizza</button>
+        <button class="category-button" data-category="World Food">World Food</button>
+        <button class="category-button" data-category="Seafood">Seafood</button>
+      </div>
+
+      <div id="restaurantList">
+        <div class="message">Loading restaurants...</div>
+      </div>
+    </section>
+
+    <section id="retailService" class="service-panel" hidden>
+      <div class="section-heading">
+        <h2>Retail Pickup</h2>
+        <p>Already placed an order with a store? Book Lewiston Courier Service to pick it up and deliver it to you.</p>
+      </div>
+
+      <div class="retail-store-grid" aria-label="Available retail pickup stores">
+        <button class="retail-store active" data-store="Walmart" type="button">🛒 <strong>Walmart</strong></button>
+        <button class="retail-store" data-store="Home Depot" type="button">🧰 <strong>Home Depot</strong></button>
+        <button class="retail-store" data-store="Lowe's" type="button">🏠 <strong>Lowe's</strong></button>
+        <button class="retail-store" data-store="Tractor Supply" type="button">🚜 <strong>Tractor Supply</strong></button>
+        <button class="retail-store" data-store="Target" type="button">🎯 <strong>Target</strong></button>
+        <button class="retail-store" data-store="Other Store" type="button">📦 <strong>Other Store</strong></button>
+      </div>
+
+      <form id="retailPickupForm" class="retail-form">
+        <input id="retailStore" name="store" type="hidden" value="Walmart">
+
+        <div class="form-grid">
+          <label>
+            Store / pickup location
+            <input name="storeLocation" placeholder="Example: Walmart Auburn, ME" required>
+          </label>
+
+          <label>
+            Name on store pickup order
+            <input name="pickupName" placeholder="Name used with the store" required>
+          </label>
+
+          <label>
+            Pickup or order number
+            <input name="pickupNumber" placeholder="Order / pickup number" required>
+          </label>
+
+          <label>
+            Your name
+            <input name="customerName" required>
+          </label>
+
+          <label>
+            Phone number
+            <input name="customerPhone" type="tel" required>
+          </label>
+
+          <label class="full-width">
+            Delivery address
+            <input name="deliveryAddress" placeholder="Street, city, state, ZIP" required>
+          </label>
+
+          <label class="full-width">
+            Pickup instructions or notes
+            <textarea name="notes" rows="4" placeholder="Vehicle description, bulky items, special pickup instructions, etc."></textarea>
+          </label>
+        </div>
+
+        <label class="authorization-row">
+          <input name="authorized" type="checkbox" required>
+          <span>I authorize Lewiston Courier Service to pick up this order on my behalf.</span>
+        </label>
+
+        <button id="retailSubmitButton" class="retail-submit" type="submit">Request Retail Pickup</button>
+        <div id="retailPickupMessage" class="retail-message" aria-live="polite"></div>
+      </form>
+    </section>
   </main>
 
+  <button id="cartButton" class="cart-button" type="button">Cart (0)</button>
 
-  <button
-    id="cartButton"
-    class="cart-button"
-    type="button"
-  >
-    Cart (0)
-  </button>
-
-
-  <div
-    id="cartOverlay"
-    class="cart-overlay"
-  >
-
+  <div id="cartOverlay" class="cart-overlay">
     <div class="cart-panel">
-
       <div class="cart-header">
-
-        <h2>
-          Your Cart
-        </h2>
-
-        <button
-          id="cartClose"
-          class="cart-close"
-          type="button"
-        >
-          ×
-        </button>
-
+        <h2>Your Cart</h2>
+        <button id="cartClose" class="cart-close" type="button">×</button>
       </div>
-
-
-      <div
-        id="cartRestaurant"
-        class="cart-restaurant"
-      ></div>
-
-
+      <div id="cartRestaurant" class="cart-restaurant"></div>
       <div id="cartItems"></div>
-
-
-      <div class="cart-total">
-
-        <span>
-          Total
-        </span>
-
-        <span id="cartTotal">
-          $0.00
-        </span>
-
-      </div>
-
-
-      <button
-        id="checkoutButton"
-        class="checkout-button"
-        type="button"
-      >
-        Checkout with Square
-      </button>
-
+      <div class="cart-total"><span>Total</span><span id="cartTotal">$0.00</span></div>
+      <button id="checkoutButton" class="checkout-button" type="button">Checkout with Square</button>
     </div>
-
   </div>
 
-
   <footer>
-
-    <strong>
-      Courier Eats
-    </strong>
-
-    <p>
-      Local restaurant ordering and delivery.
-    </p>
-
+    <strong>Courier Eats</strong>
+    <p>Restaurant ordering and retail pickup delivery by Lewiston Courier Service.</p>
   </footer>
-  <script src="/app.js"></script>
 
+  <script src="/app.js"></script>
+  <script>
+    (() => {
+      const restaurantButton = document.getElementById('restaurantServiceButton');
+      const retailButton = document.getElementById('retailServiceButton');
+      const restaurantPanel = document.getElementById('restaurantService');
+      const retailPanel = document.getElementById('retailService');
+      const cartButton = document.getElementById('cartButton');
+
+      function showService(service) {
+        const restaurants = service === 'restaurants';
+        restaurantPanel.hidden = !restaurants;
+        retailPanel.hidden = restaurants;
+        restaurantPanel.classList.toggle('active', restaurants);
+        retailPanel.classList.toggle('active', !restaurants);
+        restaurantButton.classList.toggle('active', restaurants);
+        retailButton.classList.toggle('active', !restaurants);
+        cartButton.style.display = restaurants ? '' : 'none';
+      }
+
+      restaurantButton.addEventListener('click', () => showService('restaurants'));
+      retailButton.addEventListener('click', () => showService('retail'));
+
+      const storeButtons = document.querySelectorAll('.retail-store');
+      const storeInput = document.getElementById('retailStore');
+      storeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          storeButtons.forEach(other => other.classList.remove('active'));
+          button.classList.add('active');
+          storeInput.value = button.dataset.store || '';
+        });
+      });
+
+      const form = document.getElementById('retailPickupForm');
+      const submitButton = document.getElementById('retailSubmitButton');
+      const message = document.getElementById('retailPickupMessage');
+
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        submitButton.disabled = true;
+        submitButton.textContent = 'Submitting pickup request...';
+        message.textContent = '';
+
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+        payload.store = storeInput.value;
+        payload.authorized = formData.get('authorized') === 'on';
+
+        try {
+          const response = await fetch('/api/retail-pickup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || 'Unable to submit pickup request');
+          }
+          message.textContent = `Pickup request received. Dispatch #${data.dispatchOrderId || ''}`;
+          message.className = 'retail-message success';
+          form.reset();
+          storeInput.value = 'Walmart';
+          storeButtons.forEach(button => button.classList.toggle('active', button.dataset.store === 'Walmart'));
+        } catch (error) {
+          message.textContent = error.message;
+          message.className = 'retail-message error';
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = 'Request Retail Pickup';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
