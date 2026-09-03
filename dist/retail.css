@@ -1,0 +1,120 @@
+.topbar-note { font-size: 14px; opacity: 0.85; text-align: right; }
+
+.service-switcher {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: min(620px, 100%);
+  margin: 28px auto 0;
+}
+
+.service-button {
+  border: 2px solid rgba(255,255,255,0.45);
+  border-radius: 14px;
+  padding: 16px 18px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.service-button.active {
+  background: #ffd400;
+  border-color: #ffd400;
+  color: #111;
+}
+
+.service-panel[hidden] { display: none !important; }
+.restaurant-search-wrap { margin: 22px 0 0; max-width: none; }
+.restaurant-search-wrap #restaurantSearch { border: 1px solid #ddd; }
+
+.retail-store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.retail-store {
+  min-height: 92px;
+  border: 2px solid #e2e2e2;
+  border-radius: 14px;
+  background: #fff;
+  padding: 16px;
+  font-size: 18px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+}
+
+.retail-store.active {
+  border-color: #ffd400;
+  background: #fff9cf;
+}
+
+.retail-form {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-weight: 700;
+}
+
+.form-grid input,
+.form-grid textarea {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 9px;
+  padding: 13px 14px;
+  background: #fff;
+  font: inherit;
+}
+
+.form-grid textarea { resize: vertical; }
+.full-width { grid-column: 1 / -1; }
+
+.authorization-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 20px 0;
+  font-weight: 700;
+}
+
+.authorization-row input { margin-top: 3px; }
+
+.retail-submit {
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  padding: 15px;
+  background: #ffd400;
+  color: #111;
+  font-weight: 900;
+  font-size: 17px;
+}
+
+.retail-submit:disabled { opacity: 0.6; cursor: wait; }
+.retail-message { margin-top: 14px; font-weight: 700; }
+.retail-message.success { color: #126b2d; }
+.retail-message.error { color: #a40000; }
+
+@media (max-width: 650px) {
+  .topbar { align-items: flex-start; }
+  .topbar-note { max-width: 130px; font-size: 12px; }
+  .service-switcher { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .full-width { grid-column: auto; }
+  .retail-store-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
