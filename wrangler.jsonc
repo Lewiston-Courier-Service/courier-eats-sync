@@ -2,6 +2,8 @@
   "name": "courier-eats",
   "main": "worker-entry.js",
   "compatibility_date": "2026-08-29",
+  "workers_dev": true,
+  "preview_urls": true,
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
@@ -12,15 +14,38 @@
   "vars": {
     "DISPATCH_MODE": "internal",
     "THIRD_PARTY_URL": "",
-    "SQUARE_RESTAURANT_CONNECTOR_ENABLED": "false",
+    "SQUARE_RESTAURANT_CONNECTOR_ENABLED": "true",
     "SQUARE_OAUTH_REDIRECT_URL": "https://courier-eats.lew-courier.workers.dev/api/connect/square/callback",
-    "SQUARE_RESTAURANT_WEBHOOK_NOTIFICATION_URL": "https://courier-eats.lew-courier.workers.dev/api/webhooks/square-restaurants"
+    "SQUARE_RESTAURANT_WEBHOOK_NOTIFICATION_URL": "https://courier-eats.lew-courier.workers.dev/api/webhooks/square-restaurants",
+    "SQUARE_WEBHOOK_NOTIFICATION_URL": "https://courier-eats.lew-courier.workers.dev/api/webhooks/square"
   },
   "d1_databases": [
     {
       "binding": "DISPATCH_DB",
       "database_name": "courier-eats-dispatch",
       "database_id": "45738ef2-4cc6-4a5c-a624-93d6c242e4df"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "LCS_TMS_POD",
+      "bucket_name": "lcs-tms-pod"
+    }
+  ],
+  "routes": [
+    {
+      "pattern": "api.couriereats.com",
+      "zone_name": "couriereats.com",
+      "custom_domain": true,
+      "enabled": true,
+      "previews_enabled": false
+    },
+    {
+      "pattern": "couriereats.com",
+      "zone_name": "couriereats.com",
+      "custom_domain": true,
+      "enabled": true,
+      "previews_enabled": false
     }
   ]
 }
