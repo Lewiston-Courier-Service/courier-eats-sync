@@ -120,6 +120,7 @@ export async function handleRetailPickup(request, env) {
     },
     tipping: {
       optional: true,
+      requiredForDispatch: false,
       defaultTipCents: 0,
       customerSelectedTipCents: tipCents.value,
       charged: false,
