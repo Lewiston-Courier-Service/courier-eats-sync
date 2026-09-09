@@ -115,7 +115,7 @@ function optionalTipCents(value) {
 
   const amount = Number(value);
   if (!Number.isInteger(amount) || amount < 0 || amount > 50000) {
-    return { error: "tipCents must be a whole number from 0 to 50000" };
+    return { error: "tipCents must be a whole number from 0 to 50000 ($500.00 maximum)" };
   }
 
   return { value: amount };
