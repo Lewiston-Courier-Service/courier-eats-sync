@@ -4,6 +4,7 @@ import { handleRestaurantOnboardingOperations } from "./restaurant-onboarding-op
 import { handleSquareRestaurantConnector } from "./square-restaurant-connector.js";
 import { handleSquareMenuSync } from "./square-menu-sync.js";
 import { handleRetailPickup } from "./retail-pickup.js";
+import { handleGroceryPaymentGate } from "./grocery-payment-gate.js";
 import { handleTmsAdmin } from "./tms-admin.js";
 import { handlePublicTracking } from "./public-tracking.js";
 import { handleDriverPod } from "./driver-pod.js";
@@ -16,6 +17,11 @@ export default {
     const onboardingResponse = await handleRestaurantOnboardingOperations(request, env, ctx);
     if (onboardingResponse) {
       return onboardingResponse;
+    }
+
+    const groceryPaymentResponse = await handleGroceryPaymentGate(request, env, ctx);
+    if (groceryPaymentResponse) {
+      return groceryPaymentResponse;
     }
 
     const paymentResponse = await handleSquarePaymentHardening(request, env, ctx);
