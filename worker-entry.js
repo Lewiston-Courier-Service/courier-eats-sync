@@ -1,4 +1,5 @@
 import baseWorker from "./worker.js";
+import { handleDoorDashAuth } from "./doordash-auth.js";
 import { handleSquareRestaurantConnector } from "./square-restaurant-connector.js";
 import { handleSquareMenuSync } from "./square-menu-sync.js";
 import { handleRetailPickup } from "./retail-pickup.js";
@@ -10,6 +11,11 @@ export default {
     const paymentResponse = await handleSquarePaymentHardening(request, env, ctx);
     if (paymentResponse) {
       return paymentResponse;
+    }
+
+    const doorDashAuthResponse = await handleDoorDashAuth(request, env);
+    if (doorDashAuthResponse) {
+      return doorDashAuthResponse;
     }
 
     const marketplaceResponse = await handleMarketplaceOrders(request, env, ctx);
