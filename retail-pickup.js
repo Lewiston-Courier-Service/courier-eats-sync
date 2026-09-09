@@ -36,6 +36,11 @@ export async function handleRetailPickup(request, env) {
   const deliveryAddress = clean(body.deliveryAddress);
   const notes = clean(body.notes);
   const authorized = body.authorized === true;
+  const tipCents = optionalTipCents(body.tipCents);
+
+  if (tipCents.error) {
+    return json({ error: tipCents.error }, 400);
+  }
 
   if (!store || !pickupName || !pickupNumber || !customerName || !customerPhone || !deliveryAddress) {
     return json({ error: "Missing required grocery pickup information" }, 400);
@@ -70,7 +75,9 @@ export async function handleRetailPickup(request, env) {
       `Grocery Pick Up: ${store}`,
       `Pickup name: ${pickupName}`,
       `Pickup/order number: ${pickupNumber}`,
+      `Customer-selected tip: $${(tipCents.value / 100).toFixed(2)}`,
       notes ? `Notes: ${notes}` : null,
+      "Tip is optional and selected by the customer; no gratuity is automatically added.",
       "Customer authorized Lewiston Courier Service to pick up this grocery order on their behalf."
     ]
       .filter(Boolean)
@@ -90,8 +97,28 @@ export async function handleRetailPickup(request, env) {
     service: "Grocery Pick Up",
     endpoint: GROCERY_PICKUP_ROUTE,
     dispatchOrderId,
-    dispatchStatus: "NEW"
+    dispatchStatus: "NEW",
+    tipping: {
+      optional: true,
+      defaultTipCents: 0,
+      customerSelectedTipCents: tipCents.value,
+      charged: false,
+      note: "Tip amount is recorded for checkout/display only until the Grocery Pick Up payment flow is connected."
+    }
   });
+}
+
+function optionalTipCents(value) {
+  if (value === undefined || value === null || value === "") {
+    return { value: 0 };
+  }
+
+  const amount = Number(value);
+  if (!Number.isInteger(amount) || amount < 0 || amount > 50000) {
+    return { error: "tipCents must be a whole number from 0 to 50000" };
+  }
+
+  return { value: amount };
 }
 
 function clean(value) {
