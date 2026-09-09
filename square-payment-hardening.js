@@ -111,6 +111,18 @@ async function handleSquareWebhook(request, env, url) {
     return json({ error: released.error }, released.status || 502);
   }
 
+  if (!released.released) {
+    await rememberSquareWebhookEvent(env, eventId, eventType, orderId, "ALREADY_READY");
+    return json({
+      received: true,
+      orderId,
+      dispatchOrderId: dispatchOrder.id,
+      dispatchStatus: released.status || "NEW",
+      duplicate: true,
+      reason: "order already released by another request"
+    });
+  }
+
   await rememberSquareWebhookEvent(env, eventId, eventType, orderId, "PROCESSED");
 
   return json({
@@ -249,6 +261,20 @@ async function handleSquareReconcile(request, env) {
     return json({ error: released.error }, released.status || 502);
   }
 
+  if (!released.released) {
+    return json({
+      success: true,
+      reconciled: false,
+      reason: "Order was released by another request",
+      dispatchOrderId: dispatchOrder.id,
+      squareOrderId: dispatchOrder.square_order_id,
+      status: released.status || "NEW",
+      orderTotal: total,
+      amountDue,
+      completedPaymentTotal
+    });
+  }
+
   return json({
     success: true,
     reconciled: true,
@@ -322,7 +348,7 @@ async function releaseSquareOrderToDispatch(
     order.total_money?.amount ?? options.fallbackTotal ?? 0
   );
 
-  await env.DISPATCH_DB
+  const updateResult = await env.DISPATCH_DB
     .prepare(
       `UPDATE dispatch_orders
        SET restaurant_name = COALESCE(?, restaurant_name),
@@ -350,6 +376,21 @@ async function releaseSquareOrderToDispatch(
     )
     .run();
 
+  const changes = Number(updateResult?.meta?.changes ?? 0);
+
+  if (changes !== 1) {
+    const currentOrder = await env.DISPATCH_DB
+      .prepare("SELECT status FROM dispatch_orders WHERE id = ?")
+      .bind(dispatchOrderId)
+      .first();
+
+    return {
+      ok: true,
+      released: false,
+      status: currentOrder?.status || null
+    };
+  }
+
   await env.DISPATCH_DB
     .prepare(
       `INSERT INTO dispatch_events (order_id, status, note)
@@ -358,7 +399,7 @@ async function releaseSquareOrderToDispatch(
     .bind(dispatchOrderId, options.note || "Square payment released to dispatch")
     .run();
 
-  return { ok: true };
+  return { ok: true, released: true, status: "NEW" };
 }
 
 async function rememberSquareWebhookEvent(env, eventId, eventType, orderId, result) {
