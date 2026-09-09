@@ -111,6 +111,11 @@ export async function handleRetailPickup(request, env) {
       storeItemsPaid: true,
       lcsBillPaid: false,
       courierDispatchAllowed: false,
+      requiredSequence: [
+        "Store merchandise paid",
+        "LCS delivery/service bill paid",
+        "Courier dispatch released"
+      ],
       nextStep: "Complete the LCS delivery/service checkout. The order can move to NEW only after confirmed payment."
     },
     tipping: {
