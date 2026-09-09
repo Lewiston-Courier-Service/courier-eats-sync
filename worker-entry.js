@@ -3,9 +3,15 @@ import { handleSquareRestaurantConnector } from "./square-restaurant-connector.j
 import { handleSquareMenuSync } from "./square-menu-sync.js";
 import { handleRetailPickup } from "./retail-pickup.js";
 import { handleMarketplaceOrders } from "./marketplace-orders.js";
+import { handleSquarePaymentHardening } from "./square-payment-hardening.js";
 
 export default {
   async fetch(request, env, ctx) {
+    const paymentResponse = await handleSquarePaymentHardening(request, env, ctx);
+    if (paymentResponse) {
+      return paymentResponse;
+    }
+
     const marketplaceResponse = await handleMarketplaceOrders(request, env, ctx);
     if (marketplaceResponse) {
       return marketplaceResponse;
