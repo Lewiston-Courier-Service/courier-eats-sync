@@ -111,7 +111,11 @@ async function finishSquareOAuth(url, env) {
   }
 
   const error = url.searchParams.get("error");
+  const state = url.searchParams.get("state");
   if (error) {
+    if (state) {
+      await deleteOAuthState(env, state);
+    }
     return connectorJson(
       {
         connected: false,
@@ -123,7 +127,6 @@ async function finishSquareOAuth(url, env) {
   }
 
   const code = url.searchParams.get("code");
-  const state = url.searchParams.get("state");
 
   if (!code || !state) {
     return connectorJson({ error: "Missing Square authorization code or state" }, 400);
