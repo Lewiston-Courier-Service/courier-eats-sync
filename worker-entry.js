@@ -1,6 +1,6 @@
 import baseWorker from "./worker.js";
 import { handleDoorDashAuth } from "./doordash-auth.js";
-import { handleRestaurantOnboarding } from "./restaurant-onboarding.js";
+import { handleRestaurantOnboardingOperations } from "./restaurant-onboarding-operations.js";
 import { handleSquareRestaurantConnector } from "./square-restaurant-connector.js";
 import { handleSquareMenuSync } from "./square-menu-sync.js";
 import { handleRetailPickup } from "./retail-pickup.js";
@@ -13,7 +13,7 @@ import { handleSquarePaymentHardening } from "./square-payment-hardening.js";
 
 export default {
   async fetch(request, env, ctx) {
-    const onboardingResponse = await handleRestaurantOnboarding(request, env, ctx);
+    const onboardingResponse = await handleRestaurantOnboardingOperations(request, env, ctx);
     if (onboardingResponse) {
       return onboardingResponse;
     }
