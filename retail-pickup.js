@@ -1,7 +1,10 @@
+const GROCERY_PICKUP_ROUTE = "/api/grocery-pickup";
+const LEGACY_RETAIL_PICKUP_ROUTE = "/api/retail-pickup";
+
 export async function handleRetailPickup(request, env) {
   const url = new URL(request.url);
 
-  if (url.pathname !== "/api/retail-pickup") {
+  if (![GROCERY_PICKUP_ROUTE, LEGACY_RETAIL_PICKUP_ROUTE].includes(url.pathname)) {
     return null;
   }
 
@@ -35,7 +38,7 @@ export async function handleRetailPickup(request, env) {
   const authorized = body.authorized === true;
 
   if (!store || !pickupName || !pickupNumber || !customerName || !customerPhone || !deliveryAddress) {
-    return json({ error: "Missing required retail pickup information" }, 400);
+    return json({ error: "Missing required grocery pickup information" }, 400);
   }
 
   if (!authorized) {
@@ -64,11 +67,11 @@ export async function handleRetailPickup(request, env) {
 
   if (dispatchOrderId) {
     const note = [
-      `Retail pickup: ${store}`,
+      `Grocery Pick Up: ${store}`,
       `Pickup name: ${pickupName}`,
       `Pickup/order number: ${pickupNumber}`,
       notes ? `Notes: ${notes}` : null,
-      "Customer authorized Lewiston Courier Service to pick up this order on their behalf."
+      "Customer authorized Lewiston Courier Service to pick up this grocery order on their behalf."
     ]
       .filter(Boolean)
       .join(" | ");
@@ -84,7 +87,8 @@ export async function handleRetailPickup(request, env) {
 
   return json({
     success: true,
-    service: "Retail Pickup",
+    service: "Grocery Pick Up",
+    endpoint: GROCERY_PICKUP_ROUTE,
     dispatchOrderId,
     dispatchStatus: "NEW"
   });
