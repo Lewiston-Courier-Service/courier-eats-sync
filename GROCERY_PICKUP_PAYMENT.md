@@ -19,6 +19,10 @@
 - `POST /api/webhooks/square` — Grocery Pick Up payments are intercepted first, signature verified, full payment verified, and dispatch released only when the Square order is fully paid.
 - `POST /api/admin/grocery-pickup/reconcile` — protected fallback to re-check Square if a webhook is delayed or missed.
 
+## Square Checkout API
+
+The implementation uses Square API version `2026-08-19` and the current `POST /v2/online-checkout/payment-links` CreatePaymentLink endpoint with `quick_pay` and `checkout_options.allow_tipping`.
+
 ## Safety
 
 - The store merchandise amount is not charged by this flow; it must already be paid with the store.
