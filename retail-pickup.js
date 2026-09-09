@@ -36,6 +36,7 @@ export async function handleRetailPickup(request, env) {
   const deliveryAddress = clean(body.deliveryAddress);
   const notes = clean(body.notes);
   const authorized = body.authorized === true;
+  const itemsPaid = body.itemsPaid === true;
   const tipCents = optionalTipCents(body.tipCents);
 
   if (tipCents.error) {
@@ -50,13 +51,19 @@ export async function handleRetailPickup(request, env) {
     return json({ error: "Pickup authorization is required" }, 400);
   }
 
+  if (!itemsPaid) {
+    return json({
+      error: "Grocery items must be paid with the store before LCS delivery checkout can begin"
+    }, 409);
+  }
+
   const pickupAddress = storeLocation ? `${store} - ${storeLocation}` : store;
 
   const result = await env.DISPATCH_DB
     .prepare(
       `INSERT INTO dispatch_orders
         (source, restaurant_name, customer_name, customer_phone, pickup_address, delivery_address, status, dispatch_provider, created_at, updated_at)
-       VALUES ('retail_pickup', ?, ?, ?, ?, ?, 'NEW', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
+       VALUES ('retail_pickup', ?, ?, ?, ?, ?, 'AWAITING_PAYMENT', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
     )
     .bind(
       store,
@@ -75,9 +82,11 @@ export async function handleRetailPickup(request, env) {
       `Grocery Pick Up: ${store}`,
       `Pickup name: ${pickupName}`,
       `Pickup/order number: ${pickupNumber}`,
+      "Store merchandise payment confirmed by customer.",
       `Customer-selected tip: $${(tipCents.value / 100).toFixed(2)}`,
       notes ? `Notes: ${notes}` : null,
       "Tip is optional and selected by the customer; no gratuity is automatically added.",
+      "Courier dispatch is blocked until the LCS delivery/service bill is paid.",
       "Customer authorized Lewiston Courier Service to pick up this grocery order on their behalf."
     ]
       .filter(Boolean)
@@ -86,7 +95,7 @@ export async function handleRetailPickup(request, env) {
     await env.DISPATCH_DB
       .prepare(
         `INSERT INTO dispatch_events (order_id, status, note)
-         VALUES (?, 'NEW', ?)`
+         VALUES (?, 'AWAITING_PAYMENT', ?)`
       )
       .bind(dispatchOrderId, note)
       .run();
@@ -97,7 +106,13 @@ export async function handleRetailPickup(request, env) {
     service: "Grocery Pick Up",
     endpoint: GROCERY_PICKUP_ROUTE,
     dispatchOrderId,
-    dispatchStatus: "NEW",
+    dispatchStatus: "AWAITING_PAYMENT",
+    paymentGate: {
+      storeItemsPaid: true,
+      lcsBillPaid: false,
+      courierDispatchAllowed: false,
+      nextStep: "Complete the LCS delivery/service checkout. The order can move to NEW only after confirmed payment."
+    },
     tipping: {
       optional: true,
       defaultTipCents: 0,
