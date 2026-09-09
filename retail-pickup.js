@@ -103,6 +103,7 @@ export async function handleRetailPickup(request, env) {
       defaultTipCents: 0,
       customerSelectedTipCents: tipCents.value,
       charged: false,
+      checkoutBehavior: "Customer may choose no tip, a suggested tip, or a custom tip when payment is connected.",
       note: "Tip amount is recorded for checkout/display only until the Grocery Pick Up payment flow is connected."
     }
   });
