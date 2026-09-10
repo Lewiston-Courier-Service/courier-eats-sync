@@ -3,6 +3,7 @@ import { handleDoorDashAuth } from "./doordash-auth.js";
 import { handleSquareRestaurantConnector } from "./square-restaurant-connector.js";
 import { handleSquareMenuSync } from "./square-menu-sync.js";
 import { handleSquareSandboxWebhook } from "./square-sandbox-webhook.js";
+import { applySquareLocationPricing } from "./square-location-pricing.js";
 import { handleRetailPickup } from "./retail-pickup.js";
 import { handleTmsAdmin } from "./tms-admin.js";
 import { handlePublicTracking } from "./public-tracking.js";
@@ -73,6 +74,7 @@ export default {
       return connectorResponse;
     }
 
-    return baseWorker.fetch(request, env, ctx);
+    const baseResponse = await baseWorker.fetch(request, env, ctx);
+    return await applySquareLocationPricing(request, env, baseResponse);
   }
 };
