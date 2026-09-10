@@ -2,6 +2,7 @@ import baseWorker from "./worker.js";
 import { handleDoorDashAuth } from "./doordash-auth.js";
 import { handleSquareRestaurantConnector } from "./square-restaurant-connector.js";
 import { handleSquareMenuSync } from "./square-menu-sync.js";
+import { handleSquareSandboxWebhook } from "./square-sandbox-webhook.js";
 import { handleRetailPickup } from "./retail-pickup.js";
 import { handleTmsAdmin } from "./tms-admin.js";
 import { handlePublicTracking } from "./public-tracking.js";
@@ -12,6 +13,11 @@ import { handleSquarePaymentHardening } from "./square-payment-hardening.js";
 
 export default {
   async fetch(request, env, ctx) {
+    const sandboxWebhookResponse = await handleSquareSandboxWebhook(request, env, ctx);
+    if (sandboxWebhookResponse) {
+      return sandboxWebhookResponse;
+    }
+
     const paymentResponse = await handleSquarePaymentHardening(request, env, ctx);
     if (paymentResponse) {
       return paymentResponse;
