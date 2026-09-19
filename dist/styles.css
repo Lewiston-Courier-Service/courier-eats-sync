@@ -873,3 +873,66 @@
     height: 40px;
   }
 }
+
+
+/* Corporate category organization */
+.corporate-category-list {
+  display: grid;
+  gap: 30px;
+}
+
+.corporate-category-group {
+  display: grid;
+  gap: 14px;
+}
+
+.corporate-category-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #111;
+}
+
+.corporate-category-heading h3 {
+  margin: 2px 0 0;
+  font-size: 1.45rem;
+}
+
+.corporate-category-kicker {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.corporate-category-count {
+  flex: 0 0 auto;
+  color: #666;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.restaurant-category-badge {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: var(--brand-accent);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .corporate-category-heading {
+    align-items: flex-start;
+  }
+
+  .corporate-category-count {
+    padding-top: 4px;
+  }
+}
