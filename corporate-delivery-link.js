@@ -62,10 +62,31 @@ export async function handleCorporateDeliveryLink(request, env) {
   const url = new URL(request.url);
 
   if (url.pathname === "/api/corporate/restaurants" && request.method === "GET") {
+    const deliveryQuoteEnabled =
+      String(env.CORPORATE_DELIVERY_LINK_ENABLED || "false").toLowerCase() === "true";
+
     return json({
       service: "Courier Eats Corporate Delivery-Link",
-      restaurants: CORPORATE_RESTAURANTS
+      deliveryQuoteEnabled,
+      restaurants: CORPORATE_RESTAURANTS.map(restaurant => ({
+        ...restaurant,
+        deliveryQuoteEnabled
+      }))
     });
+  }
+
+  if (
+    url.pathname.startsWith("/api/corporate/") &&
+    url.pathname !== "/api/corporate/restaurants" &&
+    String(env.CORPORATE_DELIVERY_LINK_ENABLED || "false").toLowerCase() !== "true"
+  ) {
+    return json(
+      {
+        error: "Courier Eats corporate delivery pricing is temporarily unavailable",
+        code: "CORPORATE_DELIVERY_TEMPORARILY_DISABLED"
+      },
+      503
+    );
   }
 
   if (url.pathname === "/api/corporate/delivery-link" && request.method === "POST") {
@@ -266,6 +287,17 @@ export async function handleCorporateDeliveryLink(request, env) {
       url.pathname === "/api/delivery/rate") &&
     request.method === "POST"
   ) {
+    if (
+      String(env.CORPORATE_DELIVERY_LINK_ENABLED || "false").toLowerCase() !== "true"
+    ) {
+      return json(
+        {
+          error: "Courier Eats corporate delivery pricing is temporarily unavailable",
+          code: "CORPORATE_DELIVERY_TEMPORARILY_DISABLED"
+        },
+        503
+      );
+    }
     if (!env.DISPATCH_DB) {
       return json({ error: "Dispatch database is not bound" }, 500);
     }
