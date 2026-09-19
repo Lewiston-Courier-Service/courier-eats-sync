@@ -15,6 +15,24 @@ test("lists configured corporate restaurants", async () => {
   assert.equal(body.restaurants[0].id, "popeyes-lewiston");
   assert.equal(body.restaurants[0].integrationStatus, "CORPORATE_NOT_INTEGRATED");
   assert.equal(body.restaurants[0].pickupAddress, "841 Lisbon St, Lewiston, ME 04240");
+  assert.equal(body.restaurants.length, 4);
+  assert.deepEqual(
+    body.restaurants.map(restaurant => restaurant.id),
+    [
+      "popeyes-lewiston",
+      "mcdonalds-lewiston-lisbon",
+      "burger-king-lewiston-lisbon",
+      "burger-king-auburn-center"
+    ]
+  );
+  assert.equal(
+    body.restaurants[1].pickupAddress,
+    "1035 Lisbon St, Lewiston, ME 04240"
+  );
+  assert.equal(
+    body.restaurants[3].pickupAddress,
+    "333 Center St, Auburn, ME 04210"
+  );
 });
 
 test("protected pricing preserves the minimum four dollar spread and .99 pricing", () => {
