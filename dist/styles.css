@@ -978,3 +978,136 @@
     padding-right: 10px;
   }
 }
+
+
+/* Unified local + Order Direct restaurant meal tabs */
+#restaurantList.unified-restaurant-list {
+  display: block;
+  margin-top: 24px;
+}
+
+.restaurant-meal-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 620px;
+  margin: 0 auto 24px;
+}
+
+.restaurant-meal-tab {
+  min-height: 48px;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  border-radius: 14px;
+  padding: 11px 16px;
+  background: #fff;
+  color: #111;
+  font-weight: 900;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.restaurant-meal-tab.active,
+.restaurant-meal-tab[aria-selected="true"] {
+  background: #ffd400;
+  border-color: #ffd400;
+}
+
+.unified-meal-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 11px;
+  border-bottom: 2px solid #111;
+}
+
+.unified-meal-summary h3 {
+  margin: 2px 0 0;
+  font-size: 1.55rem;
+}
+
+.restaurant-source-group {
+  margin-top: 26px;
+}
+
+.restaurant-source-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.restaurant-source-heading h4 {
+  margin: 2px 0 0;
+  font-size: 1.15rem;
+}
+
+.restaurant-source-heading > span {
+  color: #666;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.restaurant-source-kicker {
+  display: block;
+  color: #666;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.local-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.local-restaurant-badge,
+.local-meal-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.local-restaurant-badge {
+  background: #111;
+  color: #fff;
+}
+
+.local-meal-badge {
+  background: #fff4bd;
+  color: #111;
+}
+
+.local-restaurant-card {
+  height: fit-content;
+}
+
+@media (max-width: 620px) {
+  .restaurant-meal-tabs {
+    gap: 7px;
+  }
+
+  .restaurant-meal-tab {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .unified-meal-summary,
+  .restaurant-source-heading {
+    align-items: flex-start;
+  }
+}
