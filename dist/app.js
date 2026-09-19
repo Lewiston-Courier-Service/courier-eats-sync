@@ -129,7 +129,14 @@ async function loadCorporateRestaurants() {
   renderRestaurants();
 }
 
-const RESTAURANT_MEAL_TABS = ["Breakfast", "Lunch", "Dinner"];
+const RESTAURANT_CATEGORY_TABS = [
+  "Breakfast",
+  "Lunch",
+  "Dinner",
+  "Bakery",
+  "Pizza",
+  "World Food"
+];
 
 const LOCAL_BREAKFAST_NAME_HINTS = [
   "breakfast",
@@ -147,13 +154,58 @@ const LOCAL_BREAKFAST_NAME_HINTS = [
   "roys allsteak"
 ];
 
-function inferLocalMealPeriods(restaurant) {
+const LOCAL_BAKERY_NAME_HINTS = [
+  "bakery",
+  "cup cakery",
+  "cupcakery",
+  "cupcake",
+  "donut",
+  "forage"
+];
+
+const LOCAL_PIZZA_NAME_HINTS = [
+  "pizza",
+  "house of pizza",
+  "cibo",
+  "georgio"
+];
+
+const LOCAL_WORLD_FOOD_NAME_HINTS = [
+  "mother india",
+  "indian",
+  "el pocho",
+  "mexican",
+  "thai",
+  "jamaican",
+  "bua",
+  "orchid",
+  "sushi",
+  "asian",
+  "vietnam",
+  "korean"
+];
+
+function inferLocalCategories(restaurant) {
   const name = String(restaurant?.name || "").trim().toLowerCase();
-  const breakfast = LOCAL_BREAKFAST_NAME_HINTS.some(hint => name.includes(hint));
+  const categories = new Set(["Lunch", "Dinner"]);
 
-  if (breakfast) return ["Breakfast", "Lunch"];
+  if (LOCAL_BREAKFAST_NAME_HINTS.some(hint => name.includes(hint))) {
+    categories.add("Breakfast");
+  }
 
-  return ["Lunch", "Dinner"];
+  if (LOCAL_BAKERY_NAME_HINTS.some(hint => name.includes(hint))) {
+    categories.add("Bakery");
+  }
+
+  if (LOCAL_PIZZA_NAME_HINTS.some(hint => name.includes(hint))) {
+    categories.add("Pizza");
+  }
+
+  if (LOCAL_WORLD_FOOD_NAME_HINTS.some(hint => name.includes(hint))) {
+    categories.add("World Food");
+  }
+
+  return RESTAURANT_CATEGORY_TABS.filter(category => categories.has(category));
 }
 
 function restaurantMatchesSearch(restaurant, search) {
@@ -185,7 +237,7 @@ function renderRestaurants() {
 
   const localMatches = restaurants.filter(restaurant => {
     return (
-      inferLocalMealPeriods(restaurant).includes(selectedCategory) &&
+      inferLocalCategories(restaurant).includes(selectedCategory) &&
       restaurantMatchesSearch(restaurant, search)
     );
   });
@@ -194,8 +246,11 @@ function renderRestaurants() {
     const mealPeriods = Array.isArray(restaurant.mealPeriods)
       ? restaurant.mealPeriods
       : [];
+    const primaryCategory = String(restaurant.primaryCategory || "").trim();
+
     return (
-      mealPeriods.includes(selectedCategory) &&
+      (mealPeriods.includes(selectedCategory) ||
+        primaryCategory === selectedCategory) &&
       restaurantMatchesSearch(restaurant, search)
     );
   });
@@ -205,9 +260,12 @@ function renderRestaurants() {
   const tabs = document.createElement("div");
   tabs.className = "restaurant-meal-tabs";
   tabs.setAttribute("role", "tablist");
-  tabs.setAttribute("aria-label", "Breakfast, lunch, or dinner");
+  tabs.setAttribute(
+    "aria-label",
+    "Restaurant categories: Breakfast, Lunch, Dinner, Bakery, Pizza, World Food"
+  );
 
-  RESTAURANT_MEAL_TABS.forEach(meal => {
+  RESTAURANT_CATEGORY_TABS.forEach(meal => {
     const button = document.createElement("button");
     button.type = "button";
     button.className =
@@ -324,7 +382,7 @@ function createLocalRestaurantCard(restaurant) {
     .filter(Boolean)
     .join(", ");
 
-  const periods = inferLocalMealPeriods(restaurant);
+  const periods = inferLocalCategories(restaurant);
 
   card.innerHTML = `
     <div class="restaurant-top">
