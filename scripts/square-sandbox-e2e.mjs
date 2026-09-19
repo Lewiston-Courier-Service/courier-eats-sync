@@ -22,6 +22,7 @@ const wranglerCli = path.resolve(
 );
 const stateDir = path.resolve(cwd, ".wrangler/state/square-sandbox-e2e");
 const baseUrl = "http://127.0.0.1:8788";
+const sandboxCompatibilityDate = "2026-07-28";
 const vars = {
   ...readSimpleEnvFile(path.join(cwd, ".dev.vars")),
   ...process.env
@@ -60,6 +61,7 @@ try {
       wranglerCli,
       "dev",
       "--local",
+      "--compatibility-date", sandboxCompatibilityDate,
       "--port", "8788",
       "--persist-to", stateDir
     ],
