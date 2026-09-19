@@ -16,7 +16,7 @@ const cwd = process.cwd();
 const wranglerCli = path.resolve(
   cwd,
   "node_modules",
-  "wrangler",
+  "wrangler-sandbox",
   "bin",
   "wrangler.js"
 );
@@ -31,7 +31,7 @@ requireSandboxConfiguration(vars);
 
 if (!existsSync(wranglerCli)) {
   throw new Error(
-    "Wrangler is not installed locally. Run npm install, then try again."
+    "The sandbox Wrangler runtime is not installed. Run npm install, then try again."
   );
 }
 
