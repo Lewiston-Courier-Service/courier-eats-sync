@@ -24,6 +24,89 @@ return (
 (amount / 100).toFixed(2)
 );
 }
+const LOCAL_ONLINE_ORDERING = [
+  {
+    match: ["tina thai"],
+    url: "https://www.ordertinathaiexpress.com/order",
+    label: "Order Online"
+  },
+  {
+    match: ["pure thai"],
+    url: "https://purethaikitchenme.smiledining.com/",
+    label: "Order Online"
+  },
+  {
+    match: ["forage"],
+    url: "https://order.toasttab.com/online/foragelewiston",
+    label: "Order Online"
+  },
+  {
+    match: ["cibo pizza", "cibo"],
+    url: "https://order.toasttab.com/online/cibo-pizza",
+    label: "Order Online"
+  },
+  {
+    match: ["gridiron"],
+    url: "https://gridiron.biz-os.app/weborder/wo_order_time.php?loc=GridironRestaurantampSportsPub04240",
+    label: "Order Online"
+  },
+  {
+    match: ["marco's", "marcos"],
+    url: "https://order.online/store/marcos-italian-restaurante-559284",
+    label: "Order Online"
+  },
+  {
+    match: ["happy days"],
+    url: "https://order.online/store/happy-days-diner-558584",
+    label: "Order Online"
+  },
+  {
+    match: ["orchid"],
+    url: "https://order.online/store/2396901",
+    label: "Order Online"
+  },
+  {
+    match: ["bua thai", "bua"],
+    url: "https://order.online/store/bua-thai-%26-sushi-lewiston-559183",
+    label: "Order Online"
+  },
+  {
+    match: ["governor's", "governors"],
+    url: "https://order.online/store/GovernorsRestaurantBakery-559063/",
+    label: "Order Online"
+  },
+  {
+    match: ["lewiston house of pizza", "lhop"],
+    url: "https://slicelife.com/restaurants/me/lewiston/04240/lewiston-house-of-pizza/menu",
+    label: "Order Online"
+  },
+  {
+    match: ["pizza market"],
+    url: "https://www.beyondmenu.com/29791/auburn/pizza-market-auburn-04210.aspx",
+    label: "Order Online"
+  },
+  {
+    match: ["burnt ends"],
+    url: "https://order.toasttab.com/online/burnt-ends-barbecue",
+    label: "Order Online"
+  },
+  {
+    match: ["davinci", "da vinci"],
+    url: "https://order.toasttab.com/online/davincis-eatery-150-mill-st",
+    label: "Order Online"
+  }
+];
+
+function localOnlineOrderFor(restaurant) {
+  const name = String(restaurant?.name || "").trim().toLowerCase();
+
+  return (
+    LOCAL_ONLINE_ORDERING.find(entry =>
+      entry.match.some(term => name.includes(term))
+    ) || null
+  );
+}
+
 const CORPORATE_BRAND_PRESENTATION = {
   "Popeyes": {
     key: "popeyes",
@@ -383,18 +466,32 @@ function createLocalRestaurantCard(restaurant) {
     .join(", ");
 
   const periods = inferLocalCategories(restaurant);
+  const onlineOrder = localOnlineOrderFor(restaurant);
 
   card.innerHTML = `
     <div class="restaurant-top">
       <div class="local-card-badges">
         <span class="local-restaurant-badge">Local Restaurant</span>
         <span class="local-meal-badge">${escapeHTML(periods.join(" • "))}</span>
+        ${onlineOrder
+          ? '<span class="local-online-badge">Online Ordering</span>'
+          : ""}
       </div>
       <h3 class="restaurant-name">${escapeHTML(restaurant.name || "")}</h3>
       <div class="restaurant-location">${escapeHTML(locationText)}</div>
-      <button class="view-menu" type="button">
-        View ${escapeHTML(selectedCategory)} Menu
-      </button>
+      <div class="local-order-actions">
+        <button class="view-menu" type="button">
+          View ${escapeHTML(selectedCategory)} Menu
+        </button>
+        ${onlineOrder
+          ? `<a
+               class="local-online-order"
+               href="${escapeHTML(onlineOrder.url)}"
+               target="_blank"
+               rel="noopener noreferrer"
+             >${escapeHTML(onlineOrder.label || "Order Online")}</a>`
+          : ""}
+      </div>
     </div>
     <div class="restaurant-menu"></div>
   `;
