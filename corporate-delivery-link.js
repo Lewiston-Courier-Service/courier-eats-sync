@@ -1,6 +1,7 @@
 export const CORPORATE_RESTAURANTS = [
   {
     id: "popeyes-lewiston",
+    mealPeriods: ["Lunch","Dinner"],
     primaryCategory: "Chicken & Wings",
     brand: "Popeyes",
     name: "Popeyes Lewiston",
@@ -14,6 +15,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "mcdonalds-lewiston-lisbon",
+    mealPeriods: ["Breakfast","Lunch","Dinner"],
     primaryCategory: "Burgers",
     brand: "McDonald's",
     name: "McDonald's Lewiston - Lisbon St",
@@ -27,6 +29,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "burger-king-lewiston-lisbon",
+    mealPeriods: ["Breakfast","Lunch","Dinner"],
     primaryCategory: "Burgers",
     brand: "Burger King",
     name: "Burger King Lewiston - Lisbon St",
@@ -40,6 +43,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "burger-king-auburn-center",
+    mealPeriods: ["Breakfast","Lunch","Dinner"],
     primaryCategory: "Burgers",
     brand: "Burger King",
     name: "Burger King Auburn - Center St",
@@ -53,6 +57,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "ihop-auburn-turner",
+    mealPeriods: ["Breakfast","Lunch","Dinner"],
     primaryCategory: "Breakfast",
     brand: "IHOP",
     name: "IHOP Auburn - Turner St",
@@ -66,6 +71,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "buffalo-wild-wings-auburn-turner",
+    mealPeriods: ["Lunch","Dinner"],
     primaryCategory: "Chicken & Wings",
     brand: "Buffalo Wild Wings",
     name: "Buffalo Wild Wings Auburn - Turner St",
@@ -79,6 +85,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "olive-garden-auburn-subaru",
+    mealPeriods: ["Lunch","Dinner"],
     primaryCategory: "Italian",
     brand: "Olive Garden",
     name: "Olive Garden Auburn - Subaru Dr",
@@ -92,6 +99,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "99-restaurant-auburn-center",
+    mealPeriods: ["Lunch","Dinner"],
     primaryCategory: "American Grill & Steak",
     brand: "99 Restaurants",
     name: "99 Restaurant Auburn - Center St",
@@ -105,6 +113,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "applebees-auburn-center",
+    mealPeriods: ["Lunch","Dinner"],
     primaryCategory: "American Grill & Steak",
     brand: "Applebee's",
     name: "Applebee's Auburn - Center St",
@@ -118,6 +127,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "longhorn-auburn-subaru",
+    mealPeriods: ["Lunch","Dinner"],
     primaryCategory: "American Grill & Steak",
     brand: "LongHorn Steakhouse",
     name: "LongHorn Steakhouse Auburn - Subaru Dr",
@@ -131,6 +141,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "dennys-auburn-court",
+    mealPeriods: ["Breakfast","Lunch","Dinner"],
     primaryCategory: "Breakfast",
     brand: "Denny's",
     name: "Denny's Auburn - Court St",
@@ -144,6 +155,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "kfc-lewiston-lisbon",
+    mealPeriods: ["Lunch","Dinner"],
     primaryCategory: "Chicken & Wings",
     brand: "KFC",
     name: "KFC Lewiston - Lisbon St",
