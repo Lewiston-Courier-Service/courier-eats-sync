@@ -77,9 +77,10 @@ async function handleSquareWebhook(request, env, url) {
 
   const dispatchOrder = await env.DISPATCH_DB
     .prepare(
-      `SELECT id, status
+      `SELECT id, status, source
        FROM dispatch_orders
-       WHERE square_order_id = ? AND source = 'courier_eats'
+       WHERE square_order_id = ?
+         AND source IN ('courier_eats', 'corporate_delivery_link')
        ORDER BY id DESC
        LIMIT 1`
     )
@@ -88,10 +89,15 @@ async function handleSquareWebhook(request, env, url) {
 
   if (!dispatchOrder) {
     await rememberSquareWebhookEvent(env, eventId, eventType, orderId, "IGNORED");
-    return json({ received: true, ignored: true, reason: "not a Courier Eats order" });
+    return json({ received: true, ignored: true, reason: "not a supported Courier Eats payment" });
   }
 
-  if (dispatchOrder.status !== "AWAITING_PAYMENT") {
+  const expectedAwaitingStatus =
+    dispatchOrder.source === "corporate_delivery_link"
+      ? "AWAITING_DELIVERY_PAYMENT"
+      : "AWAITING_PAYMENT";
+
+  if (dispatchOrder.status !== expectedAwaitingStatus) {
     await rememberSquareWebhookEvent(env, eventId, eventType, orderId, "ALREADY_READY");
     return json({
       received: true,
@@ -104,7 +110,11 @@ async function handleSquareWebhook(request, env, url) {
   const released = await releaseSquareOrderToDispatch(env, dispatchOrder.id, orderId, {
     fallbackLocationId: payment.location_id || "",
     fallbackTotal: payment.amount_money?.amount ?? 0,
-    note: "Square payment completed; order released to dispatch"
+    note:
+      dispatchOrder.source === "corporate_delivery_link"
+        ? "Square delivery payment completed; Delivery-Link order released to dispatch"
+        : "Square payment completed; order released to dispatch",
+    source: dispatchOrder.source
   });
 
   if (!released.ok) {
@@ -163,9 +173,10 @@ async function handleSquareReconcile(request, env) {
 
   const dispatchOrder = await env.DISPATCH_DB
     .prepare(
-      `SELECT id, square_order_id, status
+      `SELECT id, square_order_id, status, source
        FROM dispatch_orders
-       WHERE id = ? AND source = 'courier_eats'
+       WHERE id = ?
+         AND source IN ('courier_eats', 'corporate_delivery_link')
        LIMIT 1`
     )
     .bind(id)
@@ -175,7 +186,12 @@ async function handleSquareReconcile(request, env) {
     return json({ error: "Dispatch order not found" }, 404);
   }
 
-  if (dispatchOrder.status !== "AWAITING_PAYMENT") {
+  const expectedAwaitingStatus =
+    dispatchOrder.source === "corporate_delivery_link"
+      ? "AWAITING_DELIVERY_PAYMENT"
+      : "AWAITING_PAYMENT";
+
+  if (dispatchOrder.status !== expectedAwaitingStatus) {
     return json({
       success: true,
       reconciled: false,
@@ -252,7 +268,11 @@ async function handleSquareReconcile(request, env) {
     {
       fallbackLocationId: order.location_id || "",
       fallbackTotal: total,
-      note: "Square payment reconciliation verified completed payment and zero balance due"
+      note:
+        dispatchOrder.source === "corporate_delivery_link"
+          ? "Square reconciliation verified delivery payment and zero balance due"
+          : "Square payment reconciliation verified completed payment and zero balance due",
+      source: dispatchOrder.source
     },
     order
   );
@@ -347,6 +367,53 @@ async function releaseSquareOrderToDispatch(
   const orderTotal = Number(
     order.total_money?.amount ?? options.fallbackTotal ?? 0
   );
+
+  if (options.source === "corporate_delivery_link") {
+    const updateResult = await env.DISPATCH_DB
+      .prepare(
+        `UPDATE dispatch_orders
+         SET order_total = ?,
+             status = 'NEW',
+             dispatch_provider = ?,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = ? AND source = 'corporate_delivery_link'
+           AND status = 'AWAITING_DELIVERY_PAYMENT'`
+      )
+      .bind(
+        orderTotal,
+        env.DISPATCH_MODE || "internal",
+        dispatchOrderId
+      )
+      .run();
+
+    const changes = Number(updateResult?.meta?.changes ?? 0);
+
+    if (changes !== 1) {
+      const currentOrder = await env.DISPATCH_DB
+        .prepare("SELECT status FROM dispatch_orders WHERE id = ?")
+        .bind(dispatchOrderId)
+        .first();
+
+      return {
+        ok: true,
+        released: false,
+        status: currentOrder?.status || null
+      };
+    }
+
+    await env.DISPATCH_DB
+      .prepare(
+        `INSERT INTO dispatch_events (order_id, status, note)
+         VALUES (?, 'NEW', ?)`
+      )
+      .bind(
+        dispatchOrderId,
+        options.note || "Square delivery payment released Delivery-Link order to dispatch"
+      )
+      .run();
+
+    return { ok: true, released: true, status: "NEW" };
+  }
 
   const updateResult = await env.DISPATCH_DB
     .prepare(
