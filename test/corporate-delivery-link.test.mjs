@@ -50,6 +50,12 @@ test("lists configured corporate restaurants", async () => {
   assert.equal(body.restaurants[4].primaryCategory, "Breakfast");
   assert.equal(body.restaurants[0].primaryCategory, "Chicken & Wings");
   assert.equal(body.restaurants[1].primaryCategory, "Burgers");
+  assert.deepEqual(body.restaurants[1].mealPeriods, ["Breakfast", "Lunch", "Dinner"]);
+  assert.deepEqual(body.restaurants[2].mealPeriods, ["Breakfast", "Lunch", "Dinner"]);
+  assert.deepEqual(body.restaurants[3].mealPeriods, ["Breakfast", "Lunch", "Dinner"]);
+  assert.deepEqual(body.restaurants[4].mealPeriods, ["Breakfast", "Lunch", "Dinner"]);
+  assert.deepEqual(body.restaurants[10].mealPeriods, ["Breakfast", "Lunch", "Dinner"]);
+  assert.deepEqual(body.restaurants[0].mealPeriods, ["Lunch", "Dinner"]);
   assert.equal(body.restaurants[6].primaryCategory, "Italian");
   assert.equal(body.restaurants[9].primaryCategory, "American Grill & Steak");
   assert.equal(
