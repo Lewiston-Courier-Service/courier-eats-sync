@@ -47,6 +47,11 @@ test("lists configured corporate restaurants", async () => {
     body.restaurants[4].pickupAddress,
     "649 Turner St, Auburn, ME 04210"
   );
+  assert.equal(body.restaurants[4].primaryCategory, "Breakfast");
+  assert.equal(body.restaurants[0].primaryCategory, "Chicken & Wings");
+  assert.equal(body.restaurants[1].primaryCategory, "Burgers");
+  assert.equal(body.restaurants[6].primaryCategory, "Italian");
+  assert.equal(body.restaurants[9].primaryCategory, "American Grill & Steak");
   assert.equal(
     body.restaurants[11].pickupAddress,
     "1201 Lisbon St, Lewiston, ME 04240"
