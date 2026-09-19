@@ -2,9 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 
 const cwd = process.cwd();
+const fileVars = readSimpleEnvFile(path.join(cwd, ".dev.vars"));
 const vars = {
-  ...readSimpleEnvFile(path.join(cwd, ".dev.vars")),
-  ...process.env
+  ...process.env,
+  ...fileVars
 };
 
 const required = [
