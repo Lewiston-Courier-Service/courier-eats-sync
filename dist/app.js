@@ -299,6 +299,7 @@ const LOCAL_WORLD_FOOD_NAME_HINTS = [
 ];
 
 const LOCAL_CATEGORY_OVERRIDES = [
+  { match: ["marvelous macarons", "marvelous macaroons"], categories: ["Bakery"] },
   { match: ["simones' hot dog stand", "simones hot dog", "simone's hot dog", "simones hot dog stand"], categories: ["Breakfast", "Lunch"] },
   { match: ["happy days diner", "happy days"], categories: ["Breakfast", "Lunch"] },
   { match: ["jeff's jamaican cuisine", "jeffs jamaican cuisine", "jeff's jamaican"], categories: ["Lunch", "Dinner", "World Food"] },
