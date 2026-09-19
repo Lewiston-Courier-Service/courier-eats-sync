@@ -63,27 +63,49 @@
 
     .hero {
       min-height: 430px;
-
-      background:
-        linear-gradient(
-          rgba(34, 40, 58, 0.82),
-          rgba(34, 40, 58, 0.82)
-        );
-
+      position: relative;
+      overflow: hidden;
+      background: #242424;
       color: white;
-
       padding: 65px 20px;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       text-align: center;
+      isolation: isolate;
+    }
+
+    .hero-background-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(18, 18, 18, 0.42);
+      z-index: -1;
+      pointer-events: none;
     }
 
     .hero-inner {
       width: 100%;
       max-width: 1000px;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-background-video {
+        display: none;
+      }
     }
 
     .hero h1 {
