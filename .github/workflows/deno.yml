@@ -46,3 +46,6 @@ jobs:
 
       - name: Validate Cloudflare Worker
         run: npx wrangler deploy --dry-run
+
+      - name: Validate isolated Square webhook test Worker
+        run: npx wrangler deploy --dry-run --config wrangler.square-webhook-test.jsonc
