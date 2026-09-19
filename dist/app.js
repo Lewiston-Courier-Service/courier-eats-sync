@@ -26,6 +26,11 @@ return (
 }
 const LOCAL_ONLINE_ORDERING = [
   {
+    match: ["orchid of lewiston", "orchid lewiston", "orchid"],
+    url: "https://order.toasttab.com/online/orchid-restaurant-and-bar-29-lisbon-st",
+    label: "Order Online"
+  },
+  {
     match: ["mac's downeast seafood", "macs downeast seafood", "mac's seafood", "macs seafood"],
     url: "https://order.online/store/mac-s-downeast-seafood-minot-ave-23038006",
     label: "Order Online"
@@ -304,6 +309,8 @@ const LOCAL_WORLD_FOOD_NAME_HINTS = [
 ];
 
 const LOCAL_CATEGORY_OVERRIDES = [
+  { match: ["pinky d's poutine", "pinky ds poutine", "pinky d's poutine factory"], categories: ["Lunch", "Dinner"] },
+  { match: ["orchid of lewiston", "orchid lewiston", "orchid"], categories: ["Lunch", "Dinner", "World Food"] },
   { match: ["always fresh la rochelle", "always fresh larochelle", "larochelle seafood", "la rochelle's"], categories: ["Lunch", "Dinner"] },
   { match: ["fire house grill", "firehouse grill", "fire house grille", "firehouse grille"], categories: ["Lunch", "Dinner"] },
   { match: ["mac's grill", "macs grill"], categories: ["Lunch", "Dinner"] },
