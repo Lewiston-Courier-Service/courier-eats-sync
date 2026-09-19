@@ -20,14 +20,17 @@ export default {
       return json({ error: "Method not allowed" }, 405);
     }
 
-    if (!env.SQUARE_WEBHOOK_TEST_SIGNATURE_KEY) {
-      return json(
-        { error: "Square webhook test signature key is not configured" },
-        503
-      );
-    }
-
     const rawBody = await request.text();
+
+    if (!env.SQUARE_WEBHOOK_TEST_SIGNATURE_KEY) {
+      return json({
+        received: true,
+        setupMode: true,
+        signatureValid: false,
+        message:
+          "Webhook endpoint is reachable. Configure the Square subscription signature key, then send another test event."
+      });
+    }
     const signature =
       request.headers.get("x-square-hmacsha256-signature") || "";
     const notificationUrl =
