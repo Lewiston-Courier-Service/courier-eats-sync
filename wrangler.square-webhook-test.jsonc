@@ -1,0 +1,10 @@
+{
+  "name": "courier-eats-square-webhook-test",
+  "main": "square-webhook-test-worker.js",
+  "compatibility_date": "2026-08-29",
+  "workers_dev": true,
+  "preview_urls": true,
+  "vars": {
+    "TEST_ONLY": "true"
+  }
+}
