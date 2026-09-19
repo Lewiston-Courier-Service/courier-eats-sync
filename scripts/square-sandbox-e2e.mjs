@@ -10,6 +10,7 @@ import {
   spawnSync
 } from "node:child_process";
 import readline from "node:readline/promises";
+import http from "node:http";
 import { stdin as input, stdout as output } from "node:process";
 
 const cwd = process.cwd();
@@ -22,6 +23,8 @@ const wranglerCli = path.resolve(
 );
 const stateDir = path.resolve(cwd, ".wrangler/state/square-sandbox-e2e");
 const baseUrl = "http://127.0.0.1:8788";
+const squareProxyUrl = "http://127.0.0.1:8790";
+const squareSandboxUrl = "https://connect.squareupsandbox.com";
 const sandboxCompatibilityDate = "2026-07-28";
 const vars = {
   ...readSimpleEnvFile(path.join(cwd, ".dev.vars")),
@@ -37,8 +40,10 @@ if (!existsSync(wranglerCli)) {
 }
 
 let worker = null;
+let squareProxy = null;
 
 try {
+  squareProxy = await startSquareSandboxProxy();
   rmSync(stateDir, { recursive: true, force: true });
 
   runWrangler([
@@ -62,6 +67,7 @@ try {
       "dev",
       "--local",
       "--compatibility-date", sandboxCompatibilityDate,
+      "--var", `SQUARE_API_BASE_URL:${squareProxyUrl}`,
       "--port", "8788",
       "--persist-to", stateDir
     ],
@@ -155,6 +161,7 @@ try {
   );
 } finally {
   stopWorker(worker);
+  await stopSquareSandboxProxy(squareProxy);
 }
 
 function readSimpleEnvFile(filePath) {
@@ -221,6 +228,74 @@ function runWrangler(args) {
   execFileSync(process.execPath, [wranglerCli, ...args], {
     cwd,
     stdio: "inherit"
+  });
+}
+
+async function startSquareSandboxProxy() {
+  const server = http.createServer(async (req, res) => {
+    try {
+      const targetUrl = new URL(req.url || "/", squareSandboxUrl);
+      const chunks = [];
+
+      for await (const chunk of req) {
+        chunks.push(chunk);
+      }
+
+      const body = chunks.length ? Buffer.concat(chunks) : undefined;
+      const headers = { ...req.headers };
+      delete headers.host;
+      delete headers.connection;
+      delete headers["content-length"];
+
+      const upstream = await fetch(targetUrl, {
+        method: req.method,
+        headers,
+        body:
+          req.method === "GET" || req.method === "HEAD"
+            ? undefined
+            : body
+      });
+
+      res.statusCode = upstream.status;
+
+      for (const [name, value] of upstream.headers) {
+        if (name.toLowerCase() === "content-encoding") continue;
+        if (name.toLowerCase() === "content-length") continue;
+        res.setHeader(name, value);
+      }
+
+      const responseBody = Buffer.from(await upstream.arrayBuffer());
+      res.end(responseBody);
+    } catch (error) {
+      res.statusCode = 502;
+      res.setHeader("content-type", "application/json");
+      res.end(
+        JSON.stringify({
+          error: "Square Sandbox proxy failed",
+          message: String(error?.message || error)
+        })
+      );
+    }
+  });
+
+  await new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(8790, "127.0.0.1", resolve);
+  });
+
+  console.log(
+    "Square Sandbox host proxy ready on http://127.0.0.1:8790 " +
+    "(for local Wrangler HTTPS-subrequest workaround)."
+  );
+
+  return server;
+}
+
+async function stopSquareSandboxProxy(server) {
+  if (!server) return;
+
+  await new Promise((resolve) => {
+    server.close(() => resolve());
   });
 }
 
