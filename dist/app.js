@@ -21,6 +21,85 @@ return (
 (amount / 100).toFixed(2)
 );
 }
+const CORPORATE_BRAND_PRESENTATION = {
+  "Popeyes": {
+    key: "popeyes",
+    domain: "popeyes.com",
+    initials: "P"
+  },
+  "McDonald's": {
+    key: "mcdonalds",
+    domain: "mcdonalds.com",
+    initials: "M"
+  },
+  "Burger King": {
+    key: "burger-king",
+    domain: "bk.com",
+    initials: "BK"
+  },
+  "IHOP": {
+    key: "ihop",
+    domain: "ihop.com",
+    initials: "IH"
+  },
+  "Buffalo Wild Wings": {
+    key: "buffalo-wild-wings",
+    domain: "buffalowildwings.com",
+    initials: "BWW"
+  },
+  "Olive Garden": {
+    key: "olive-garden",
+    domain: "olivegarden.com",
+    initials: "OG"
+  },
+  "99 Restaurants": {
+    key: "99-restaurants",
+    domain: "99restaurants.com",
+    initials: "99"
+  },
+  "Applebee's": {
+    key: "applebees",
+    domain: "applebees.com",
+    initials: "A"
+  },
+  "LongHorn Steakhouse": {
+    key: "longhorn",
+    domain: "longhornsteakhouse.com",
+    initials: "LH"
+  },
+  "Denny's": {
+    key: "dennys",
+    domain: "dennys.com",
+    initials: "D"
+  },
+  "KFC": {
+    key: "kfc",
+    domain: "kfc.com",
+    initials: "KFC"
+  }
+};
+
+function corporateBrandPresentation(restaurant) {
+  const brand = String(restaurant.brand || "").trim();
+  const presentation =
+    CORPORATE_BRAND_PRESENTATION[brand] || {
+      key: "default",
+      domain: "",
+      initials: brand.slice(0, 2).toUpperCase() || "CE"
+    };
+
+  const logoUrl = presentation.domain
+    ? "https://www.google.com/s2/favicons?domain=" +
+      encodeURIComponent(presentation.domain) +
+      "&sz=128"
+    : "";
+
+  return {
+    ...presentation,
+    logoUrl
+  };
+}
+
 async function loadCorporateRestaurants() {
   const list = document.getElementById("corporateRestaurantList");
   if (!list) return;
@@ -64,16 +143,36 @@ function renderCorporateRestaurants(corporateRestaurants) {
 
   corporateRestaurants.forEach(restaurant => {
     const card = document.createElement("article");
-    card.className = "corporate-restaurant-card";
+    const brandPresentation = corporateBrandPresentation(restaurant);
+    card.className =
+      "corporate-restaurant-card corporate-brand-" + brandPresentation.key;
 
     card.innerHTML = `
+      <div class="corporate-brand-strip" aria-hidden="true"></div>
       <div class="corporate-card-header">
-        <div>
-          <div class="corporate-brand">${escapeHTML(restaurant.brand || "Corporate Restaurant")}</div>
-          <h3>${escapeHTML(restaurant.name || "")}</h3>
-          <p>${escapeHTML(restaurant.pickupAddress || "")}</p>
+        <div class="corporate-identity">
+          <div class="corporate-logo-wrap">
+            <img
+              class="corporate-brand-logo"
+              src="${escapeHTML(brandPresentation.logoUrl)}"
+              alt="${escapeHTML((restaurant.brand || restaurant.name || "Restaurant") + " logo")}"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+            >
+            <span class="corporate-brand-fallback" hidden>
+              ${escapeHTML(brandPresentation.initials)}
+            </span>
+          </div>
+          <div>
+            <div class="corporate-brand">${escapeHTML(restaurant.brand || "Corporate Restaurant")}</div>
+            <h3>${escapeHTML(restaurant.name || "")}</h3>
+            <p>${escapeHTML(restaurant.pickupAddress || "")}</p>
+          </div>
         </div>
-        <span class="delivery-link-badge">Delivery-Link</span>
+        <div class="corporate-card-badges">
+          <span class="delivery-link-badge">Delivery-Link</span>
+          <span class="independent-delivery-badge">Independent delivery</span>
+        </div>
       </div>
 
       <div class="corporate-steps">
@@ -126,6 +225,15 @@ function renderCorporateRestaurants(corporateRestaurants) {
         Courier Eats / Lewiston Courier Service is an independent delivery service and is not affiliated with ${escapeHTML(restaurant.brand || restaurant.name || "this restaurant")}.
       </p>
     `;
+
+    const logo = card.querySelector(".corporate-brand-logo");
+    const logoFallback = card.querySelector(".corporate-brand-fallback");
+    if (logo && logoFallback) {
+      logo.addEventListener("error", () => {
+        logo.hidden = true;
+        logoFallback.hidden = false;
+      });
+    }
 
     const toggle = card.querySelector(".corporate-delivery-toggle");
     const form = card.querySelector(".corporate-delivery-form");
