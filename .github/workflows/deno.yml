@@ -36,6 +36,12 @@ jobs:
       - name: Validate Uber Direct live quote harness syntax
         run: node --check scripts/uber-direct-live-quote.mjs
 
+      - name: Validate corporate front-end JavaScript syntax
+        run: node --check dist/app.js
+
+      - name: Validate Square corporate provisioning script syntax
+        run: node --check scripts/square-provision-corporate-delivery-items.mjs
+
       - name: Validate Delivery-Link D1 migration locally
         shell: bash
         run: |
