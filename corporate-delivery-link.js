@@ -1,6 +1,7 @@
 export const CORPORATE_RESTAURANTS = [
   {
     id: "popeyes-lewiston",
+    primaryCategory: "Chicken & Wings",
     brand: "Popeyes",
     name: "Popeyes Lewiston",
     orderingMode: "DELIVERY_LINK",
@@ -13,6 +14,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "mcdonalds-lewiston-lisbon",
+    primaryCategory: "Burgers",
     brand: "McDonald's",
     name: "McDonald's Lewiston - Lisbon St",
     orderingMode: "DELIVERY_LINK",
@@ -25,6 +27,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "burger-king-lewiston-lisbon",
+    primaryCategory: "Burgers",
     brand: "Burger King",
     name: "Burger King Lewiston - Lisbon St",
     orderingMode: "DELIVERY_LINK",
@@ -37,6 +40,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "burger-king-auburn-center",
+    primaryCategory: "Burgers",
     brand: "Burger King",
     name: "Burger King Auburn - Center St",
     orderingMode: "DELIVERY_LINK",
@@ -49,6 +53,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "ihop-auburn-turner",
+    primaryCategory: "Breakfast",
     brand: "IHOP",
     name: "IHOP Auburn - Turner St",
     orderingMode: "DELIVERY_LINK",
@@ -61,6 +66,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "buffalo-wild-wings-auburn-turner",
+    primaryCategory: "Chicken & Wings",
     brand: "Buffalo Wild Wings",
     name: "Buffalo Wild Wings Auburn - Turner St",
     orderingMode: "DELIVERY_LINK",
@@ -73,6 +79,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "olive-garden-auburn-subaru",
+    primaryCategory: "Italian",
     brand: "Olive Garden",
     name: "Olive Garden Auburn - Subaru Dr",
     orderingMode: "DELIVERY_LINK",
@@ -85,6 +92,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "99-restaurant-auburn-center",
+    primaryCategory: "American Grill & Steak",
     brand: "99 Restaurants",
     name: "99 Restaurant Auburn - Center St",
     orderingMode: "DELIVERY_LINK",
@@ -97,6 +105,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "applebees-auburn-center",
+    primaryCategory: "American Grill & Steak",
     brand: "Applebee's",
     name: "Applebee's Auburn - Center St",
     orderingMode: "DELIVERY_LINK",
@@ -109,6 +118,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "longhorn-auburn-subaru",
+    primaryCategory: "American Grill & Steak",
     brand: "LongHorn Steakhouse",
     name: "LongHorn Steakhouse Auburn - Subaru Dr",
     orderingMode: "DELIVERY_LINK",
@@ -121,6 +131,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "dennys-auburn-court",
+    primaryCategory: "Breakfast",
     brand: "Denny's",
     name: "Denny's Auburn - Court St",
     orderingMode: "DELIVERY_LINK",
@@ -133,6 +144,7 @@ export const CORPORATE_RESTAURANTS = [
   },
   {
     id: "kfc-lewiston-lisbon",
+    primaryCategory: "Chicken & Wings",
     brand: "KFC",
     name: "KFC Lewiston - Lisbon St",
     orderingMode: "DELIVERY_LINK",
