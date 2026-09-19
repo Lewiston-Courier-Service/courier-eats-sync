@@ -46,6 +46,102 @@ export const CORPORATE_RESTAURANTS = [
     orderUrl: "https://www.bk.com/",
     pickupAddress: "333 Center St, Auburn, ME 04210",
     deliveryEnabled: true
+  },
+  {
+    id: "ihop-auburn-turner",
+    brand: "IHOP",
+    name: "IHOP Auburn - Turner St",
+    orderingMode: "DELIVERY_LINK",
+    integrationStatus: "CORPORATE_NOT_INTEGRATED",
+    coreMarket: "Twin City",
+    corePostalCodes: ["04240", "04210"],
+    orderUrl: "https://restaurants.ihop.com/en-us/me/auburn/breakfast-649-turner-st-3534",
+    pickupAddress: "649 Turner St, Auburn, ME 04210",
+    deliveryEnabled: true
+  },
+  {
+    id: "buffalo-wild-wings-auburn-turner",
+    brand: "Buffalo Wild Wings",
+    name: "Buffalo Wild Wings Auburn - Turner St",
+    orderingMode: "DELIVERY_LINK",
+    integrationStatus: "CORPORATE_NOT_INTEGRATED",
+    coreMarket: "Twin City",
+    corePostalCodes: ["04240", "04210"],
+    orderUrl: "https://www.buffalowildwings.com/",
+    pickupAddress: "648 Turner St #2, Auburn, ME 04210",
+    deliveryEnabled: true
+  },
+  {
+    id: "olive-garden-auburn-subaru",
+    brand: "Olive Garden",
+    name: "Olive Garden Auburn - Subaru Dr",
+    orderingMode: "DELIVERY_LINK",
+    integrationStatus: "CORPORATE_NOT_INTEGRATED",
+    coreMarket: "Twin City",
+    corePostalCodes: ["04240", "04210"],
+    orderUrl: "https://www.olivegarden.com/",
+    pickupAddress: "10 Subaru Dr, Auburn, ME 04210",
+    deliveryEnabled: true
+  },
+  {
+    id: "99-restaurant-auburn-center",
+    brand: "99 Restaurants",
+    name: "99 Restaurant Auburn - Center St",
+    orderingMode: "DELIVERY_LINK",
+    integrationStatus: "CORPORATE_NOT_INTEGRATED",
+    coreMarket: "Twin City",
+    corePostalCodes: ["04240", "04210"],
+    orderUrl: "https://www.99restaurants.com/locations/maine/auburn/",
+    pickupAddress: "650 Center St, Auburn, ME 04210",
+    deliveryEnabled: true
+  },
+  {
+    id: "applebees-auburn-center",
+    brand: "Applebee's",
+    name: "Applebee's Auburn - Center St",
+    orderingMode: "DELIVERY_LINK",
+    integrationStatus: "CORPORATE_NOT_INTEGRATED",
+    coreMarket: "Twin City",
+    corePostalCodes: ["04240", "04210"],
+    orderUrl: "https://restaurants.applebees.com/en-us/me/auburn/599-center-street-83062",
+    pickupAddress: "599 Center St, Auburn, ME 04210",
+    deliveryEnabled: true
+  },
+  {
+    id: "longhorn-auburn-subaru",
+    brand: "LongHorn Steakhouse",
+    name: "LongHorn Steakhouse Auburn - Subaru Dr",
+    orderingMode: "DELIVERY_LINK",
+    integrationStatus: "CORPORATE_NOT_INTEGRATED",
+    coreMarket: "Twin City",
+    corePostalCodes: ["04240", "04210"],
+    orderUrl: "https://www.longhornsteakhouse.com/",
+    pickupAddress: "14 Subaru Dr, Auburn, ME 04210",
+    deliveryEnabled: true
+  },
+  {
+    id: "dennys-auburn-court",
+    brand: "Denny's",
+    name: "Denny's Auburn - Court St",
+    orderingMode: "DELIVERY_LINK",
+    integrationStatus: "CORPORATE_NOT_INTEGRATED",
+    coreMarket: "Twin City",
+    corePostalCodes: ["04240", "04210"],
+    orderUrl: "https://locations.dennys.com/me/auburn/246354",
+    pickupAddress: "211 Court St, Auburn, ME 04210",
+    deliveryEnabled: true
+  },
+  {
+    id: "kfc-lewiston-lisbon",
+    brand: "KFC",
+    name: "KFC Lewiston - Lisbon St",
+    orderingMode: "DELIVERY_LINK",
+    integrationStatus: "CORPORATE_NOT_INTEGRATED",
+    coreMarket: "Twin City",
+    corePostalCodes: ["04240", "04210"],
+    orderUrl: "https://www.kfc.com/",
+    pickupAddress: "1201 Lisbon St, Lewiston, ME 04240",
+    deliveryEnabled: true
   }
 ];
 
