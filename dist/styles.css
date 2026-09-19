@@ -1153,3 +1153,100 @@
   font-size: 0.68rem;
   font-weight: 900;
 }
+
+
+/* Local restaurant logo + brand treatment */
+.local-restaurant-card {
+  position: relative;
+  overflow: hidden;
+  --local-accent: #111;
+  --local-accent-2: #ffd400;
+  --local-soft: #f4f4f4;
+}
+
+.local-brand-strip {
+  height: 7px;
+  background: linear-gradient(90deg, var(--local-accent), var(--local-accent-2));
+}
+
+.local-card-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.local-logo-wrap {
+  flex: 0 0 62px;
+  width: 62px;
+  height: 62px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--local-soft);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.local-brand-logo {
+  width: 46px;
+  height: 46px;
+  display: block;
+  object-fit: contain;
+}
+
+.local-brand-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: var(--local-accent);
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-align: center;
+  padding: 6px;
+}
+
+.local-card-title {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.local-restaurant-card .restaurant-name {
+  margin-top: 0;
+}
+
+.local-restaurant-card .view-menu {
+  background: var(--local-accent-2);
+  color: #111;
+}
+
+.local-restaurant-card .local-online-order {
+  background: var(--local-accent);
+  color: #fff;
+}
+
+.local-restaurant-card .local-restaurant-badge {
+  background: var(--local-accent);
+  color: #fff;
+}
+
+.local-restaurant-card .local-meal-badge {
+  background: var(--local-soft);
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 620px) {
+  .local-logo-wrap {
+    flex-basis: 54px;
+    width: 54px;
+    height: 54px;
+  }
+
+  .local-brand-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
