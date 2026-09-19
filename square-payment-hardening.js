@@ -205,7 +205,7 @@ async function handleSquareReconcile(request, env) {
   }
 
   const orderResponse = await fetch(
-    `https://connect.squareup.com/v2/orders/${encodeURIComponent(dispatchOrder.square_order_id)}`,
+    `${squareApiBase(env)}/v2/orders/${encodeURIComponent(dispatchOrder.square_order_id)}`,
     {
       method: "GET",
       headers: squareHeaders(env)
@@ -229,7 +229,7 @@ async function handleSquareReconcile(request, env) {
     if (!tender.payment_id) continue;
 
     const paymentResponse = await fetch(
-      `https://connect.squareup.com/v2/payments/${encodeURIComponent(tender.payment_id)}`,
+      `${squareApiBase(env)}/v2/payments/${encodeURIComponent(tender.payment_id)}`,
       {
         method: "GET",
         headers: squareHeaders(env)
@@ -318,7 +318,7 @@ async function releaseSquareOrderToDispatch(
 
   if (!order) {
     const orderResponse = await fetch(
-      `https://connect.squareup.com/v2/orders/${encodeURIComponent(orderId)}`,
+      `${squareApiBase(env)}/v2/orders/${encodeURIComponent(orderId)}`,
       {
         method: "GET",
         headers: squareHeaders(env)
@@ -335,7 +335,12 @@ async function releaseSquareOrderToDispatch(
     order = orderData.order;
   }
 
-  const fulfillment = Array.isArray(order.fulfillments)
+  const orderTotal = Number(
+    order.total_money?.amount ?? options.fallbackTotal ?? 0
+  );
+
+  if (options.source === "corporate_delivery_link") {
+   const fulfillment = Array.isArray(order.fulfillments)
     ? order.fulfillments[0]
     : null;
   const recipient = getFulfillmentRecipient(fulfillment);
@@ -349,7 +354,7 @@ async function releaseSquareOrderToDispatch(
 
   if (locationId) {
     const locationResponse = await fetch(
-      `https://connect.squareup.com/v2/locations/${encodeURIComponent(locationId)}`,
+      `${squareApiBase(env)}/v2/locations/${encodeURIComponent(locationId)}`,
       {
         method: "GET",
         headers: squareHeaders(env)
@@ -364,12 +369,7 @@ async function releaseSquareOrderToDispatch(
     }
   }
 
-  const orderTotal = Number(
-    order.total_money?.amount ?? options.fallbackTotal ?? 0
-  );
-
-  if (options.source === "corporate_delivery_link") {
-    const updateResult = await env.DISPATCH_DB
+  const updateResult = await env.DISPATCH_DB
       .prepare(
         `UPDATE dispatch_orders
          SET order_total = ?,
@@ -563,6 +563,11 @@ function formatAddress(address) {
 function blankToNull(value) {
   const text = String(value || "").trim();
   return text || null;
+}
+
+function squareApiBase(env) {
+  return String(env.SQUARE_API_BASE_URL || "https://connect.squareup.com")
+    .replace(/\/+$/, "");
 }
 
 function squareHeaders(env) {
