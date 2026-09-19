@@ -103,6 +103,127 @@ export async function handleCorporateDeliveryLink(request, env) {
     }, 201);
   }
 
+  if (url.pathname === "/api/corporate/delivery-payment" && request.method === "POST") {
+    if (!env.DISPATCH_DB) return json({ error: "Dispatch database is not bound" }, 500);
+    if (!env.SQUARE_ACCESS_TOKEN || !env.SQUARE_LOCATION_ID) {
+      return json({ error: "Square delivery-payment configuration is incomplete" }, 503);
+    }
+
+    const body = await readJson(request);
+    const dispatchOrderId = Number(body.dispatchOrderId || 0);
+    const amountCents = Number(body.amountCents || 0);
+
+    if (!Number.isInteger(dispatchOrderId) || dispatchOrderId <= 0) {
+      return json({ error: "Valid dispatchOrderId is required" }, 400);
+    }
+    if (!Number.isInteger(amountCents) || amountCents <= 0) {
+      return json({ error: "Valid delivery amount is required" }, 400);
+    }
+
+    const dispatchOrder = await env.DISPATCH_DB
+      .prepare(`SELECT id, restaurant_name, restaurant_location_id, status
+                 FROM dispatch_orders
+                 WHERE id = ? AND source = 'corporate_delivery_link' LIMIT 1`)
+      .bind(dispatchOrderId)
+      .first();
+
+    if (!dispatchOrder) return json({ error: "Delivery-Link order not found" }, 404);
+    if (dispatchOrder.status !== "AWAITING_DELIVERY_PAYMENT") {
+      return json({ error: "Order is not awaiting delivery payment", status: dispatchOrder.status }, 409);
+    }
+
+    const squareResponse = await fetch("https://connect.squareup.com/v2/online-checkout/payment-links", {
+      method: "POST",
+      headers: squareHeaders(env),
+      body: JSON.stringify({
+        idempotency_key: `lcs-delivery-${dispatchOrderId}-${amountCents}`,
+        quick_pay: {
+          name: `LCS Delivery - ${dispatchOrder.restaurant_name || "Courier Eats"}`,
+          price_money: { amount: amountCents, currency: "USD" },
+          location_id: env.SQUARE_LOCATION_ID
+        },
+        checkout_options: {
+          redirect_url: `https://couriereats.com/?delivery=paid&dispatch=${dispatchOrderId}`,
+          ask_for_shipping_address: false,
+          allow_tipping: true
+        },
+        payment_note: `Courier Eats Delivery-Link dispatch #${dispatchOrderId}`
+      })
+    });
+
+    const squareData = await safeJson(squareResponse);
+    if (!squareResponse.ok) return json(squareData, squareResponse.status);
+
+    const squareOrderId = squareData.payment_link?.order_id || null;
+    const checkoutUrl = squareData.payment_link?.url || squareData.payment_link?.long_url || null;
+
+    if (!squareOrderId || !checkoutUrl) {
+      return json({ error: "Square did not return a delivery checkout link" }, 502);
+    }
+
+    await env.DISPATCH_DB
+      .prepare(`UPDATE dispatch_orders
+                SET square_order_id = ?, order_total = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ? AND status = 'AWAITING_DELIVERY_PAYMENT'`)
+      .bind(squareOrderId, amountCents, dispatchOrderId)
+      .run();
+
+    return json({ success: true, dispatchOrderId, squareOrderId, checkoutUrl, amountCents });
+  }
+
+  if (url.pathname === "/api/uber-direct/quote" && request.method === "POST") {
+    if (!env.UBER_DIRECT_CLIENT_ID || !env.UBER_DIRECT_CLIENT_SECRET || !env.UBER_DIRECT_CUSTOMER_ID) {
+      return json({ error: "Uber Direct credentials are not configured" }, 503);
+    }
+
+    const body = await readJson(request);
+    const pickupAddress = body.pickupAddress;
+    const dropoffAddress = body.dropoffAddress;
+
+    if (!pickupAddress || !dropoffAddress) {
+      return json({ error: "pickupAddress and dropoffAddress are required" }, 400);
+    }
+
+    const token = await getUberAccessToken(env);
+    if (!token.ok) return json({ error: "Unable to authenticate with Uber Direct", details: token.error }, 502);
+
+    const quoteResponse = await fetch(
+      `https://api.uber.com/v1/customers/${encodeURIComponent(env.UBER_DIRECT_CUSTOMER_ID)}/delivery_quotes`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token.accessToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          pickup_address: normalizeUberAddress(pickupAddress),
+          dropoff_address: normalizeUberAddress(dropoffAddress)
+        })
+      }
+    );
+
+    const quote = await safeJson(quoteResponse);
+    if (!quoteResponse.ok) return json(quote, quoteResponse.status);
+
+    const feeCents = Number(quote.fee || 0);
+    const customerPriceCents = Number(body.customerPriceCents || 0);
+    const minimumMarginCents = Number(env.MIN_GROSS_MARGIN_CENTS || DEFAULT_MIN_GROSS_MARGIN_CENTS);
+    const grossMarginCents = customerPriceCents > 0 ? customerPriceCents - feeCents : null;
+
+    return json({
+      success: true,
+      quote,
+      fulfillmentPriority: ["LCS", "UBER_DIRECT", "APPROVED_FALLBACK"],
+      margin: {
+        customerPriceCents: customerPriceCents || null,
+        uberFeeCents: feeCents || null,
+        grossMarginCents,
+        minimumMarginCents,
+        uberEligible: grossMarginCents == null ? null : grossMarginCents >= minimumMarginCents
+      }
+    });
+  }
+
   if (url.pathname === "/api/delivery/rate" && request.method === "POST") {
     const body = await readJson(request);
     const miles = Number(body.miles);
@@ -172,4 +293,45 @@ function json(data, status = 200) {
       "Access-Control-Allow-Origin": "*"
     }
   });
+}
+
+
+async function getUberAccessToken(env) {
+  const form = new URLSearchParams({
+    client_id: env.UBER_DIRECT_CLIENT_ID,
+    client_secret: env.UBER_DIRECT_CLIENT_SECRET,
+    grant_type: "client_credentials",
+    scope: "eats.deliveries"
+  });
+
+  const response = await fetch("https://auth.uber.com/oauth/v2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: form.toString()
+  });
+
+  const data = await safeJson(response);
+  if (!response.ok || !data.access_token) {
+    return { ok: false, error: data };
+  }
+  return { ok: true, accessToken: data.access_token };
+}
+
+function normalizeUberAddress(address) {
+  return typeof address === "string" ? address : JSON.stringify(address);
+}
+
+function squareHeaders(env) {
+  return {
+    Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
+    "Square-Version": "2026-09-16",
+    "Content-Type": "application/json"
+  };
+}
+
+async function safeJson(response) {
+  const text = await response.text();
+  if (!text) return {};
+  try { return JSON.parse(text); }
+  catch { return { error: "Non-JSON response", body: text.slice(0, 1000) }; }
 }
