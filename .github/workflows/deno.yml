@@ -30,6 +30,9 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+      - name: Validate Square Sandbox harness syntax
+        run: node --check scripts/square-sandbox-e2e.mjs
+
       - name: Validate Delivery-Link D1 migration locally
         shell: bash
         run: |
