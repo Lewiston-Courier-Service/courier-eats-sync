@@ -30,5 +30,16 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+      - name: Validate Delivery-Link D1 migration locally
+        shell: bash
+        run: |
+          rm -rf .wrangler/state
+          npx wrangler d1 execute courier-eats-dispatch --local --file=test/fixtures/dispatch-schema-pre-005.sql
+          npx wrangler d1 execute courier-eats-dispatch --local --file=migrations/005-corporate-delivery-link.sql
+          SCHEMA="$(npx wrangler d1 execute courier-eats-dispatch --local --command="PRAGMA table_info('dispatch_orders');")"
+          for column in restaurant_order_id delivery_postal_code ordering_mode delivery_fee_cents pricing_basis uber_quote_id uber_quote_fee_cents uber_quote_expires_at; do
+            echo "$SCHEMA" | grep -q "$column" || { echo "Missing migrated column: $column"; exit 1; }
+          done
+
       - name: Validate Cloudflare Worker
         run: npx wrangler deploy --dry-run
