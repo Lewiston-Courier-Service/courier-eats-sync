@@ -13,7 +13,13 @@ import readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 
 const cwd = process.cwd();
-const npx = process.platform === "win32" ? "npx.cmd" : "npx";
+const wranglerCli = path.resolve(
+  cwd,
+  "node_modules",
+  "wrangler",
+  "bin",
+  "wrangler.js"
+);
 const stateDir = path.resolve(cwd, ".wrangler/state/square-sandbox-e2e");
 const baseUrl = "http://127.0.0.1:8788";
 const vars = {
@@ -22,6 +28,12 @@ const vars = {
 };
 
 requireSandboxConfiguration(vars);
+
+if (!existsSync(wranglerCli)) {
+  throw new Error(
+    "Wrangler is not installed locally. Run npm install, then try again."
+  );
+}
 
 let worker = null;
 
@@ -43,9 +55,10 @@ try {
   ]);
 
   worker = spawn(
-    npx,
+    process.execPath,
     [
-      "wrangler", "dev",
+      wranglerCli,
+      "dev",
       "--local",
       "--port", "8788",
       "--persist-to", stateDir
@@ -210,7 +223,7 @@ function requireSandboxConfiguration(values) {
 }
 
 function runWrangler(args) {
-  execFileSync(npx, ["wrangler", ...args], {
+  execFileSync(process.execPath, [wranglerCli, ...args], {
     cwd,
     stdio: "inherit"
   });
