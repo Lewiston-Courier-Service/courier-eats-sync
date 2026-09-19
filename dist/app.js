@@ -130,6 +130,14 @@ async function loadCorporateRestaurants() {
   }
 }
 
+const CORPORATE_CATEGORY_ORDER = [
+  "Breakfast",
+  "Burgers",
+  "Chicken & Wings",
+  "Italian",
+  "American Grill & Steak"
+];
+
 function renderCorporateRestaurants(corporateRestaurants) {
   const list = document.getElementById("corporateRestaurantList");
   if (!list) return;
@@ -137,125 +145,177 @@ function renderCorporateRestaurants(corporateRestaurants) {
   list.innerHTML = "";
 
   if (corporateRestaurants.length === 0) {
-    list.innerHTML = '<div class="message">No corporate Delivery-Link restaurants are available yet.</div>';
+    list.innerHTML =
+      '<div class="message">No corporate Delivery-Link restaurants are available yet.</div>';
     return;
   }
 
+  const groups = new Map();
+
   corporateRestaurants.forEach(restaurant => {
-    const card = document.createElement("article");
-    const brandPresentation = corporateBrandPresentation(restaurant);
-    card.className =
-      "corporate-restaurant-card corporate-brand-" + brandPresentation.key;
+    const category = String(
+      restaurant.primaryCategory || "Other Restaurants"
+    ).trim();
 
-    card.innerHTML = `
-      <div class="corporate-brand-strip" aria-hidden="true"></div>
-      <div class="corporate-card-header">
-        <div class="corporate-identity">
-          <div class="corporate-logo-wrap">
-            <img
-              class="corporate-brand-logo"
-              src="${escapeHTML(brandPresentation.logoUrl)}"
-              alt="${escapeHTML((restaurant.brand || restaurant.name || "Restaurant") + " logo")}"
-              loading="lazy"
-              referrerpolicy="no-referrer"
-            >
-            <span class="corporate-brand-fallback" hidden>
-              ${escapeHTML(brandPresentation.initials)}
-            </span>
-          </div>
-          <div>
-            <div class="corporate-brand">${escapeHTML(restaurant.brand || "Corporate Restaurant")}</div>
-            <h3>${escapeHTML(restaurant.name || "")}</h3>
-            <p>${escapeHTML(restaurant.pickupAddress || "")}</p>
-          </div>
-        </div>
-        <div class="corporate-card-badges">
-          <span class="delivery-link-badge">Delivery-Link</span>
-          <span class="independent-delivery-badge">Independent delivery</span>
-        </div>
+    if (!groups.has(category)) groups.set(category, []);
+    groups.get(category).push(restaurant);
+  });
+
+  const categories = [
+    ...CORPORATE_CATEGORY_ORDER.filter(category => groups.has(category)),
+    ...Array.from(groups.keys()).filter(
+      category => !CORPORATE_CATEGORY_ORDER.includes(category)
+    )
+  ];
+
+  categories.forEach(category => {
+    const restaurantsInCategory = groups.get(category) || [];
+    const section = document.createElement("section");
+    section.className = "corporate-category-group";
+
+    const heading = document.createElement("div");
+    heading.className = "corporate-category-heading";
+    heading.innerHTML = `
+      <div>
+        <span class="corporate-category-kicker">Corporate Restaurants</span>
+        <h3>${escapeHTML(category)}</h3>
       </div>
-
-      <div class="corporate-steps">
-        <span><strong>1.</strong> Order and pay the restaurant directly.</span>
-        <span><strong>2.</strong> Enter the restaurant order number below.</span>
-        <span><strong>3.</strong> Pay Courier Eats separately for delivery through Square.</span>
-      </div>
-
-      <div class="corporate-actions">
-        <a class="corporate-order-button" href="${escapeHTML(restaurant.orderUrl || "#")}" target="_blank" rel="noopener noreferrer">
-          Order Direct
-        </a>
-        <button
-          class="corporate-delivery-toggle"
-          type="button"
-          ${restaurant.deliveryQuoteEnabled ? "" : "disabled"}
-        >
-          ${restaurant.deliveryQuoteEnabled
-            ? "I Already Ordered — Get Delivery"
-            : "Courier Eats Delivery Pricing Temporarily Unavailable"}
-        </button>
-      </div>
-
-      <form class="corporate-delivery-form" hidden>
-        <label>
-          Restaurant order number
-          <input name="restaurantOrderId" autocomplete="off" required>
-        </label>
-        <label>
-          Your name
-          <input name="customerName" autocomplete="name" required>
-        </label>
-        <label>
-          Phone number
-          <input name="customerPhone" type="tel" autocomplete="tel" required>
-        </label>
-        <label class="corporate-form-wide">
-          Delivery address
-          <input name="deliveryAddress" placeholder="Street, city, state" autocomplete="street-address" required>
-        </label>
-        <label>
-          Delivery ZIP
-          <input name="deliveryPostalCode" inputmode="numeric" pattern="[0-9]{5}(-[0-9]{4})?" placeholder="04240" required>
-        </label>
-        <button class="corporate-quote-button" type="submit">Get Delivery Price</button>
-        <div class="corporate-delivery-message" aria-live="polite"></div>
-      </form>
-
-      <p class="corporate-independent-note">
-        Courier Eats / Lewiston Courier Service is an independent delivery service and is not affiliated with ${escapeHTML(restaurant.brand || restaurant.name || "this restaurant")}.
-      </p>
+      <span class="corporate-category-count">
+        ${restaurantsInCategory.length}
+        ${restaurantsInCategory.length === 1 ? "restaurant" : "restaurants"}
+      </span>
     `;
 
-    const logo = card.querySelector(".corporate-brand-logo");
-    const logoFallback = card.querySelector(".corporate-brand-fallback");
-    if (logo && logoFallback) {
-      logo.addEventListener("error", () => {
-        logo.hidden = true;
-        logoFallback.hidden = false;
-      });
-    }
+    const grid = document.createElement("div");
+    grid.className = "corporate-restaurant-grid";
 
-    const toggle = card.querySelector(".corporate-delivery-toggle");
-    const form = card.querySelector(".corporate-delivery-form");
+    restaurantsInCategory.forEach(restaurant => {
+      grid.appendChild(createCorporateRestaurantCard(restaurant));
+    });
 
-    if (restaurant.deliveryQuoteEnabled) {
-      toggle.addEventListener("click", () => {
-        form.hidden = !form.hidden;
-        toggle.textContent = form.hidden
-          ? "I Already Ordered — Get Delivery"
-          : "Hide Delivery Form";
-      });
-
-      form.addEventListener("submit", event => {
-        submitCorporateDelivery(event, restaurant);
-      });
-    } else {
-      form.hidden = true;
-      toggle.title = "Uber Direct account enablement is still pending.";
-    }
-
-    list.appendChild(card);
+    section.appendChild(heading);
+    section.appendChild(grid);
+    list.appendChild(section);
   });
+}
+
+function createCorporateRestaurantCard(restaurant) {
+  const card = document.createElement("article");
+  const brandPresentation = corporateBrandPresentation(restaurant);
+  card.className =
+    "corporate-restaurant-card corporate-brand-" + brandPresentation.key;
+
+  card.innerHTML = `
+    <div class="corporate-brand-strip" aria-hidden="true"></div>
+    <div class="corporate-card-header">
+      <div class="corporate-identity">
+        <div class="corporate-logo-wrap">
+          <img
+            class="corporate-brand-logo"
+            src="${escapeHTML(brandPresentation.logoUrl)}"
+            alt="${escapeHTML((restaurant.brand || restaurant.name || "Restaurant") + " logo")}"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+          >
+          <span class="corporate-brand-fallback" hidden>
+            ${escapeHTML(brandPresentation.initials)}
+          </span>
+        </div>
+        <div>
+          <div class="corporate-brand">${escapeHTML(restaurant.brand || "Corporate Restaurant")}</div>
+          <h3>${escapeHTML(restaurant.name || "")}</h3>
+          <p>${escapeHTML(restaurant.pickupAddress || "")}</p>
+        </div>
+      </div>
+      <div class="corporate-card-badges">
+        <span class="restaurant-category-badge">
+          ${escapeHTML(restaurant.primaryCategory || "Restaurant")}
+        </span>
+        <span class="delivery-link-badge">Delivery-Link</span>
+        <span class="independent-delivery-badge">Independent delivery</span>
+      </div>
+    </div>
+
+    <div class="corporate-steps">
+      <span><strong>1.</strong> Order and pay the restaurant directly.</span>
+      <span><strong>2.</strong> Enter the restaurant order number below.</span>
+      <span><strong>3.</strong> Pay Courier Eats separately for delivery through Square.</span>
+    </div>
+
+    <div class="corporate-actions">
+      <a class="corporate-order-button" href="${escapeHTML(restaurant.orderUrl || "#")}" target="_blank" rel="noopener noreferrer">
+        Order Direct
+      </a>
+      <button
+        class="corporate-delivery-toggle"
+        type="button"
+        ${restaurant.deliveryQuoteEnabled ? "" : "disabled"}
+      >
+        ${restaurant.deliveryQuoteEnabled
+          ? "I Already Ordered — Get Delivery"
+          : "Courier Eats Delivery Pricing Temporarily Unavailable"}
+      </button>
+    </div>
+
+    <form class="corporate-delivery-form" hidden>
+      <label>
+        Restaurant order number
+        <input name="restaurantOrderId" autocomplete="off" required>
+      </label>
+      <label>
+        Your name
+        <input name="customerName" autocomplete="name" required>
+      </label>
+      <label>
+        Phone number
+        <input name="customerPhone" type="tel" autocomplete="tel" required>
+      </label>
+      <label class="corporate-form-wide">
+        Delivery address
+        <input name="deliveryAddress" placeholder="Street, city, state" autocomplete="street-address" required>
+      </label>
+      <label>
+        Delivery ZIP
+        <input name="deliveryPostalCode" inputmode="numeric" pattern="[0-9]{5}(-[0-9]{4})?" placeholder="04240" required>
+      </label>
+      <button class="corporate-quote-button" type="submit">Get Delivery Price</button>
+      <div class="corporate-delivery-message" aria-live="polite"></div>
+    </form>
+
+    <p class="corporate-independent-note">
+      Courier Eats / Lewiston Courier Service is an independent delivery service and is not affiliated with ${escapeHTML(restaurant.brand || restaurant.name || "this restaurant")}.
+    </p>
+  `;
+
+  const logo = card.querySelector(".corporate-brand-logo");
+  const logoFallback = card.querySelector(".corporate-brand-fallback");
+  if (logo && logoFallback) {
+    logo.addEventListener("error", () => {
+      logo.hidden = true;
+      logoFallback.hidden = false;
+    });
+  }
+
+  const toggle = card.querySelector(".corporate-delivery-toggle");
+  const form = card.querySelector(".corporate-delivery-form");
+
+  if (restaurant.deliveryQuoteEnabled) {
+    toggle.addEventListener("click", () => {
+      form.hidden = !form.hidden;
+      toggle.textContent = form.hidden
+        ? "I Already Ordered — Get Delivery"
+        : "Hide Delivery Form";
+    });
+
+    form.addEventListener("submit", event => {
+      submitCorporateDelivery(event, restaurant);
+    });
+  } else {
+    form.hidden = true;
+    toggle.title = "Uber Direct account enablement is still pending.";
+  }
+
+  return card;
 }
 
 async function submitCorporateDelivery(event, restaurant) {
