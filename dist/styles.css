@@ -700,3 +700,176 @@
   background: #e8e8e8;
   color: #555;
 }
+
+
+/* Brand presentation for corporate restaurant cards */
+.corporate-restaurant-card {
+  position: relative;
+  overflow: hidden;
+  --brand-accent: #111;
+  --brand-accent-2: #ffd43b;
+  --brand-soft: #f5f5f5;
+}
+
+.corporate-brand-strip {
+  height: 7px;
+  margin: -18px -18px 16px;
+  background: linear-gradient(90deg, var(--brand-accent), var(--brand-accent-2));
+}
+
+.corporate-identity {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.corporate-logo-wrap {
+  flex: 0 0 58px;
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: var(--brand-soft);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.corporate-brand-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  display: block;
+}
+
+.corporate-brand-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: var(--brand-accent);
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.corporate-card-badges {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.independent-delivery-badge {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.corporate-restaurant-card .corporate-order-button {
+  background: var(--brand-accent);
+  color: #fff;
+}
+
+.corporate-restaurant-card .corporate-order-button:hover {
+  filter: brightness(0.92);
+}
+
+.corporate-restaurant-card .delivery-link-badge {
+  background: var(--brand-soft);
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Brand-inspired card accents. Logos are loaded as web icons from each brand domain. */
+.corporate-brand-popeyes {
+  --brand-accent: #f15a24;
+  --brand-accent-2: #f7a81b;
+  --brand-soft: #fff1e8;
+}
+
+.corporate-brand-mcdonalds {
+  --brand-accent: #da291c;
+  --brand-accent-2: #ffc72c;
+  --brand-soft: #fff4cc;
+}
+
+.corporate-brand-burger-king {
+  --brand-accent: #d62300;
+  --brand-accent-2: #f5ebdc;
+  --brand-soft: #fff3e9;
+}
+
+.corporate-brand-ihop {
+  --brand-accent: #005aa7;
+  --brand-accent-2: #ef3340;
+  --brand-soft: #eef7ff;
+}
+
+.corporate-brand-buffalo-wild-wings {
+  --brand-accent: #111111;
+  --brand-accent-2: #ffc600;
+  --brand-soft: #fff8d6;
+}
+
+.corporate-brand-olive-garden {
+  --brand-accent: #5b3a29;
+  --brand-accent-2: #8aa83b;
+  --brand-soft: #f3f6e9;
+}
+
+.corporate-brand-99-restaurants {
+  --brand-accent: #b31b34;
+  --brand-accent-2: #222222;
+  --brand-soft: #fbecef;
+}
+
+.corporate-brand-applebees {
+  --brand-accent: #a6192e;
+  --brand-accent-2: #5d8720;
+  --brand-soft: #f4f8ea;
+}
+
+.corporate-brand-longhorn {
+  --brand-accent: #7a1f2b;
+  --brand-accent-2: #111111;
+  --brand-soft: #f6ecee;
+}
+
+.corporate-brand-dennys {
+  --brand-accent: #d71920;
+  --brand-accent-2: #f2c230;
+  --brand-soft: #fff7d7;
+}
+
+.corporate-brand-kfc {
+  --brand-accent: #e4002b;
+  --brand-accent-2: #111111;
+  --brand-soft: #fff0f2;
+}
+
+@media (max-width: 620px) {
+  .corporate-card-header {
+    gap: 12px;
+  }
+
+  .corporate-card-badges {
+    justify-items: start;
+  }
+
+  .corporate-logo-wrap {
+    flex-basis: 52px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .corporate-brand-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
