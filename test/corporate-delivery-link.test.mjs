@@ -17,14 +17,22 @@ test("lists configured corporate restaurants", async () => {
   assert.equal(body.restaurants[0].deliveryQuoteEnabled, false);
   assert.equal(body.restaurants[0].integrationStatus, "CORPORATE_NOT_INTEGRATED");
   assert.equal(body.restaurants[0].pickupAddress, "841 Lisbon St, Lewiston, ME 04240");
-  assert.equal(body.restaurants.length, 4);
+  assert.equal(body.restaurants.length, 12);
   assert.deepEqual(
     body.restaurants.map(restaurant => restaurant.id),
     [
       "popeyes-lewiston",
       "mcdonalds-lewiston-lisbon",
       "burger-king-lewiston-lisbon",
-      "burger-king-auburn-center"
+      "burger-king-auburn-center",
+      "ihop-auburn-turner",
+      "buffalo-wild-wings-auburn-turner",
+      "olive-garden-auburn-subaru",
+      "99-restaurant-auburn-center",
+      "applebees-auburn-center",
+      "longhorn-auburn-subaru",
+      "dennys-auburn-court",
+      "kfc-lewiston-lisbon"
     ]
   );
   assert.equal(
@@ -34,6 +42,14 @@ test("lists configured corporate restaurants", async () => {
   assert.equal(
     body.restaurants[3].pickupAddress,
     "333 Center St, Auburn, ME 04210"
+  );
+  assert.equal(
+    body.restaurants[4].pickupAddress,
+    "649 Turner St, Auburn, ME 04210"
+  );
+  assert.equal(
+    body.restaurants[11].pickupAddress,
+    "1201 Lisbon St, Lewiston, ME 04240"
   );
 });
 
