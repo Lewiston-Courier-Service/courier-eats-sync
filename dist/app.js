@@ -21,6 +21,234 @@ return (
 (amount / 100).toFixed(2)
 );
 }
+async function loadCorporateRestaurants() {
+  const list = document.getElementById("corporateRestaurantList");
+  if (!list) return;
+
+  try {
+    const response = await fetch("/api/corporate/restaurants", {
+      cache: "no-store"
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Corporate restaurant API returned " + response.status);
+    }
+
+    const corporateRestaurants = Array.isArray(data.restaurants)
+      ? data.restaurants.filter(restaurant => restaurant.deliveryEnabled !== false)
+      : [];
+
+    renderCorporateRestaurants(corporateRestaurants);
+  } catch (error) {
+    console.error(error);
+    list.innerHTML = `
+      <div class="message">
+        Unable to load corporate delivery restaurants:
+        ${escapeHTML(error.message)}
+      </div>
+    `;
+  }
+}
+
+function renderCorporateRestaurants(corporateRestaurants) {
+  const list = document.getElementById("corporateRestaurantList");
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  if (corporateRestaurants.length === 0) {
+    list.innerHTML = '<div class="message">No corporate Delivery-Link restaurants are available yet.</div>';
+    return;
+  }
+
+  corporateRestaurants.forEach(restaurant => {
+    const card = document.createElement("article");
+    card.className = "corporate-restaurant-card";
+
+    card.innerHTML = `
+      <div class="corporate-card-header">
+        <div>
+          <div class="corporate-brand">${escapeHTML(restaurant.brand || "Corporate Restaurant")}</div>
+          <h3>${escapeHTML(restaurant.name || "")}</h3>
+          <p>${escapeHTML(restaurant.pickupAddress || "")}</p>
+        </div>
+        <span class="delivery-link-badge">Delivery-Link</span>
+      </div>
+
+      <div class="corporate-steps">
+        <span><strong>1.</strong> Order and pay the restaurant directly.</span>
+        <span><strong>2.</strong> Enter the restaurant order number below.</span>
+        <span><strong>3.</strong> Pay Courier Eats separately for delivery through Square.</span>
+      </div>
+
+      <div class="corporate-actions">
+        <a class="corporate-order-button" href="${escapeHTML(restaurant.orderUrl || "#")}" target="_blank" rel="noopener noreferrer">
+          Order Direct
+        </a>
+        <button class="corporate-delivery-toggle" type="button">I Already Ordered — Get Delivery</button>
+      </div>
+
+      <form class="corporate-delivery-form" hidden>
+        <label>
+          Restaurant order number
+          <input name="restaurantOrderId" autocomplete="off" required>
+        </label>
+        <label>
+          Your name
+          <input name="customerName" autocomplete="name" required>
+        </label>
+        <label>
+          Phone number
+          <input name="customerPhone" type="tel" autocomplete="tel" required>
+        </label>
+        <label class="corporate-form-wide">
+          Delivery address
+          <input name="deliveryAddress" placeholder="Street, city, state" autocomplete="street-address" required>
+        </label>
+        <label>
+          Delivery ZIP
+          <input name="deliveryPostalCode" inputmode="numeric" pattern="[0-9]{5}(-[0-9]{4})?" placeholder="04240" required>
+        </label>
+        <button class="corporate-quote-button" type="submit">Get Delivery Price</button>
+        <div class="corporate-delivery-message" aria-live="polite"></div>
+      </form>
+
+      <p class="corporate-independent-note">
+        Courier Eats / Lewiston Courier Service is an independent delivery service and is not affiliated with ${escapeHTML(restaurant.brand || restaurant.name || "this restaurant")}.
+      </p>
+    `;
+
+    const toggle = card.querySelector(".corporate-delivery-toggle");
+    const form = card.querySelector(".corporate-delivery-form");
+
+    toggle.addEventListener("click", () => {
+      form.hidden = !form.hidden;
+      toggle.textContent = form.hidden
+        ? "I Already Ordered — Get Delivery"
+        : "Hide Delivery Form";
+    });
+
+    form.addEventListener("submit", event => {
+      submitCorporateDelivery(event, restaurant);
+    });
+
+    list.appendChild(card);
+  });
+}
+
+async function submitCorporateDelivery(event, restaurant) {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const button = form.querySelector(".corporate-quote-button");
+  const message = form.querySelector(".corporate-delivery-message");
+  const formData = new FormData(form);
+
+  button.disabled = true;
+  button.textContent = "Checking delivery price...";
+  message.className = "corporate-delivery-message";
+  message.textContent = "";
+
+  try {
+    let dispatchOrderId = 0;
+
+    const createResponse = await fetch("/api/corporate/delivery-link", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        restaurantId: restaurant.id,
+        restaurantOrderId: formData.get("restaurantOrderId"),
+        customerName: formData.get("customerName"),
+        customerPhone: formData.get("customerPhone"),
+        deliveryAddress: formData.get("deliveryAddress"),
+        deliveryPostalCode: formData.get("deliveryPostalCode")
+      })
+    });
+
+    const createData = await createResponse.json();
+
+    if (createResponse.ok) {
+      dispatchOrderId = Number(createData.dispatchOrderId || 0);
+    } else if (
+      createResponse.status === 409 &&
+      createData.dispatchOrderId &&
+      createData.status === "AWAITING_DELIVERY_PAYMENT"
+    ) {
+      dispatchOrderId = Number(createData.dispatchOrderId);
+    } else {
+      throw new Error(createData.error || "Unable to start the delivery request.");
+    }
+
+    const quoteResponse = await fetch("/api/uber-direct/quote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dispatchOrderId })
+    });
+    const quoteData = await quoteResponse.json();
+
+    if (!quoteResponse.ok) {
+      const detail =
+        quoteData?.metadata?.param_details ||
+        quoteData?.details?.metadata?.param_details ||
+        quoteData?.message ||
+        quoteData?.error ||
+        "Delivery pricing is temporarily unavailable.";
+      throw new Error(typeof detail === "string" ? detail : "Delivery pricing is temporarily unavailable.");
+    }
+
+    const price = quoteData.customerPrice || money(quoteData.customerPriceCents);
+
+    message.className = "corporate-delivery-message success";
+    message.innerHTML = `
+      <strong>Courier Eats delivery: ${escapeHTML(price)}</strong>
+      <span>Restaurant food is paid separately to the restaurant.</span>
+    `;
+
+    const payButton = document.createElement("button");
+    payButton.type = "button";
+    payButton.className = "corporate-pay-button";
+    payButton.textContent = "Pay " + price + " Delivery with Square";
+    payButton.addEventListener("click", async () => {
+      payButton.disabled = true;
+      payButton.textContent = "Opening Square...";
+
+      try {
+        const paymentResponse = await fetch("/api/corporate/delivery-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ dispatchOrderId })
+        });
+        const paymentData = await paymentResponse.json();
+
+        if (!paymentResponse.ok || !paymentData.checkoutUrl) {
+          throw new Error(
+            paymentData.error ||
+            paymentData.message ||
+            "Square checkout could not be created."
+          );
+        }
+
+        window.location.href = paymentData.checkoutUrl;
+      } catch (error) {
+        message.className = "corporate-delivery-message error";
+        message.textContent = error.message;
+        payButton.disabled = false;
+        payButton.textContent = "Try Square Checkout Again";
+      }
+    });
+
+    message.appendChild(payButton);
+    button.textContent = "Price Ready";
+  } catch (error) {
+    console.error(error);
+    message.className = "corporate-delivery-message error";
+    message.textContent = error.message;
+    button.disabled = false;
+    button.textContent = "Try Delivery Price Again";
+  }
+}
+
 async function loadRestaurants() {
 const list =
 document.getElementById(
@@ -884,5 +1112,6 @@ document
 .style.display =
 "block";
 }
+loadCorporateRestaurants();
 loadRestaurants();
 updateCartUI();
