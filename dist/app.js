@@ -26,6 +26,11 @@ return (
 }
 const LOCAL_ONLINE_ORDERING = [
   {
+    match: ["legends sports bar", "legends"],
+    url: "https://order.toasttab.com/online/legends-sports-bar-and-grill-4-mollison-way",
+    label: "Order Online"
+  },
+  {
     match: ["orchid of lewiston", "orchid lewiston", "orchid"],
     url: "https://order.toasttab.com/online/orchid-restaurant-and-bar-29-lisbon-st",
     label: "Order Online"
@@ -309,6 +314,8 @@ const LOCAL_WORLD_FOOD_NAME_HINTS = [
 ];
 
 const LOCAL_CATEGORY_OVERRIDES = [
+  { match: ["marco's restaurant", "marcos restaurant", "marco's", "marcos"], categories: ["Lunch", "Dinner", "Pizza"] },
+  { match: ["legends sports bar", "legends"], categories: ["Lunch", "Dinner"] },
   { match: ["pinky d's poutine", "pinky ds poutine", "pinky d's poutine factory"], categories: ["Lunch", "Dinner"] },
   { match: ["orchid of lewiston", "orchid lewiston", "orchid"], categories: ["Lunch", "Dinner", "World Food"] },
   { match: ["always fresh la rochelle", "always fresh larochelle", "larochelle seafood", "la rochelle's"], categories: ["Lunch", "Dinner"] },
