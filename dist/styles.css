@@ -1117,3 +1117,39 @@
     align-items: flex-start;
   }
 }
+
+
+/* Local restaurant external online-order buttons */
+.local-order-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.local-online-order {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 11px 14px;
+  background: #111;
+  color: #fff;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.local-online-order:hover {
+  filter: brightness(0.92);
+}
+
+.local-online-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: #dff6dd;
+  color: #145a20;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
