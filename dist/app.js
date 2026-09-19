@@ -371,6 +371,7 @@ const LOCAL_WORLD_FOOD_NAME_HINTS = [
 ];
 
 const LOCAL_CATEGORY_OVERRIDES = [
+  { match: ["fran's restaurant", "frans restaurant", "fran's"], categories: ["Breakfast", "Lunch"] },
   { match: ["marco's restaurant", "marcos restaurant", "marco's", "marcos"], categories: ["Lunch", "Dinner", "Pizza"] },
   { match: ["legends sports bar", "legends"], categories: ["Lunch", "Dinner"] },
   { match: ["pinky d's poutine", "pinky ds poutine", "pinky d's poutine factory"], categories: ["Lunch", "Dinner"] },
