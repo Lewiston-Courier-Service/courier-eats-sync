@@ -26,6 +26,16 @@ return (
 }
 const LOCAL_ONLINE_ORDERING = [
   {
+    match: ["val's drive in", "vals drive in", "val's drive-in", "vals drive-in"],
+    url: "https://order.online/store/val%27s-drive-in-lewiston-28473272",
+    label: "Order Online"
+  },
+  {
+    match: ["kp's place", "kps place", "kp's"],
+    url: "https://kpsplacemaine.com/order",
+    label: "Order Online"
+  },
+  {
     match: ["grant's bakery", "grants bakery"],
     url: "https://grantsbakery.com/",
     label: "Order Online"
@@ -289,6 +299,9 @@ const LOCAL_WORLD_FOOD_NAME_HINTS = [
 ];
 
 const LOCAL_CATEGORY_OVERRIDES = [
+  { match: ["jeff's jamaican cuisine", "jeffs jamaican cuisine", "jeff's jamaican"], categories: ["Lunch", "Dinner", "World Food"] },
+  { match: ["val's drive in", "vals drive in", "val's drive-in", "vals drive-in"], categories: ["Lunch", "Dinner"] },
+  { match: ["kp's place", "kps place", "kp's"], categories: ["Lunch", "Dinner"] },
   { match: ["the italian bakery", "italian bakery"], categories: ["Breakfast", "Lunch", "Bakery", "Pizza"] },
   { match: ["the cupcakery", "cupcakery"], categories: ["Breakfast", "Lunch", "Bakery"] },
   { match: ["grant's bakery", "grants bakery"], categories: ["Lunch", "Bakery"] },
