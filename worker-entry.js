@@ -11,9 +11,15 @@ import { handleDriverPod } from "./driver-pod.js";
 import { handleDriverApp } from "./driver-app.js";
 import { handleMarketplaceOrders } from "./marketplace-orders.js";
 import { handleSquarePaymentHardening } from "./square-payment-hardening.js";
+import { handleCorporateDeliveryLink } from "./corporate-delivery-link.js";
 
 export default {
   async fetch(request, env, ctx) {
+    const corporateDeliveryLinkResponse = await handleCorporateDeliveryLink(request, env, ctx);
+    if (corporateDeliveryLinkResponse) {
+      return corporateDeliveryLinkResponse;
+    }
+
     const sandboxWebhookResponse = await handleSquareSandboxWebhook(request, env, ctx);
     if (sandboxWebhookResponse) {
       return sandboxWebhookResponse;
