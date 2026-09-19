@@ -515,3 +515,181 @@
         padding-right: 14px;
       }
     }
+
+
+/* Corporate Delivery-Link */
+.corporate-delivery-section {
+  margin-bottom: 28px;
+}
+
+.section-divider {
+  height: 1px;
+  margin: 28px 0;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.corporate-restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.corporate-restaurant-card {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 18px;
+  padding: 18px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+}
+
+.corporate-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.corporate-card-header h3 {
+  margin: 4px 0 6px;
+  font-size: 1.15rem;
+}
+
+.corporate-card-header p,
+.corporate-independent-note {
+  margin: 0;
+  color: #5b5b5b;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.corporate-brand {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.delivery-link-badge {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #f2f2f2;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.corporate-steps {
+  display: grid;
+  gap: 6px;
+  margin: 16px 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.corporate-actions {
+  display: grid;
+  gap: 9px;
+}
+
+.corporate-order-button,
+.corporate-delivery-toggle,
+.corporate-quote-button,
+.corporate-pay-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.corporate-order-button {
+  background: #111;
+  color: #fff;
+}
+
+.corporate-delivery-toggle,
+.corporate-quote-button,
+.corporate-pay-button {
+  background: #ffd43b;
+  color: #111;
+}
+
+.corporate-delivery-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.corporate-delivery-form[hidden] {
+  display: none;
+}
+
+.corporate-delivery-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.corporate-delivery-form input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 10px;
+  padding: 11px 12px;
+  font: inherit;
+}
+
+.corporate-form-wide,
+.corporate-quote-button,
+.corporate-delivery-message {
+  grid-column: 1 / -1;
+}
+
+.corporate-delivery-message {
+  display: grid;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.corporate-delivery-message.success {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(46, 160, 67, 0.1);
+}
+
+.corporate-delivery-message.error {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(190, 40, 40, 0.1);
+}
+
+.corporate-independent-note {
+  margin-top: 14px;
+}
+
+@media (max-width: 620px) {
+  .corporate-restaurant-grid,
+  .corporate-delivery-form {
+    grid-template-columns: 1fr;
+  }
+
+  .corporate-form-wide,
+  .corporate-quote-button,
+  .corporate-delivery-message {
+    grid-column: auto;
+  }
+
+  .corporate-card-header {
+    flex-direction: column;
+  }
+}
