@@ -59,20 +59,45 @@ export async function handleCorporateDeliveryLink(request, env) {
       return json({ error: "Delivery address and postal code are required" }, 400);
     }
 
+    const duplicate = await env.DISPATCH_DB
+      .prepare(
+        `SELECT id, status
+         FROM dispatch_orders
+         WHERE source = 'corporate_delivery_link'
+           AND restaurant_name = ?
+           AND restaurant_order_id = ?
+         LIMIT 1`
+      )
+      .bind(restaurant.name, restaurantOrderId)
+      .first();
+
+    if (duplicate) {
+      return json({
+        error: "This restaurant order number is already in Courier Eats",
+        dispatchOrderId: duplicate.id,
+        status: duplicate.status
+      }, 409);
+    }
+
     const result = await env.DISPATCH_DB
       .prepare(
         `INSERT INTO dispatch_orders
-          (source, restaurant_name, restaurant_location_id, customer_name,
-           customer_phone, pickup_address, delivery_address, status, dispatch_provider)
-         VALUES ('corporate_delivery_link', ?, ?, ?, ?, ?, ?, 'AWAITING_DELIVERY_PAYMENT', 'internal')`
+          (source, restaurant_name, restaurant_location_id, restaurant_order_id,
+           ordering_mode, customer_name, customer_phone, pickup_address,
+           delivery_address, delivery_postal_code, status, dispatch_provider)
+         VALUES ('corporate_delivery_link', ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                 'AWAITING_DELIVERY_PAYMENT', 'internal')`
       )
       .bind(
         restaurant.name,
-        `${restaurant.id}:${restaurantOrderId}`,
+        restaurant.id,
+        restaurantOrderId,
+        restaurant.orderingMode,
         blankToNull(customerName),
         blankToNull(customerPhone),
         restaurant.pickupAddress,
-        deliveryAddress
+        deliveryAddress,
+        deliveryPostalCode
       )
       .run();
 
@@ -111,35 +136,44 @@ export async function handleCorporateDeliveryLink(request, env) {
 
     const body = await readJson(request);
     const dispatchOrderId = Number(body.dispatchOrderId || 0);
-    const amountCents = Number(body.amountCents || 0);
 
     if (!Number.isInteger(dispatchOrderId) || dispatchOrderId <= 0) {
       return json({ error: "Valid dispatchOrderId is required" }, 400);
     }
-    if (!Number.isInteger(amountCents) || amountCents <= 0) {
-      return json({ error: "Valid delivery amount is required" }, 400);
-    }
-
-    const allowedDeliveryAmounts = new Set(
-      TWIN_CITY_RATES.map((entry) => entry.customerPriceCents)
-    );
-
-    if (!allowedDeliveryAmounts.has(amountCents)) {
-      return json({
-        error: "Delivery amount does not match a configured Courier Eats rate"
-      }, 400);
-    }
 
     const dispatchOrder = await env.DISPATCH_DB
-      .prepare(`SELECT id, restaurant_name, restaurant_location_id, status
-                 FROM dispatch_orders
-                 WHERE id = ? AND source = 'corporate_delivery_link' LIMIT 1`)
+      .prepare(
+        `SELECT id, restaurant_name, restaurant_order_id, status,
+                delivery_fee_cents, pricing_basis, uber_quote_expires_at
+         FROM dispatch_orders
+         WHERE id = ? AND source = 'corporate_delivery_link'
+         LIMIT 1`
+      )
       .bind(dispatchOrderId)
       .first();
 
     if (!dispatchOrder) return json({ error: "Delivery-Link order not found" }, 404);
     if (dispatchOrder.status !== "AWAITING_DELIVERY_PAYMENT") {
-      return json({ error: "Order is not awaiting delivery payment", status: dispatchOrder.status }, 409);
+      return json({
+        error: "Order is not awaiting delivery payment",
+        status: dispatchOrder.status
+      }, 409);
+    }
+
+    const amountCents = Number(dispatchOrder.delivery_fee_cents || 0);
+    if (!Number.isInteger(amountCents) || amountCents <= 0) {
+      return json({
+        error: "A server-side delivery quote is required before payment"
+      }, 409);
+    }
+
+    if (
+      dispatchOrder.uber_quote_expires_at &&
+      Date.parse(dispatchOrder.uber_quote_expires_at) <= Date.now()
+    ) {
+      return json({
+        error: "The delivery quote expired. Request a new delivery rate before payment."
+      }, 409);
     }
 
     const squareResponse = await fetch("https://connect.squareup.com/v2/online-checkout/payment-links", {
@@ -172,109 +206,133 @@ export async function handleCorporateDeliveryLink(request, env) {
     }
 
     await env.DISPATCH_DB
-      .prepare(`UPDATE dispatch_orders
-                SET square_order_id = ?, order_total = ?, updated_at = CURRENT_TIMESTAMP
-                WHERE id = ? AND status = 'AWAITING_DELIVERY_PAYMENT'`)
+      .prepare(
+        `UPDATE dispatch_orders
+         SET square_order_id = ?, order_total = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ? AND status = 'AWAITING_DELIVERY_PAYMENT'`
+      )
       .bind(squareOrderId, amountCents, dispatchOrderId)
       .run();
 
-    return json({ success: true, dispatchOrderId, squareOrderId, checkoutUrl, amountCents });
-  }
-
-  if (url.pathname === "/api/uber-direct/quote" && request.method === "POST") {
-    if (!env.UBER_DIRECT_CLIENT_ID || !env.UBER_DIRECT_CLIENT_SECRET || !env.UBER_DIRECT_CUSTOMER_ID) {
-      return json({ error: "Uber Direct credentials are not configured" }, 503);
-    }
-
-    const body = await readJson(request);
-    const pickupAddress = body.pickupAddress;
-    const dropoffAddress = body.dropoffAddress;
-
-    if (!pickupAddress || !dropoffAddress) {
-      return json({ error: "pickupAddress and dropoffAddress are required" }, 400);
-    }
-
-    const token = await getUberAccessToken(env);
-    if (!token.ok) return json({ error: "Unable to authenticate with Uber Direct", details: token.error }, 502);
-
-    const quoteResponse = await fetch(
-      `https://api.uber.com/v1/customers/${encodeURIComponent(env.UBER_DIRECT_CUSTOMER_ID)}/delivery_quotes`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token.accessToken}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          pickup_address: normalizeUberAddress(pickupAddress),
-          dropoff_address: normalizeUberAddress(dropoffAddress)
-        })
-      }
-    );
-
-    const quote = await safeJson(quoteResponse);
-    if (!quoteResponse.ok) return json(quote, quoteResponse.status);
-
-    const feeCents = Number(quote.fee || 0);
-    const customerPriceCents = Number(body.customerPriceCents || 0);
-    const minimumMarginCents = Number(env.MIN_GROSS_MARGIN_CENTS || DEFAULT_MIN_GROSS_MARGIN_CENTS);
-    const grossMarginCents = customerPriceCents > 0 ? customerPriceCents - feeCents : null;
-
     return json({
       success: true,
-      quote,
-      fulfillmentPriority: ["LCS", "UBER_DIRECT", "APPROVED_FALLBACK"],
-      margin: {
-        customerPriceCents: customerPriceCents || null,
-        uberFeeCents: feeCents || null,
-        grossMarginCents,
-        minimumMarginCents,
-        uberEligible: grossMarginCents == null ? null : grossMarginCents >= minimumMarginCents
-      }
+      dispatchOrderId,
+      squareOrderId,
+      checkoutUrl,
+      amountCents,
+      pricingBasis: dispatchOrder.pricing_basis || null
     });
   }
 
-  if (url.pathname === "/api/delivery/rate" && request.method === "POST") {
+  if (
+    (url.pathname === "/api/uber-direct/quote" ||
+      url.pathname === "/api/delivery/rate") &&
+    request.method === "POST"
+  ) {
+    if (!env.DISPATCH_DB) {
+      return json({ error: "Dispatch database is not bound" }, 500);
+    }
+
     const body = await readJson(request);
-    const miles = Number(body.miles);
+    const dispatchOrderId = Number(body.dispatchOrderId || 0);
 
-    if (!Number.isFinite(miles) || miles < 0) {
-      return json({ error: "Valid miles value is required" }, 400);
+    if (!Number.isInteger(dispatchOrderId) || dispatchOrderId <= 0) {
+      return json({ error: "Valid dispatchOrderId is required" }, 400);
     }
 
-    const rate = TWIN_CITY_RATES.find((entry) => miles <= entry.maxMiles);
+    if (
+      !env.UBER_DIRECT_CLIENT_ID ||
+      !env.UBER_DIRECT_CLIENT_SECRET ||
+      !env.UBER_DIRECT_CUSTOMER_ID
+    ) {
+      return json({ error: "Uber Direct credentials are not configured" }, 503);
+    }
 
-    if (!rate) {
+    const dispatchOrder = await env.DISPATCH_DB
+      .prepare(
+        `SELECT id, restaurant_name, pickup_address, delivery_address,
+                delivery_postal_code, status
+         FROM dispatch_orders
+         WHERE id = ? AND source = 'corporate_delivery_link'
+         LIMIT 1`
+      )
+      .bind(dispatchOrderId)
+      .first();
+
+    if (!dispatchOrder) {
+      return json({ error: "Delivery-Link order not found" }, 404);
+    }
+
+    if (dispatchOrder.status !== "AWAITING_DELIVERY_PAYMENT") {
       return json({
-        quoted: false,
-        manualReview: true,
-        reason: "Distance is outside the configured 10-mile table"
-      }, 202);
+        error: "Order is not awaiting delivery pricing",
+        status: dispatchOrder.status
+      }, 409);
     }
 
-    const uberQuoteCents =
-      body.uberQuoteCents == null ? null : Number(body.uberQuoteCents);
+    const quoteResult = await createUberDeliveryQuote(env, {
+      pickupAddress: dispatchOrder.pickup_address,
+      dropoffAddress: dispatchOrder.delivery_address,
+      dropoffPostalCode: dispatchOrder.delivery_postal_code
+    });
+
+    if (!quoteResult.ok) {
+      return json(quoteResult.error, quoteResult.status || 502);
+    }
+
+    const quote = quoteResult.quote;
+    const uberFeeCents = Number(quote.fee || 0);
+    if (!Number.isInteger(uberFeeCents) || uberFeeCents <= 0) {
+      return json({ error: "Uber Direct returned an invalid delivery fee" }, 502);
+    }
+
     const minimumMarginCents = Number(
       env.MIN_GROSS_MARGIN_CENTS || DEFAULT_MIN_GROSS_MARGIN_CENTS
     );
+    const customerPriceCents = calculateProtectedCustomerPrice(
+      uberFeeCents,
+      minimumMarginCents
+    );
+    const grossMarginCents = customerPriceCents - uberFeeCents;
 
-    const grossMarginCents =
-      Number.isFinite(uberQuoteCents)
-        ? rate.customerPriceCents - uberQuoteCents
-        : null;
+    await env.DISPATCH_DB
+      .prepare(
+        `UPDATE dispatch_orders
+         SET delivery_fee_cents = ?,
+             pricing_basis = 'uber_quote_plus_margin',
+             uber_quote_id = ?,
+             uber_quote_fee_cents = ?,
+             uber_quote_expires_at = ?,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = ? AND source = 'corporate_delivery_link'
+           AND status = 'AWAITING_DELIVERY_PAYMENT'`
+      )
+      .bind(
+        customerPriceCents,
+        blankToNull(quote.id),
+        uberFeeCents,
+        blankToNull(quote.expires),
+        dispatchOrderId
+      )
+      .run();
 
     return json({
       quoted: true,
-      miles,
-      customerPriceCents: rate.customerPriceCents,
-      customerPrice: (rate.customerPriceCents / 100).toFixed(2),
+      serverPriced: true,
+      dispatchOrderId,
+      customerPriceCents,
+      customerPrice: (customerPriceCents / 100).toFixed(2),
+      pricingBasis: "uber_quote_plus_margin",
       fulfillmentPriority: ["LCS", "UBER_DIRECT", "APPROVED_FALLBACK"],
       uberDirect: {
-        quoteRequiredBeforeDispatch: true,
+        quoteId: quote.id || null,
+        quoteExpiresAt: quote.expires || null,
+        feeCents: uberFeeCents,
+        pickupDurationMinutes: quote.pickup_duration ?? null,
+        durationMinutes: quote.duration ?? null,
         grossMarginCents,
         minimumMarginCents,
-        marginProtected:
-          grossMarginCents == null ? null : grossMarginCents >= minimumMarginCents
+        marginProtected: grossMarginCents >= minimumMarginCents
       }
     });
   }
@@ -327,8 +385,102 @@ async function getUberAccessToken(env) {
   return { ok: true, accessToken: data.access_token };
 }
 
-function normalizeUberAddress(address) {
-  return typeof address === "string" ? address : JSON.stringify(address);
+async function createUberDeliveryQuote(env, {
+  pickupAddress,
+  dropoffAddress,
+  dropoffPostalCode
+}) {
+  if (!pickupAddress || !dropoffAddress) {
+    return {
+      ok: false,
+      status: 400,
+      error: { error: "Pickup and delivery addresses are required" }
+    };
+  }
+
+  const token = await getUberAccessToken(env);
+  if (!token.ok) {
+    return {
+      ok: false,
+      status: 502,
+      error: {
+        error: "Unable to authenticate with Uber Direct",
+        details: token.error
+      }
+    };
+  }
+
+  const quoteResponse = await fetch(
+    `https://api.uber.com/v1/customers/${encodeURIComponent(
+      env.UBER_DIRECT_CUSTOMER_ID
+    )}/delivery_quotes`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token.accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        pickup_address: normalizeUberAddress(
+          pickupAddress,
+          extractPostalCode(pickupAddress)
+        ),
+        dropoff_address: normalizeUberAddress(
+          dropoffAddress,
+          dropoffPostalCode
+        )
+      })
+    }
+  );
+
+  const quote = await safeJson(quoteResponse);
+  if (!quoteResponse.ok) {
+    return { ok: false, status: quoteResponse.status, error: quote };
+  }
+
+  return { ok: true, quote };
+}
+
+function normalizeUberAddress(address, postalCode = "") {
+  if (address && typeof address === "object") {
+    return JSON.stringify(address);
+  }
+
+  const payload = {
+    street_address: [String(address || "").trim()],
+    country: "US"
+  };
+
+  if (postalCode) {
+    payload.zip_code = String(postalCode).trim();
+  }
+
+  return JSON.stringify(payload);
+}
+
+function extractPostalCode(address) {
+  const match = String(address || "").match(/\b\d{5}(?:-\d{4})?\b/);
+  return match ? match[0] : "";
+}
+
+export function calculateProtectedCustomerPrice(
+  uberFeeCents,
+  minimumMarginCents = DEFAULT_MIN_GROSS_MARGIN_CENTS
+) {
+  const fee = Number(uberFeeCents);
+  const margin = Number(minimumMarginCents);
+
+  if (!Number.isInteger(fee) || fee <= 0) {
+    throw new TypeError("uberFeeCents must be a positive integer");
+  }
+
+  if (!Number.isInteger(margin) || margin < 0) {
+    throw new TypeError("minimumMarginCents must be a non-negative integer");
+  }
+
+  const protectedPrice = fee + margin;
+  const roundedToNinetyNine = Math.ceil((protectedPrice + 1) / 100) * 100 - 1;
+  return Math.max(TWIN_CITY_RATES[0].customerPriceCents, roundedToNinetyNine);
 }
 
 function squareHeaders(env) {
