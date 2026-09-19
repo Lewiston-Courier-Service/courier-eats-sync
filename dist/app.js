@@ -1,5 +1,8 @@
 let restaurants = [];
-let selectedCategory = "All";
+let corporateRestaurants = [];
+let localRestaurantsLoadError = "";
+let corporateRestaurantsLoadError = "";
+let selectedCategory = "Breakfast";
 let cart = [];
 let cartLocationId = null;
 let cartRestaurantName = "";
@@ -101,9 +104,6 @@ function corporateBrandPresentation(restaurant) {
 }
 
 async function loadCorporateRestaurants() {
-  const list = document.getElementById("corporateRestaurantList");
-  if (!list) return;
-
   try {
     const response = await fetch("/api/corporate/restaurants", {
       cache: "no-store"
@@ -111,111 +111,242 @@ async function loadCorporateRestaurants() {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "Corporate restaurant API returned " + response.status);
+      throw new Error(
+        data.error || "Corporate restaurant API returned " + response.status
+      );
     }
 
-    const corporateRestaurants = Array.isArray(data.restaurants)
+    corporateRestaurants = Array.isArray(data.restaurants)
       ? data.restaurants.filter(restaurant => restaurant.deliveryEnabled !== false)
       : [];
-
-    renderCorporateRestaurants(corporateRestaurants);
+    corporateRestaurantsLoadError = "";
   } catch (error) {
     console.error(error);
-    list.innerHTML = `
-      <div class="message">
-        Unable to load corporate delivery restaurants:
-        ${escapeHTML(error.message)}
-      </div>
-    `;
+    corporateRestaurants = [];
+    corporateRestaurantsLoadError = error.message || "Unable to load Order Direct restaurants.";
   }
+
+  renderRestaurants();
 }
 
-const CORPORATE_MEAL_TABS = ["Breakfast", "Lunch", "Dinner"];
-let selectedCorporateMeal = "Breakfast";
-let cachedCorporateRestaurants = [];
+const RESTAURANT_MEAL_TABS = ["Breakfast", "Lunch", "Dinner"];
 
-function renderCorporateRestaurants(corporateRestaurants) {
-  const list = document.getElementById("corporateRestaurantList");
+const LOCAL_BREAKFAST_NAME_HINTS = [
+  "breakfast",
+  "brunch",
+  "cafe",
+  "café",
+  "diner",
+  "bakery",
+  "donut",
+  "forage",
+  "dubois",
+  "kristi",
+  "rolly",
+  "roy's allsteak",
+  "roys allsteak"
+];
+
+function inferLocalMealPeriods(restaurant) {
+  const name = String(restaurant?.name || "").trim().toLowerCase();
+  const breakfast = LOCAL_BREAKFAST_NAME_HINTS.some(hint => name.includes(hint));
+
+  if (breakfast) return ["Breakfast", "Lunch"];
+
+  return ["Lunch", "Dinner"];
+}
+
+function restaurantMatchesSearch(restaurant, search) {
+  if (!search) return true;
+
+  const haystack = [
+    restaurant?.name,
+    restaurant?.brand,
+    restaurant?.city,
+    restaurant?.state,
+    restaurant?.pickupAddress
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return haystack.includes(search);
+}
+
+function renderRestaurants() {
+  const list = document.getElementById("restaurantList");
   if (!list) return;
 
-  cachedCorporateRestaurants = Array.isArray(corporateRestaurants)
-    ? corporateRestaurants
-    : [];
+  const search = String(
+    document.getElementById("restaurantSearch")?.value || ""
+  )
+    .trim()
+    .toLowerCase();
+
+  const localMatches = restaurants.filter(restaurant => {
+    return (
+      inferLocalMealPeriods(restaurant).includes(selectedCategory) &&
+      restaurantMatchesSearch(restaurant, search)
+    );
+  });
+
+  const corporateMatches = corporateRestaurants.filter(restaurant => {
+    const mealPeriods = Array.isArray(restaurant.mealPeriods)
+      ? restaurant.mealPeriods
+      : [];
+    return (
+      mealPeriods.includes(selectedCategory) &&
+      restaurantMatchesSearch(restaurant, search)
+    );
+  });
 
   list.innerHTML = "";
 
-  if (cachedCorporateRestaurants.length === 0) {
-    list.innerHTML =
-      '<div class="message">No corporate Delivery-Link restaurants are available yet.</div>';
-    return;
-  }
-
   const tabs = document.createElement("div");
-  tabs.className = "corporate-meal-tabs";
+  tabs.className = "restaurant-meal-tabs";
   tabs.setAttribute("role", "tablist");
-  tabs.setAttribute("aria-label", "Restaurant meal times");
+  tabs.setAttribute("aria-label", "Breakfast, lunch, or dinner");
 
-  CORPORATE_MEAL_TABS.forEach(meal => {
+  RESTAURANT_MEAL_TABS.forEach(meal => {
     const button = document.createElement("button");
     button.type = "button";
     button.className =
-      "corporate-meal-tab" + (meal === selectedCorporateMeal ? " active" : "");
+      "restaurant-meal-tab" + (meal === selectedCategory ? " active" : "");
     button.textContent = meal;
     button.dataset.meal = meal;
     button.setAttribute("role", "tab");
     button.setAttribute(
       "aria-selected",
-      meal === selectedCorporateMeal ? "true" : "false"
+      meal === selectedCategory ? "true" : "false"
     );
 
     button.addEventListener("click", () => {
-      selectedCorporateMeal = meal;
-      renderCorporateRestaurants(cachedCorporateRestaurants);
+      selectedCategory = meal;
+      renderRestaurants();
     });
 
     tabs.appendChild(button);
   });
 
-  const matchingRestaurants = cachedCorporateRestaurants.filter(restaurant => {
-    const periods = Array.isArray(restaurant.mealPeriods)
-      ? restaurant.mealPeriods
-      : [];
-    return periods.includes(selectedCorporateMeal);
-  });
+  list.appendChild(tabs);
 
-  const panel = document.createElement("section");
-  panel.className = "corporate-meal-panel";
-  panel.setAttribute("role", "tabpanel");
-
-  const heading = document.createElement("div");
-  heading.className = "corporate-category-heading";
-  heading.innerHTML = `
+  const summary = document.createElement("div");
+  summary.className = "unified-meal-summary";
+  summary.innerHTML = `
     <div>
-      <span class="corporate-category-kicker">Corporate Restaurants</span>
-      <h3>${escapeHTML(selectedCorporateMeal)}</h3>
+      <span class="corporate-category-kicker">Courier Eats Restaurants</span>
+      <h3>${escapeHTML(selectedCategory)}</h3>
     </div>
     <span class="corporate-category-count">
-      ${matchingRestaurants.length}
-      ${matchingRestaurants.length === 1 ? "restaurant" : "restaurants"}
+      ${localMatches.length + corporateMatches.length}
+      ${localMatches.length + corporateMatches.length === 1
+        ? "restaurant"
+        : "restaurants"}
     </span>
   `;
+  list.appendChild(summary);
 
-  const grid = document.createElement("div");
-  grid.className = "corporate-restaurant-grid";
-
-  matchingRestaurants.forEach(restaurant => {
-    grid.appendChild(createCorporateRestaurantCard(restaurant));
-  });
-
-  if (matchingRestaurants.length === 0) {
-    grid.innerHTML =
-      '<div class="message">No restaurants are listed for this meal yet.</div>';
+  if (
+    localMatches.length === 0 &&
+    corporateMatches.length === 0 &&
+    !localRestaurantsLoadError &&
+    !corporateRestaurantsLoadError
+  ) {
+    list.insertAdjacentHTML(
+      "beforeend",
+      '<div class="message">No restaurants found in this meal tab.</div>'
+    );
+    return;
   }
 
-  panel.appendChild(heading);
-  panel.appendChild(grid);
-  list.appendChild(tabs);
-  list.appendChild(panel);
+  if (localMatches.length > 0) {
+    const localSection = document.createElement("section");
+    localSection.className = "restaurant-source-group";
+    localSection.innerHTML = `
+      <div class="restaurant-source-heading">
+        <div>
+          <span class="restaurant-source-kicker">Order on Courier Eats</span>
+          <h4>Local Restaurants</h4>
+        </div>
+        <span>${localMatches.length}</span>
+      </div>
+    `;
+
+    const localGrid = document.createElement("div");
+    localGrid.className = "restaurant-grid unified-local-grid";
+    localMatches.forEach(restaurant => {
+      localGrid.appendChild(createLocalRestaurantCard(restaurant));
+    });
+
+    localSection.appendChild(localGrid);
+    list.appendChild(localSection);
+  } else if (localRestaurantsLoadError) {
+    list.insertAdjacentHTML(
+      "beforeend",
+      `<div class="message">Local restaurants: ${escapeHTML(localRestaurantsLoadError)}</div>`
+    );
+  }
+
+  if (corporateMatches.length > 0) {
+    const corporateSection = document.createElement("section");
+    corporateSection.className = "restaurant-source-group";
+    corporateSection.innerHTML = `
+      <div class="restaurant-source-heading">
+        <div>
+          <span class="restaurant-source-kicker">Order from the restaurant first</span>
+          <h4>Order Direct + Courier Eats Delivery</h4>
+        </div>
+        <span>${corporateMatches.length}</span>
+      </div>
+    `;
+
+    const corporateGrid = document.createElement("div");
+    corporateGrid.className = "corporate-restaurant-grid";
+    corporateMatches.forEach(restaurant => {
+      corporateGrid.appendChild(createCorporateRestaurantCard(restaurant));
+    });
+
+    corporateSection.appendChild(corporateGrid);
+    list.appendChild(corporateSection);
+  } else if (corporateRestaurantsLoadError) {
+    list.insertAdjacentHTML(
+      "beforeend",
+      `<div class="message">Order Direct restaurants: ${escapeHTML(corporateRestaurantsLoadError)}</div>`
+    );
+  }
+}
+
+function createLocalRestaurantCard(restaurant) {
+  const card = document.createElement("article");
+  card.className = "restaurant-card local-restaurant-card";
+
+  const locationText = [restaurant.city, restaurant.state]
+    .filter(Boolean)
+    .join(", ");
+
+  const periods = inferLocalMealPeriods(restaurant);
+
+  card.innerHTML = `
+    <div class="restaurant-top">
+      <div class="local-card-badges">
+        <span class="local-restaurant-badge">Local Restaurant</span>
+        <span class="local-meal-badge">${escapeHTML(periods.join(" • "))}</span>
+      </div>
+      <h3 class="restaurant-name">${escapeHTML(restaurant.name || "")}</h3>
+      <div class="restaurant-location">${escapeHTML(locationText)}</div>
+      <button class="view-menu" type="button">
+        View ${escapeHTML(selectedCategory)} Menu
+      </button>
+    </div>
+    <div class="restaurant-menu"></div>
+  `;
+
+  const button = card.querySelector(".view-menu");
+  button.addEventListener("click", () => {
+    loadMenu(restaurant, button);
+  });
+
+  return card;
 }
 
 function createCorporateRestaurantCard(restaurant) {
@@ -454,134 +585,27 @@ async function submitCorporateDelivery(event, restaurant) {
 }
 
 async function loadRestaurants() {
-const list =
-document.getElementById(
-"restaurantList"
-);
-try {
-const response =
-await fetch(
-"/api/restaurants",
-{
-cache: "no-store"
+  try {
+    const response = await fetch("/api/restaurants", {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Restaurant API returned " + response.status);
+    }
+
+    const data = await response.json();
+    restaurants = Array.isArray(data.restaurants) ? data.restaurants : [];
+    localRestaurantsLoadError = "";
+  } catch (error) {
+    console.error(error);
+    restaurants = [];
+    localRestaurantsLoadError = error.message || "Unable to load local restaurants.";
+  }
+
+  renderRestaurants();
 }
-);
-if (!response.ok) {
-throw new Error(
-"Restaurant API returned " +
-response.status
-);
-}
-const data =
-await response.json();
-restaurants =
-Array.isArray(
-data.restaurants
-)
-? data.restaurants
-: [];
-renderRestaurants();
-} catch (error) {
-console.error(error);
-list.innerHTML = `
-<div class="message">
-Unable to load restaurants:
-${escapeHTML(
-error.message
-)}
-</div>
-`;
-}
-}
-function renderRestaurants() {
-const list =
-document.getElementById(
-"restaurantList"
-);
-const search =
-document
-.getElementById(
-"restaurantSearch"
-)
-.value
-.trim()
-.toLowerCase();
-const filtered =
-restaurants.filter(
-restaurant => {
-return String(
-restaurant.name || ""
-)
-.toLowerCase()
-.includes(search);
-}
-);
-list.innerHTML = "";
-if (
-filtered.length === 0
-) {
-list.innerHTML = `
-<div class="message">
-No restaurants found.
-</div>
-`;
-return;
-}
-filtered.forEach(
-restaurant => {
-const card =
-document.createElement(
-"article"
-);
-card.className =
-"restaurant-card";
-const locationText =
-[
-restaurant.city,
-restaurant.state
-]
-.filter(Boolean)
-.join(", ");
-card.innerHTML = `
-<div class="restaurant-top">
-<h3 class="restaurant-name">
-${escapeHTML(
-restaurant.name
-)}
-</h3>
-<div class="restaurant-location">
-${escapeHTML(
-locationText
-)}
-</div>
-<button
-class="view-menu"
-type="button"
->
-View Menu
-</button>
-</div>
-<div
-class="restaurant-menu"
-></div>
-`;
-const button =
-card.querySelector(
-".view-menu"
-);
-button.addEventListener(
-"click",
-() => {
-loadMenu(
-restaurant,
-button
-);
-}
-);
-list.appendChild(card);
-}
-);
-}
+
 async function loadMenu(
 restaurant,
 button
@@ -1203,64 +1227,6 @@ document
 .addEventListener(
 "input",
 renderRestaurants
-);
-document
-.querySelectorAll(
-".category-button"
-)
-.forEach(
-button => {
-button.addEventListener(
-"click",
-() => {
-document
-.querySelectorAll(
-".category-button"
-)
-.forEach(
-otherButton => {
-otherButton
-.classList
-.remove(
-"active"
-);
-}
-);
-button
-.classList
-.add(
-"active"
-);
-selectedCategory =
-button.dataset
-.category;
-document
-.querySelectorAll(
-".restaurant-menu"
-)
-.forEach(
-menu => {
-menu.innerHTML =
-"";
-menu.dataset.loaded =
-"false";
-menu.style.display =
-"none";
-}
-);
-document
-.querySelectorAll(
-".view-menu"
-)
-.forEach(
-menuButton => {
-menuButton.textContent =
-"View Menu";
-}
-);
-}
-);
-}
 );
 document
 .getElementById(
