@@ -372,7 +372,7 @@ const LOCAL_WORLD_FOOD_NAME_HINTS = [
 
 const LOCAL_CATEGORY_OVERRIDES = [
   { match: ["kristi's cafe", "kristis cafe", "kristi cafe"], categories: ["Breakfast", "Lunch"] },
-  { match: ["roy's all steak hamburgers", "roys all steak hamburgers", "roy's allsteak", "roys allsteak"], categories: ["Breakfast", "Lunch"] },
+  { match: ["roy's all steak hamburgers", "roys all steak hamburgers", "roy's allsteak", "roys allsteak"], categories: ["Breakfast", "Lunch", "Dinner"] },
   { match: ["fran's restaurant", "frans restaurant", "fran's"], categories: ["Breakfast", "Lunch"] },
   { match: ["marco's restaurant", "marcos restaurant", "marco's", "marcos"], categories: ["Lunch", "Dinner", "Pizza"] },
   { match: ["legends sports bar", "legends"], categories: ["Lunch", "Dinner"] },
