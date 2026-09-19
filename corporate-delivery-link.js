@@ -7,6 +7,7 @@ const CORPORATE_RESTAURANTS = [
     coreMarket: "Twin City",
     corePostalCodes: ["04240", "04210"],
     orderUrl: "https://www.popeyes.com/",
+    pickupAddress: "841 Lisbon St, Lewiston, ME 04240",
     deliveryEnabled: true
   }
 ];
@@ -49,7 +50,6 @@ export async function handleCorporateDeliveryLink(request, env) {
     const customerPhone = String(body.customerPhone || "").trim();
     const deliveryAddress = String(body.deliveryAddress || "").trim();
     const deliveryPostalCode = String(body.deliveryPostalCode || "").trim();
-    const pickupAddress = String(body.pickupAddress || "").trim();
 
     if (!restaurantOrderId) {
       return json({ error: "Restaurant order number is required" }, 400);
@@ -71,7 +71,7 @@ export async function handleCorporateDeliveryLink(request, env) {
         `${restaurant.id}:${restaurantOrderId}`,
         blankToNull(customerName),
         blankToNull(customerPhone),
-        blankToNull(pickupAddress),
+        restaurant.pickupAddress,
         deliveryAddress
       )
       .run();
@@ -118,6 +118,16 @@ export async function handleCorporateDeliveryLink(request, env) {
     }
     if (!Number.isInteger(amountCents) || amountCents <= 0) {
       return json({ error: "Valid delivery amount is required" }, 400);
+    }
+
+    const allowedDeliveryAmounts = new Set(
+      TWIN_CITY_RATES.map((entry) => entry.customerPriceCents)
+    );
+
+    if (!allowedDeliveryAmounts.has(amountCents)) {
+      return json({
+        error: "Delivery amount does not match a configured Courier Eats rate"
+      }, 400);
     }
 
     const dispatchOrder = await env.DISPATCH_DB
