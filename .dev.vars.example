@@ -12,3 +12,6 @@ SQUARE_APP_ID=replace_with_square_application_id
 SQUARE_APP_SECRET=replace_with_square_application_secret
 CONNECTOR_ENCRYPTION_KEY=replace_with_base64_encoded_32_byte_key
 SQUARE_RESTAURANT_WEBHOOK_SIGNATURE_KEY=replace_with_restaurant_webhook_signature_key
+
+# Optional: only used by scripts/square-provision-corporate-delivery-items.mjs --production --apply
+SQUARE_PRODUCTION_ACCESS_TOKEN=replace_with_square_production_token
