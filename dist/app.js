@@ -26,6 +26,26 @@ return (
 }
 const LOCAL_ONLINE_ORDERING = [
   {
+    match: ["grant's bakery", "grants bakery"],
+    url: "https://grantsbakery.com/",
+    label: "Order Online"
+  },
+  {
+    match: ["mancini's italian deli", "mancinis italian deli"],
+    url: "https://order.toasttab.com/online/mancinis-italian-deli-5-park-street",
+    label: "Order Online"
+  },
+  {
+    match: ["labadie's bakery", "labadies bakery"],
+    url: "https://labadiesbakery.com/",
+    label: "Shop Online"
+  },
+  {
+    match: ["the maine grill", "maine grill"],
+    url: "https://www.grubhub.com/restaurant/the-maine-grill-490-pleasant-street-lewiston/15055232",
+    label: "Order Online"
+  },
+  {
     match: ["tina thai"],
     url: "https://www.ordertinathaiexpress.com/order",
     label: "Order Online"
@@ -268,8 +288,32 @@ const LOCAL_WORLD_FOOD_NAME_HINTS = [
   "korean"
 ];
 
+const LOCAL_CATEGORY_OVERRIDES = [
+  { match: ["the italian bakery", "italian bakery"], categories: ["Breakfast", "Lunch", "Bakery", "Pizza"] },
+  { match: ["the cupcakery", "cupcakery"], categories: ["Breakfast", "Lunch", "Bakery"] },
+  { match: ["grant's bakery", "grants bakery"], categories: ["Lunch", "Bakery"] },
+  { match: ["mancini's italian deli", "mancinis italian deli"], categories: ["Lunch", "Dinner"] },
+  { match: ["labadie's bakery", "labadies bakery"], categories: ["Breakfast", "Bakery"] },
+  { match: ["bakery barn"], categories: ["Bakery"] },
+  { match: ["the maine grill", "maine grill"], categories: ["Dinner"] },
+  { match: ["davinci", "da vinci"], categories: ["Lunch", "Dinner", "Pizza"] },
+  { match: ["the village inn", "village inn"], categories: ["Lunch", "Dinner"] },
+  { match: ["new lewiston mandarin", "mandarin buffet", "mandarin"], categories: ["Lunch", "Dinner", "World Food"] }
+];
+
 function inferLocalCategories(restaurant) {
   const name = String(restaurant?.name || "").trim().toLowerCase();
+
+  const override = LOCAL_CATEGORY_OVERRIDES.find(entry =>
+    entry.match.some(term => name.includes(term))
+  );
+
+  if (override) {
+    return override.categories.filter(category =>
+      RESTAURANT_CATEGORY_TABS.includes(category)
+    );
+  }
+
   const categories = new Set(["Lunch", "Dinner"]);
 
   if (LOCAL_BREAKFAST_NAME_HINTS.some(hint => name.includes(hint))) {
