@@ -26,9 +26,13 @@ const baseUrl = "http://127.0.0.1:8788";
 const squareProxyUrl = "http://127.0.0.1:8790";
 const squareSandboxUrl = "https://connect.squareupsandbox.com";
 const sandboxCompatibilityDate = "2026-07-28";
+const fileVars = readSimpleEnvFile(path.join(cwd, ".dev.vars"));
 const vars = {
-  ...readSimpleEnvFile(path.join(cwd, ".dev.vars")),
-  ...process.env
+  ...process.env,
+  ...fileVars,
+  SQUARE_API_BASE_URL:
+    process.env.SQUARE_API_BASE_URL ||
+    fileVars.SQUARE_API_BASE_URL
 };
 
 requireSandboxConfiguration(vars);
@@ -385,7 +389,7 @@ function formatBody(value) {
 }
 
 async function waitForReconciliation(dispatchOrderId) {
-  for (let attempt = 0; attempt < 40; attempt += 1) {
+  for (let attempt = 0; attempt < 100; attempt += 1) {
     const response = await fetch(`${baseUrl}/api/dispatch/reconcile`, {
       method: "POST",
       headers: {
@@ -401,11 +405,9 @@ async function waitForReconciliation(dispatchOrderId) {
       return true;
     }
 
-    if (response.status !== 409) {
-      console.log(
-        `Reconcile check ${attempt + 1}: ${JSON.stringify(body)}`
-      );
-    }
+    console.log(
+      `Reconcile check ${attempt + 1}: HTTP ${response.status} ${JSON.stringify(body)}`
+    );
 
     await sleep(3000);
   }
