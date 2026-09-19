@@ -1,4 +1,4 @@
-const CORPORATE_RESTAURANTS = [
+export const CORPORATE_RESTAURANTS = [
   {
     id: "popeyes-lewiston",
     brand: "Popeyes",
