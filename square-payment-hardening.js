@@ -329,7 +329,11 @@ async function releaseSquareOrderToDispatch(
 
     if (!orderResponse.ok || !orderData.order) {
       console.error("Unable to retrieve Square order for dispatch", orderData);
-      return { ok: false, status: 502, error: "Unable to retrieve paid Square order" };
+      return {
+        ok: false,
+        status: 502,
+        error: "Unable to retrieve paid Square order"
+      };
     }
 
     order = orderData.order;
@@ -340,36 +344,7 @@ async function releaseSquareOrderToDispatch(
   );
 
   if (options.source === "corporate_delivery_link") {
-   const fulfillment = Array.isArray(order.fulfillments)
-    ? order.fulfillments[0]
-    : null;
-  const recipient = getFulfillmentRecipient(fulfillment);
-  const deliveryAddress = formatAddress(recipient?.address);
-  const customerName = recipient?.display_name || "";
-  const customerPhone = recipient?.phone_number || "";
-  const locationId = order.location_id || options.fallbackLocationId || "";
-
-  let restaurantName = "";
-  let pickupAddress = "";
-
-  if (locationId) {
-    const locationResponse = await fetch(
-      `${squareApiBase(env)}/v2/locations/${encodeURIComponent(locationId)}`,
-      {
-        method: "GET",
-        headers: squareHeaders(env)
-      }
-    );
-
-    const locationData = await safeJson(locationResponse);
-
-    if (locationResponse.ok && locationData.location) {
-      restaurantName = locationData.location.name || "";
-      pickupAddress = formatAddress(locationData.location.address);
-    }
-  }
-
-  const updateResult = await env.DISPATCH_DB
+    const updateResult = await env.DISPATCH_DB
       .prepare(
         `UPDATE dispatch_orders
          SET order_total = ?,
@@ -408,11 +383,41 @@ async function releaseSquareOrderToDispatch(
       )
       .bind(
         dispatchOrderId,
-        options.note || "Square delivery payment released Delivery-Link order to dispatch"
+        options.note ||
+          "Square delivery payment released Delivery-Link order to dispatch"
       )
       .run();
 
     return { ok: true, released: true, status: "NEW" };
+  }
+
+  const fulfillment = Array.isArray(order.fulfillments)
+    ? order.fulfillments[0]
+    : null;
+  const recipient = getFulfillmentRecipient(fulfillment);
+  const deliveryAddress = formatAddress(recipient?.address);
+  const customerName = recipient?.display_name || "";
+  const customerPhone = recipient?.phone_number || "";
+  const locationId = order.location_id || options.fallbackLocationId || "";
+
+  let restaurantName = "";
+  let pickupAddress = "";
+
+  if (locationId) {
+    const locationResponse = await fetch(
+      `${squareApiBase(env)}/v2/locations/${encodeURIComponent(locationId)}`,
+      {
+        method: "GET",
+        headers: squareHeaders(env)
+      }
+    );
+
+    const locationData = await safeJson(locationResponse);
+
+    if (locationResponse.ok && locationData.location) {
+      restaurantName = locationData.location.name || "";
+      pickupAddress = formatAddress(locationData.location.address);
+    }
   }
 
   const updateResult = await env.DISPATCH_DB
@@ -463,7 +468,10 @@ async function releaseSquareOrderToDispatch(
       `INSERT INTO dispatch_events (order_id, status, note)
        VALUES (?, 'NEW', ?)`
     )
-    .bind(dispatchOrderId, options.note || "Square payment released to dispatch")
+    .bind(
+      dispatchOrderId,
+      options.note || "Square payment released to dispatch"
+    )
     .run();
 
   return { ok: true, released: true, status: "NEW" };
