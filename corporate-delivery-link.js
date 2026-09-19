@@ -176,7 +176,7 @@ export async function handleCorporateDeliveryLink(request, env) {
       }, 409);
     }
 
-    const squareResponse = await fetch("https://connect.squareup.com/v2/online-checkout/payment-links", {
+    const squareResponse = await fetch(`${squareApiBase(env)}/v2/online-checkout/payment-links`, {
       method: "POST",
       headers: squareHeaders(env),
       body: JSON.stringify({
@@ -481,6 +481,11 @@ export function calculateProtectedCustomerPrice(
   const protectedPrice = fee + margin;
   const roundedToNinetyNine = Math.ceil((protectedPrice + 1) / 100) * 100 - 1;
   return Math.max(TWIN_CITY_RATES[0].customerPriceCents, roundedToNinetyNine);
+}
+
+function squareApiBase(env) {
+  return String(env.SQUARE_API_BASE_URL || "https://connect.squareup.com")
+    .replace(/\/+$/, "");
 }
 
 function squareHeaders(env) {
