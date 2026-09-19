@@ -13,6 +13,8 @@ test("lists configured corporate restaurants", async () => {
   assert.equal(response.status, 200);
   const body = await response.json();
   assert.equal(body.restaurants[0].id, "popeyes-lewiston");
+  assert.equal(body.deliveryQuoteEnabled, false);
+  assert.equal(body.restaurants[0].deliveryQuoteEnabled, false);
   assert.equal(body.restaurants[0].integrationStatus, "CORPORATE_NOT_INTEGRATED");
   assert.equal(body.restaurants[0].pickupAddress, "841 Lisbon St, Lewiston, ME 04240");
   assert.equal(body.restaurants.length, 4);
@@ -49,7 +51,7 @@ test("delivery rate endpoint no longer accepts client supplied mileage by itself
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ miles: 5 })
     }),
-    { DISPATCH_DB: {} }
+    { DISPATCH_DB: {}, CORPORATE_DELIVERY_LINK_ENABLED: "true" }
   );
   assert.equal(response.status, 400);
   const body = await response.json();
@@ -88,7 +90,8 @@ test("delivery payment requires a server-side quoted amount", async () => {
     {
       DISPATCH_DB: fakeDb,
       SQUARE_ACCESS_TOKEN: "test-token",
-      SQUARE_LOCATION_ID: "test-location"
+      SQUARE_LOCATION_ID: "test-location",
+      CORPORATE_DELIVERY_LINK_ENABLED: "true"
     }
   );
 
