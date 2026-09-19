@@ -37,6 +37,8 @@ const vars = {
 
 requireSandboxConfiguration(vars);
 
+const resumeDispatchOrderId = readResumeDispatchOrderId(process.argv.slice(2));
+
 if (!existsSync(wranglerCli)) {
   throw new Error(
     "The sandbox Wrangler runtime is not installed. Run npm install, then try again."
@@ -48,21 +50,24 @@ let squareProxy = null;
 
 try {
   squareProxy = await startSquareSandboxProxy();
-  rmSync(stateDir, { recursive: true, force: true });
 
-  runWrangler([
-    "d1", "execute", "courier-eats-dispatch",
-    "--local",
-    "--persist-to", stateDir,
-    "--file=test/fixtures/dispatch-schema-pre-005.sql"
-  ]);
+  if (!resumeDispatchOrderId) {
+    rmSync(stateDir, { recursive: true, force: true });
 
-  runWrangler([
-    "d1", "execute", "courier-eats-dispatch",
-    "--local",
-    "--persist-to", stateDir,
-    "--file=migrations/005-corporate-delivery-link.sql"
-  ]);
+    runWrangler([
+      "d1", "execute", "courier-eats-dispatch",
+      "--local",
+      "--persist-to", stateDir,
+      "--file=test/fixtures/dispatch-schema-pre-005.sql"
+    ]);
+
+    runWrangler([
+      "d1", "execute", "courier-eats-dispatch",
+      "--local",
+      "--persist-to", stateDir,
+      "--file=migrations/005-corporate-delivery-link.sql"
+    ]);
+  }
 
   worker = spawn(
     process.execPath,
@@ -84,6 +89,25 @@ try {
 
   await waitForWorker();
 
+  if (resumeDispatchOrderId) {
+    console.log(
+      `Resuming Square Sandbox reconciliation for dispatch #${resumeDispatchOrderId}...`
+    );
+
+    const reconciled = await waitForReconciliation(resumeDispatchOrderId);
+
+    if (!reconciled) {
+      throw new Error(
+        `Square Sandbox payment for dispatch #${resumeDispatchOrderId} was not reconciled.`
+      );
+    }
+
+    console.log("\nPASS: Existing Square Sandbox payment was verified.");
+    console.log(
+      `PASS: Dispatch #${resumeDispatchOrderId} is NEW and ready for dispatch.`
+    );
+    process.exitCode = 0;
+  } else {
   const restaurantOrderId = `SANDBOX-${Date.now()}`;
   const createResponse = await fetch(`${baseUrl}/api/corporate/delivery-link`, {
     method: "POST",
@@ -163,9 +187,22 @@ try {
     "The real external webhook is not exercised by this localhost test; " +
     "that path is covered by the signed webhook integration test in npm test."
   );
+  }
 } finally {
   stopWorker(worker);
   await stopSquareSandboxProxy(squareProxy);
+}
+
+function readResumeDispatchOrderId(args) {
+  const index = args.indexOf("--resume");
+  if (index === -1) return 0;
+
+  const value = Number(args[index + 1] || 0);
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error("--resume requires a positive dispatch order ID.");
+  }
+
+  return value;
 }
 
 function readSimpleEnvFile(filePath) {
