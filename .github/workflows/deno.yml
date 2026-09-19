@@ -27,5 +27,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Run unit tests
+        run: npm test
+
       - name: Validate Cloudflare Worker
         run: npx wrangler deploy --dry-run
