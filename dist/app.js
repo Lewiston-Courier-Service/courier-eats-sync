@@ -152,6 +152,63 @@ function localOnlineOrderFor(restaurant) {
   );
 }
 
+const LOCAL_BRAND_DOMAINS = [
+  { match: ["marco's restaurant", "marcos restaurant", "marco's", "marcos"], domain: "marcosrestaurantmaine.com" },
+  { match: ["legends sports bar", "legends"], domain: "legendsmaine.com" },
+  { match: ["grant's bakery", "grants bakery"], domain: "grantsbakery.com" },
+  { match: ["labadie's bakery", "labadies bakery"], domain: "labadiesbakery.com" },
+  { match: ["kp's place", "kps place", "kp's"], domain: "kpsplacemaine.com" },
+  { match: ["tina thai"], domain: "ordertinathaiexpress.com" },
+  { match: ["the italian bakery", "italian bakery"], domain: "theitalianbakeryme.com" }
+];
+
+const LOCAL_BRAND_PALETTE = [
+  ["#b64036", "#f1b24a", "#fff2e3"],
+  ["#235347", "#78a083", "#edf7f1"],
+  ["#5d3a9b", "#b79ced", "#f3effc"],
+  ["#0f5f8f", "#5fb3d3", "#edf8fc"],
+  ["#8a3b12", "#d98324", "#fff3e8"],
+  ["#31572c", "#90a955", "#f3f8e9"],
+  ["#7b2d45", "#d66d8a", "#fceef3"],
+  ["#1f4e79", "#76a5d6", "#eef5fc"]
+];
+
+function localBrandPresentation(restaurant) {
+  const name = String(restaurant?.name || "").trim();
+  const lower = name.toLowerCase();
+
+  const domainMatch = LOCAL_BRAND_DOMAINS.find(entry =>
+    entry.match.some(term => lower.includes(term))
+  );
+
+  let hash = 0;
+  for (const character of lower) {
+    hash = ((hash << 5) - hash + character.charCodeAt(0)) | 0;
+  }
+
+  const palette = LOCAL_BRAND_PALETTE[Math.abs(hash) % LOCAL_BRAND_PALETTE.length];
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .map(part => part[0])
+    .join("")
+    .toUpperCase() || "CE";
+
+  return {
+    domain: domainMatch?.domain || "",
+    logoUrl: domainMatch?.domain
+      ? "https://www.google.com/s2/favicons?domain=" +
+        encodeURIComponent(domainMatch.domain) +
+        "&sz=128"
+      : "",
+    initials,
+    accent: palette[0],
+    accent2: palette[1],
+    soft: palette[2]
+  };
+}
+
 const CORPORATE_BRAND_PRESENTATION = {
   "Popeyes": {
     key: "popeyes",
@@ -543,7 +600,12 @@ function renderRestaurants() {
 
 function createLocalRestaurantCard(restaurant) {
   const card = document.createElement("article");
+  const brand = localBrandPresentation(restaurant);
+
   card.className = "restaurant-card local-restaurant-card";
+  card.style.setProperty("--local-accent", brand.accent);
+  card.style.setProperty("--local-accent-2", brand.accent2);
+  card.style.setProperty("--local-soft", brand.soft);
 
   const locationText = [restaurant.city, restaurant.state]
     .filter(Boolean)
@@ -553,16 +615,36 @@ function createLocalRestaurantCard(restaurant) {
   const onlineOrder = localOnlineOrderFor(restaurant);
 
   card.innerHTML = `
+    <div class="local-brand-strip" aria-hidden="true"></div>
     <div class="restaurant-top">
-      <div class="local-card-badges">
-        <span class="local-restaurant-badge">Local Restaurant</span>
-        <span class="local-meal-badge">${escapeHTML(periods.join(" • "))}</span>
-        ${onlineOrder
-          ? '<span class="local-online-badge">Online Ordering</span>'
-          : ""}
+      <div class="local-card-heading">
+        <div class="local-logo-wrap">
+          ${brand.logoUrl
+            ? `<img
+                 class="local-brand-logo"
+                 src="${escapeHTML(brand.logoUrl)}"
+                 alt="${escapeHTML((restaurant.name || "Local restaurant") + " logo")}"
+                 loading="lazy"
+                 referrerpolicy="no-referrer"
+               >`
+            : ""}
+          <span class="local-brand-fallback" ${brand.logoUrl ? "hidden" : ""}>
+            ${escapeHTML(brand.initials)}
+          </span>
+        </div>
+        <div class="local-card-title">
+          <div class="local-card-badges">
+            <span class="local-restaurant-badge">Local Restaurant</span>
+            <span class="local-meal-badge">${escapeHTML(periods.join(" • "))}</span>
+            ${onlineOrder
+              ? '<span class="local-online-badge">Online Ordering</span>'
+              : ""}
+          </div>
+          <h3 class="restaurant-name">${escapeHTML(restaurant.name || "")}</h3>
+          <div class="restaurant-location">${escapeHTML(locationText)}</div>
+        </div>
       </div>
-      <h3 class="restaurant-name">${escapeHTML(restaurant.name || "")}</h3>
-      <div class="restaurant-location">${escapeHTML(locationText)}</div>
+
       <div class="local-order-actions">
         <button class="view-menu" type="button">
           View ${escapeHTML(selectedCategory)} Menu
@@ -579,6 +661,15 @@ function createLocalRestaurantCard(restaurant) {
     </div>
     <div class="restaurant-menu"></div>
   `;
+
+  const logo = card.querySelector(".local-brand-logo");
+  const fallback = card.querySelector(".local-brand-fallback");
+  if (logo && fallback) {
+    logo.addEventListener("error", () => {
+      logo.hidden = true;
+      fallback.hidden = false;
+    });
+  }
 
   const button = card.querySelector(".view-menu");
   button.addEventListener("click", () => {
