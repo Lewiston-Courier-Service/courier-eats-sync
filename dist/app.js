@@ -86,7 +86,15 @@ function renderCorporateRestaurants(corporateRestaurants) {
         <a class="corporate-order-button" href="${escapeHTML(restaurant.orderUrl || "#")}" target="_blank" rel="noopener noreferrer">
           Order Direct
         </a>
-        <button class="corporate-delivery-toggle" type="button">I Already Ordered — Get Delivery</button>
+        <button
+          class="corporate-delivery-toggle"
+          type="button"
+          ${restaurant.deliveryQuoteEnabled ? "" : "disabled"}
+        >
+          ${restaurant.deliveryQuoteEnabled
+            ? "I Already Ordered — Get Delivery"
+            : "Courier Eats Delivery Pricing Temporarily Unavailable"}
+        </button>
       </div>
 
       <form class="corporate-delivery-form" hidden>
@@ -122,16 +130,21 @@ function renderCorporateRestaurants(corporateRestaurants) {
     const toggle = card.querySelector(".corporate-delivery-toggle");
     const form = card.querySelector(".corporate-delivery-form");
 
-    toggle.addEventListener("click", () => {
-      form.hidden = !form.hidden;
-      toggle.textContent = form.hidden
-        ? "I Already Ordered — Get Delivery"
-        : "Hide Delivery Form";
-    });
+    if (restaurant.deliveryQuoteEnabled) {
+      toggle.addEventListener("click", () => {
+        form.hidden = !form.hidden;
+        toggle.textContent = form.hidden
+          ? "I Already Ordered — Get Delivery"
+          : "Hide Delivery Form";
+      });
 
-    form.addEventListener("submit", event => {
-      submitCorporateDelivery(event, restaurant);
-    });
+      form.addEventListener("submit", event => {
+        submitCorporateDelivery(event, restaurant);
+      });
+    } else {
+      form.hidden = true;
+      toggle.title = "Uber Direct account enablement is still pending.";
+    }
 
     list.appendChild(card);
   });
