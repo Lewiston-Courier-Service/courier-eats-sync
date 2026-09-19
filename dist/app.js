@@ -26,6 +26,11 @@ return (
 }
 const LOCAL_ONLINE_ORDERING = [
   {
+    match: ["mac's downeast seafood", "macs downeast seafood", "mac's seafood", "macs seafood"],
+    url: "https://order.online/store/mac-s-downeast-seafood-minot-ave-23038006",
+    label: "Order Online"
+  },
+  {
     match: ["val's drive in", "vals drive in", "val's drive-in", "vals drive-in"],
     url: "https://order.online/store/val%27s-drive-in-lewiston-28473272",
     label: "Order Online"
@@ -299,6 +304,11 @@ const LOCAL_WORLD_FOOD_NAME_HINTS = [
 ];
 
 const LOCAL_CATEGORY_OVERRIDES = [
+  { match: ["always fresh la rochelle", "always fresh larochelle", "larochelle seafood", "la rochelle's"], categories: ["Lunch", "Dinner"] },
+  { match: ["fire house grill", "firehouse grill", "fire house grille", "firehouse grille"], categories: ["Lunch", "Dinner"] },
+  { match: ["mac's grill", "macs grill"], categories: ["Lunch", "Dinner"] },
+  { match: ["mac's downeast seafood", "macs downeast seafood", "mac's seafood", "macs seafood"], categories: ["Lunch", "Dinner"] },
+  { match: ["ms. claws", "ms claws", "ms claws lobster and seafood"], categories: ["Lunch", "Dinner"] },
   { match: ["marvelous macarons", "marvelous macaroons"], categories: ["Bakery"] },
   { match: ["simones' hot dog stand", "simones hot dog", "simone's hot dog", "simones hot dog stand"], categories: ["Breakfast", "Lunch"] },
   { match: ["happy days diner", "happy days"], categories: ["Breakfast", "Lunch"] },
