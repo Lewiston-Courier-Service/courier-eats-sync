@@ -693,3 +693,10 @@
     flex-direction: column;
   }
 }
+
+.corporate-delivery-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  background: #e8e8e8;
+  color: #555;
+}
