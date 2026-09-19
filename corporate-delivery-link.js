@@ -1,6 +1,7 @@
 const CORPORATE_RESTAURANTS = [
   {
     id: "popeyes-lewiston",
+    brand: "Popeyes",
     name: "Popeyes Lewiston",
     orderingMode: "DELIVERY_LINK",
     integrationStatus: "CORPORATE_NOT_INTEGRATED",
@@ -8,6 +9,42 @@ const CORPORATE_RESTAURANTS = [
     corePostalCodes: ["04240", "04210"],
     orderUrl: "https://www.popeyes.com/",
     pickupAddress: "841 Lisbon St, Lewiston, ME 04240",
+    deliveryEnabled: true
+  },
+  {
+    id: "mcdonalds-lewiston-lisbon",
+    brand: "McDonald's",
+    name: "McDonald's Lewiston - Lisbon St",
+    orderingMode: "DELIVERY_LINK",
+    integrationStatus: "CORPORATE_NOT_INTEGRATED",
+    coreMarket: "Twin City",
+    corePostalCodes: ["04240", "04210"],
+    orderUrl: "https://www.mcdonalds.com/us/en-us.html",
+    pickupAddress: "1035 Lisbon St, Lewiston, ME 04240",
+    deliveryEnabled: true
+  },
+  {
+    id: "burger-king-lewiston-lisbon",
+    brand: "Burger King",
+    name: "Burger King Lewiston - Lisbon St",
+    orderingMode: "DELIVERY_LINK",
+    integrationStatus: "CORPORATE_NOT_INTEGRATED",
+    coreMarket: "Twin City",
+    corePostalCodes: ["04240", "04210"],
+    orderUrl: "https://www.bk.com/",
+    pickupAddress: "827 Lisbon St, Lewiston, ME 04240",
+    deliveryEnabled: true
+  },
+  {
+    id: "burger-king-auburn-center",
+    brand: "Burger King",
+    name: "Burger King Auburn - Center St",
+    orderingMode: "DELIVERY_LINK",
+    integrationStatus: "CORPORATE_NOT_INTEGRATED",
+    coreMarket: "Twin City",
+    corePostalCodes: ["04240", "04210"],
+    orderUrl: "https://www.bk.com/",
+    pickupAddress: "333 Center St, Auburn, ME 04210",
     deliveryEnabled: true
   }
 ];
