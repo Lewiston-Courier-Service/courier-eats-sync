@@ -86,9 +86,9 @@ try {
     })
   });
 
-  const created = await createResponse.json();
+  const created = await readResponseBody(createResponse);
 
-  if (!createResponse.ok || !created.dispatchOrderId) {
+  if (!createResponse.ok || !created?.dispatchOrderId) {
     throw new Error(
       `Unable to create sandbox Delivery-Link order: ${JSON.stringify(created)}`
     );
@@ -110,20 +110,13 @@ try {
        WHERE id = ${dispatchOrderId};`
   ]);
 
-  const paymentResponse = await fetch(
-    `${baseUrl}/api/corporate/delivery-payment`,
-    {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ dispatchOrderId })
-    }
-  );
+  const paymentResult = await requestSandboxCheckout(dispatchOrderId);
+  const payment = paymentResult.body;
 
-  const payment = await paymentResponse.json();
-
-  if (!paymentResponse.ok || !payment.checkoutUrl) {
+  if (!paymentResult.ok || !payment?.checkoutUrl) {
     throw new Error(
-      `Unable to create Square Sandbox checkout: ${JSON.stringify(payment)}`
+      "Unable to create Square Sandbox checkout. " +
+      `HTTP ${paymentResult.status}. Response: ${formatBody(payment)}`
     );
   }
 
@@ -242,6 +235,78 @@ async function waitForWorker() {
   throw new Error("Local Wrangler Worker did not become ready.");
 }
 
+async function requestSandboxCheckout(dispatchOrderId) {
+  let last = { ok: false, status: 0, body: null };
+
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const response = await fetch(
+        `${baseUrl}/api/corporate/delivery-payment`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ dispatchOrderId })
+        }
+      );
+
+      const body = await readResponseBody(response);
+      last = { ok: response.ok, status: response.status, body };
+
+      if (response.ok) return last;
+
+      const transient =
+        response.status >= 500 ||
+        /network connection lost/i.test(formatBody(body));
+
+      if (!transient || attempt === 3) return last;
+
+      console.log(
+        `Square Sandbox checkout attempt ${attempt} failed transiently; retrying...`
+      );
+      await sleep(2000 * attempt);
+    } catch (error) {
+      last = {
+        ok: false,
+        status: 0,
+        body: { error: String(error?.message || error) }
+      };
+
+      if (attempt === 3) return last;
+
+      console.log(
+        `Square Sandbox checkout attempt ${attempt} hit a network error; retrying...`
+      );
+      await sleep(2000 * attempt);
+    }
+  }
+
+  return last;
+}
+
+async function readResponseBody(response) {
+  const text = await response.text();
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {
+      error: "Non-JSON response",
+      contentType: response.headers.get("content-type") || "",
+      body: text.slice(0, 1200)
+    };
+  }
+}
+
+function formatBody(value) {
+  if (typeof value === "string") return value;
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
 async function waitForReconciliation(dispatchOrderId) {
   for (let attempt = 0; attempt < 40; attempt += 1) {
     const response = await fetch(`${baseUrl}/api/dispatch/reconcile`, {
@@ -253,9 +318,9 @@ async function waitForReconciliation(dispatchOrderId) {
       body: JSON.stringify({ id: dispatchOrderId })
     });
 
-    const body = await response.json();
+    const body = await readResponseBody(response);
 
-    if (response.ok && body.status === "NEW") {
+    if (response.ok && body?.status === "NEW") {
       return true;
     }
 
