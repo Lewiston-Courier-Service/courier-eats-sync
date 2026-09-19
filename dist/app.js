@@ -130,73 +130,92 @@ async function loadCorporateRestaurants() {
   }
 }
 
-const CORPORATE_CATEGORY_ORDER = [
-  "Breakfast",
-  "Burgers",
-  "Chicken & Wings",
-  "Italian",
-  "American Grill & Steak"
-];
+const CORPORATE_MEAL_TABS = ["Breakfast", "Lunch", "Dinner"];
+let selectedCorporateMeal = "Breakfast";
+let cachedCorporateRestaurants = [];
 
 function renderCorporateRestaurants(corporateRestaurants) {
   const list = document.getElementById("corporateRestaurantList");
   if (!list) return;
 
+  cachedCorporateRestaurants = Array.isArray(corporateRestaurants)
+    ? corporateRestaurants
+    : [];
+
   list.innerHTML = "";
 
-  if (corporateRestaurants.length === 0) {
+  if (cachedCorporateRestaurants.length === 0) {
     list.innerHTML =
       '<div class="message">No corporate Delivery-Link restaurants are available yet.</div>';
     return;
   }
 
-  const groups = new Map();
+  const tabs = document.createElement("div");
+  tabs.className = "corporate-meal-tabs";
+  tabs.setAttribute("role", "tablist");
+  tabs.setAttribute("aria-label", "Restaurant meal times");
 
-  corporateRestaurants.forEach(restaurant => {
-    const category = String(
-      restaurant.primaryCategory || "Other Restaurants"
-    ).trim();
+  CORPORATE_MEAL_TABS.forEach(meal => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className =
+      "corporate-meal-tab" + (meal === selectedCorporateMeal ? " active" : "");
+    button.textContent = meal;
+    button.dataset.meal = meal;
+    button.setAttribute("role", "tab");
+    button.setAttribute(
+      "aria-selected",
+      meal === selectedCorporateMeal ? "true" : "false"
+    );
 
-    if (!groups.has(category)) groups.set(category, []);
-    groups.get(category).push(restaurant);
-  });
-
-  const categories = [
-    ...CORPORATE_CATEGORY_ORDER.filter(category => groups.has(category)),
-    ...Array.from(groups.keys()).filter(
-      category => !CORPORATE_CATEGORY_ORDER.includes(category)
-    )
-  ];
-
-  categories.forEach(category => {
-    const restaurantsInCategory = groups.get(category) || [];
-    const section = document.createElement("section");
-    section.className = "corporate-category-group";
-
-    const heading = document.createElement("div");
-    heading.className = "corporate-category-heading";
-    heading.innerHTML = `
-      <div>
-        <span class="corporate-category-kicker">Corporate Restaurants</span>
-        <h3>${escapeHTML(category)}</h3>
-      </div>
-      <span class="corporate-category-count">
-        ${restaurantsInCategory.length}
-        ${restaurantsInCategory.length === 1 ? "restaurant" : "restaurants"}
-      </span>
-    `;
-
-    const grid = document.createElement("div");
-    grid.className = "corporate-restaurant-grid";
-
-    restaurantsInCategory.forEach(restaurant => {
-      grid.appendChild(createCorporateRestaurantCard(restaurant));
+    button.addEventListener("click", () => {
+      selectedCorporateMeal = meal;
+      renderCorporateRestaurants(cachedCorporateRestaurants);
     });
 
-    section.appendChild(heading);
-    section.appendChild(grid);
-    list.appendChild(section);
+    tabs.appendChild(button);
   });
+
+  const matchingRestaurants = cachedCorporateRestaurants.filter(restaurant => {
+    const periods = Array.isArray(restaurant.mealPeriods)
+      ? restaurant.mealPeriods
+      : [];
+    return periods.includes(selectedCorporateMeal);
+  });
+
+  const panel = document.createElement("section");
+  panel.className = "corporate-meal-panel";
+  panel.setAttribute("role", "tabpanel");
+
+  const heading = document.createElement("div");
+  heading.className = "corporate-category-heading";
+  heading.innerHTML = `
+    <div>
+      <span class="corporate-category-kicker">Corporate Restaurants</span>
+      <h3>${escapeHTML(selectedCorporateMeal)}</h3>
+    </div>
+    <span class="corporate-category-count">
+      ${matchingRestaurants.length}
+      ${matchingRestaurants.length === 1 ? "restaurant" : "restaurants"}
+    </span>
+  `;
+
+  const grid = document.createElement("div");
+  grid.className = "corporate-restaurant-grid";
+
+  matchingRestaurants.forEach(restaurant => {
+    grid.appendChild(createCorporateRestaurantCard(restaurant));
+  });
+
+  if (matchingRestaurants.length === 0) {
+    grid.innerHTML =
+      '<div class="message">No restaurants are listed for this meal yet.</div>';
+  }
+
+  panel.appendChild(heading);
+  panel.appendChild(grid);
+  list.appendChild(tabs);
+  list.appendChild(panel);
 }
 
 function createCorporateRestaurantCard(restaurant) {
@@ -229,7 +248,11 @@ function createCorporateRestaurantCard(restaurant) {
       </div>
       <div class="corporate-card-badges">
         <span class="restaurant-category-badge">
-          ${escapeHTML(restaurant.primaryCategory || "Restaurant")}
+          ${escapeHTML(
+            Array.isArray(restaurant.mealPeriods)
+              ? restaurant.mealPeriods.join(" • ")
+              : "Restaurant"
+          )}
         </span>
         <span class="delivery-link-badge">Delivery-Link</span>
         <span class="independent-delivery-badge">Independent delivery</span>
