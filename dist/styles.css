@@ -1272,3 +1272,116 @@
     height: 40px;
   }
 }
+
+
+/* Breakfast / Lunch / Dinner menu backgrounds */
+#restaurantService {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 28px;
+}
+
+#restaurantService::before,
+#restaurantService::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+#restaurantService::before {
+  z-index: -2;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#restaurantService::after {
+  z-index: -1;
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(1px);
+}
+
+#restaurantService[data-menu-background="breakfast"]::before {
+  background-image: url("/breakfast-bg.webp");
+  opacity: 1;
+}
+
+#restaurantService[data-menu-background="lunch"]::before {
+  background-image: url("/lunch-bg.webp");
+  opacity: 1;
+}
+
+#restaurantService[data-menu-background="dinner"]::before {
+  background-image: url("/dinner-bg.webp");
+  opacity: 1;
+}
+
+#restaurantService[data-menu-background]::after {
+  opacity: 1;
+}
+
+#restaurantService[data-menu-background] > .section-heading,
+#restaurantService[data-menu-background] > .restaurant-search-wrap,
+#restaurantService[data-menu-background] .restaurant-meal-tabs,
+#restaurantService[data-menu-background] .unified-meal-summary,
+#restaurantService[data-menu-background] .restaurant-source-heading {
+  position: relative;
+  z-index: 1;
+}
+
+#restaurantService[data-menu-background] > .section-heading {
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 16px;
+  padding: 13px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(5px);
+}
+
+#restaurantService[data-menu-background] > .section-heading p {
+  margin-bottom: 0;
+  color: #444;
+}
+
+#restaurantService[data-menu-background] > .restaurant-search-wrap {
+  padding: 6px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(5px);
+}
+
+#restaurantService[data-menu-background] .restaurant-meal-tabs {
+  padding: 9px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(5px);
+}
+
+#restaurantService[data-menu-background] .unified-meal-summary,
+#restaurantService[data-menu-background] .restaurant-source-heading {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
+  backdrop-filter: blur(5px);
+}
+
+#restaurantService[data-menu-background] .unified-meal-summary {
+  border-bottom: 0;
+}
+
+@media (max-width: 620px) {
+  #restaurantService {
+    margin-inline: -8px;
+    padding: 20px 12px;
+    border-radius: 18px;
+  }
+}
