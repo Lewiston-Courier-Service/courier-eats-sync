@@ -19,6 +19,9 @@ call :get wrangler.jsonc wrangler.jsonc || exit /b 1
 call :get dist/index.html dist\index.html || exit /b 1
 call :get dist/app.js dist\app.js || exit /b 1
 call :get dist/styles.css dist\styles.css || exit /b 1
+call :get dist/breakfast-bg.webp dist\breakfast-bg.webp || exit /b 1
+call :get dist/lunch-bg.webp dist\lunch-bg.webp || exit /b 1
+call :get dist/dinner-bg.webp dist\dinner-bg.webp || exit /b 1
 
 echo.
 echo Checking JavaScript syntax...
