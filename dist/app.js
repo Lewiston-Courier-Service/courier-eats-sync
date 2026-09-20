@@ -458,6 +458,21 @@ function renderRestaurants() {
   const list = document.getElementById("restaurantList");
   if (!list) return;
 
+  const restaurantService = document.getElementById("restaurantService");
+  if (restaurantService) {
+    const mealBackground = ["Breakfast", "Lunch", "Dinner"].includes(
+      selectedCategory
+    )
+      ? selectedCategory.toLowerCase()
+      : "";
+
+    if (mealBackground) {
+      restaurantService.dataset.menuBackground = mealBackground;
+    } else {
+      delete restaurantService.dataset.menuBackground;
+    }
+  }
+
   const search = String(
     document.getElementById("restaurantSearch")?.value || ""
   )
