@@ -22,6 +22,18 @@
   </div>
 
   <section class="hero production-front-hero" aria-label="Courier Eats Lewiston-Auburn">
+    <video
+      class="hero-background-video production-front-fallback"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      aria-hidden="true"
+    >
+      <source src="/courier-eats-background-loop.mp4" type="video/mp4">
+    </video>
+
     <img
       class="production-front-art"
       src="/courier-eats-front.webp"
@@ -30,6 +42,7 @@
       height="941"
       decoding="async"
       fetchpriority="high"
+      onerror="this.style.display='none'"
     >
 
     <div class="hero-inner production-front-controls">
