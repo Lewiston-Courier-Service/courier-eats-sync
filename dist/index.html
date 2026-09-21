@@ -21,26 +21,27 @@
     Thank you. Your Courier Eats order has been submitted.
   </div>
 
-  <section class="hero">
-    <video
-      class="hero-background-video"
-      autoplay
-      muted
-      loop
-      playsinline
-      preload="auto"
-      aria-hidden="true"
+  <section class="hero production-front-hero" aria-label="Courier Eats Lewiston-Auburn">
+    <img
+      class="production-front-art"
+      src="/courier-eats-front.webp"
+      alt="Courier Eats Lewiston-Auburn front page with local food, downtown skyline, courier scooter, and Lewiston Courier Service branding."
+      width="1672"
+      height="941"
+      decoding="async"
+      fetchpriority="high"
     >
-      <source src="/courier-eats-background-loop.mp4" type="video/mp4">
-    </video>
-    <div class="hero-inner">
-      <h1>What can we pick up for you?</h1>
-      <p>Order from local restaurants or book a retail pickup from stores such as Walmart, Home Depot, Lowe's, Tractor Supply, and Target.</p>
 
-      <div class="service-switcher" role="tablist" aria-label="Courier Eats services">
-        <button id="restaurantServiceButton" class="service-button active" type="button">🍽️ Restaurants</button>
-        <button id="retailServiceButton" class="service-button" type="button">🛍️ Retail Pickup</button>
+    <div class="hero-inner production-front-controls">
+      <h1 class="visually-hidden">Courier Eats — Good Food. Delivered.</h1>
+      <p class="visually-hidden">Support local. Eat local. Courier Eats serves Lewiston-Auburn with Lewiston Courier Service.</p>
+
+      <div class="service-switcher production-nav-hotspots" role="tablist" aria-label="Courier Eats services">
+        <button id="restaurantServiceButton" class="service-button active production-hotspot production-hotspot-restaurants" type="button" aria-label="Restaurants">Restaurants</button>
+        <button id="retailServiceButton" class="service-button production-hotspot production-hotspot-grocery" type="button" aria-label="Grocery Pickup">Grocery Pickup</button>
       </div>
+
+      <a id="heroOrderNow" class="production-hotspot production-hotspot-order" href="#restaurantService" aria-label="Order Now">Order Now</a>
     </div>
   </section>
 
@@ -168,6 +169,13 @@
 
       restaurantButton.addEventListener('click', () => showService('restaurants'));
       retailButton.addEventListener('click', () => showService('retail'));
+
+      const heroOrderNow = document.getElementById('heroOrderNow');
+      if (heroOrderNow) {
+        heroOrderNow.addEventListener('click', () => {
+          showService('restaurants');
+        });
+      }
 
       const storeButtons = document.querySelectorAll('.retail-store');
       const storeInput = document.getElementById('retailStore');
