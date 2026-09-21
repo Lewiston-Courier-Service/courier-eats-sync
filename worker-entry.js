@@ -12,9 +12,15 @@ import { handleDriverApp } from "./driver-app.js";
 import { handleMarketplaceOrders } from "./marketplace-orders.js";
 import { handleSquarePaymentHardening } from "./square-payment-hardening.js";
 import { handleCorporateDeliveryLink } from "./corporate-delivery-link.js";
+import { handleDispatchCenter, processExpiredPriorityLoads } from "./dispatch-center.js";
 
 export default {
   async fetch(request, env, ctx) {
+    const dispatchCenterResponse = await handleDispatchCenter(request, env, ctx);
+    if (dispatchCenterResponse) {
+      return dispatchCenterResponse;
+    }
+
     const corporateDeliveryLinkResponse = await handleCorporateDeliveryLink(request, env, ctx);
     if (corporateDeliveryLinkResponse) {
       return corporateDeliveryLinkResponse;
@@ -82,5 +88,9 @@ export default {
 
     const baseResponse = await baseWorker.fetch(request, env, ctx);
     return await applySquareLocationPricing(request, env, baseResponse);
+  },
+
+  async scheduled(controller, env, ctx) {
+    ctx.waitUntil(processExpiredPriorityLoads(env));
   }
 };
