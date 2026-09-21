@@ -16,9 +16,13 @@
     "THIRD_PARTY_URL": "",
     "SQUARE_RESTAURANT_CONNECTOR_ENABLED": "true",
     "CORPORATE_DELIVERY_LINK_ENABLED": "false",
+    "LCS_PRIORITY_MINUTES": "5",
     "SQUARE_OAUTH_REDIRECT_URL": "https://courier-eats.lew-courier.workers.dev/api/connect/square/callback",
     "SQUARE_RESTAURANT_WEBHOOK_NOTIFICATION_URL": "https://courier-eats.lew-courier.workers.dev/api/webhooks/square-restaurants",
     "SQUARE_WEBHOOK_NOTIFICATION_URL": "https://courier-eats.lew-courier.workers.dev/api/webhooks/square"
+  },
+  "triggers": {
+    "crons": ["* * * * *"]
   },
   "d1_databases": [
     {
