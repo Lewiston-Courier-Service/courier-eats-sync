@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LCS Dispatch Center</title>
+  <link rel="stylesheet" href="/dispatch-center.css">
+</head>
+<body>
+  <header>
+    <div><span class="eyebrow">Lewiston Courier Service</span><h1>Live Dispatch Center</h1></div>
+    <div class="connection"><span id="pulse"></span><span id="connection">Sign in required</span></div>
+  </header>
+  <main>
+    <section class="signin" id="signin">
+      <h2>Dispatcher access</h2>
+      <p>Enter the private admin key. It stays in this browser tab and is never placed in the address bar.</p>
+      <form id="loginForm"><input id="adminKey" type="password" autocomplete="off" placeholder="Admin API key" required><button>Open live board</button></form>
+    </section>
+    <section id="board" hidden>
+      <div class="toolbar">
+        <div><strong id="availableCount">0</strong><span>available now</span></div>
+        <div><strong id="claimedCount">0</strong><span>claimed by LCS</span></div>
+        <div><strong id="fallbackCount">0</strong><span>fallback queue</span></div>
+        <button class="secondary" id="refresh">Refresh</button>
+        <button class="secondary" id="signout">Sign out</button>
+      </div>
+      <nav id="filters" aria-label="Shipment filters">
+        <button class="active" data-filter="ALL">All food</button><button data-filter="RESTAURANT">Restaurants</button><button data-filter="BAKERY">Bakeries</button><button data-filter="FOOD_TRUCK">Food trucks</button><button data-filter="GROCERY">Groceries</button><button data-filter="CONVENIENCE_STORE">Convenience</button><button data-filter="MEAT_MARKET">Meat markets</button><button data-filter="FOOD_PACKAGE">Packages</button>
+      </nav>
+      <div id="message" role="status"></div>
+      <div id="loads" class="loads"></div>
+    </section>
+  </main>
+  <script type="module" src="/dispatch-center-app.js"></script>
+</body>
+</html>
