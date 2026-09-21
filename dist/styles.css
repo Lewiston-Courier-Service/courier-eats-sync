@@ -1557,3 +1557,12 @@
 .production-topbar {
   display: none;
 }
+
+
+.production-front-hero .production-front-fallback {
+  z-index: 0;
+}
+
+.production-front-art {
+  z-index: 1;
+}
