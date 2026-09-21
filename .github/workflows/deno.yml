@@ -39,6 +39,9 @@ jobs:
       - name: Validate corporate front-end JavaScript syntax
         run: node --check dist/app.js
 
+      - name: Validate dispatch center front-end syntax
+        run: node --check dist/dispatch-center-app.js
+
       - name: Validate Square corporate provisioning script syntax
         run: node --check scripts/square-provision-corporate-delivery-items.mjs
 
@@ -51,6 +54,15 @@ jobs:
           SCHEMA="$(npx wrangler d1 execute courier-eats-dispatch --local --command="PRAGMA table_info('dispatch_orders');")"
           for column in restaurant_order_id delivery_postal_code ordering_mode delivery_fee_cents pricing_basis uber_quote_id uber_quote_fee_cents uber_quote_expires_at; do
             echo "$SCHEMA" | grep -q "$column" || { echo "Missing migrated column: $column"; exit 1; }
+          done
+
+      - name: Validate Dispatch Center D1 migration locally
+        shell: bash
+        run: |
+          npx wrangler d1 execute courier-eats-dispatch --local --file=migrations/006-lcs-dispatch-center.sql
+          SCHEMA="$(npx wrangler d1 execute courier-eats-dispatch --local --command="PRAGMA table_info('dispatch_orders');")"
+          for column in shipment_category claim_status claim_deadline claimed_at claimed_by fallback_provider fallback_status fallback_attempted_at intake_key; do
+            echo "$SCHEMA" | grep -q "$column" || { echo "Missing Dispatch Center column: $column"; exit 1; }
           done
 
       - name: Validate Cloudflare Worker
