@@ -1552,3 +1552,8 @@
     display: none;
   }
 }
+
+
+.production-topbar {
+  display: none;
+}
