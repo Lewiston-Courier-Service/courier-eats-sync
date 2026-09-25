@@ -223,7 +223,17 @@
       const input = document.getElementById("restaurantName");
       const title = document.getElementById("panelTitle");
       const note = document.getElementById("pilotNote");
-      const restaurant = (params.get("restaurant") || "").trim();
+      const slugMap = {
+        "happy-days": "Happy Days",
+        "marcos": "Marcos",
+        "village-inn": "The Village Inn"
+      };
+      const pathSlug = window.location.pathname.split("/").filter(Boolean)[1] || "";
+      const restaurant = (
+        params.get("restaurant") ||
+        slugMap[pathSlug] ||
+        ""
+      ).trim();
 
       if (restaurant) {
         input.value = restaurant;
