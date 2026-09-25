@@ -194,7 +194,7 @@
         </form>
 
         <div class="notice">
-          <strong>Restaurant-first model:</strong> keep 100% of your menu sales with 0% Courier Eats commission. You stay in control of your Square account, Pickup remains unchanged, and Square will show the permissions requested before you approve access.
+          <strong>Restaurant-first model:</strong> keep 100% of your menu sales with 0% Courier Eats commission. Standard payment-processing charges and any separately agreed delivery/service fees are not commissions. You stay in control of your Square account, Pickup remains unchanged, and Square will show the permissions requested before you approve access.
         </div>
 
         <p class="pilot" id="pilotNote"></p>
@@ -237,7 +237,11 @@
           }));
         } catch {}
 
-        const next = "/api/connect/square/start?restaurant=" + encodeURIComponent(name);
+        const next =
+          "/api/connect/square/start?restaurant=" +
+          encodeURIComponent(name) +
+          "&catering=" +
+          encodeURIComponent(catering);
         window.location.assign(next);
       });
     })();
