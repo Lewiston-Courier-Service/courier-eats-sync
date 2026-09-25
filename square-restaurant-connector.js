@@ -1,9 +1,13 @@
 const SQUARE_VERSION = "2026-08-19";
 
+const DEFAULT_LCS_DELIVERY_MERCHANT_IDS = new Set([
+  "MLTFTRA3HDH8E" // Happy Days Diner
+]);
+
 const DEFAULT_LCS_DELIVERY_LOCATION_IDS = new Set([
-  "L1AZD3AZ40JZH", // Happy Days
-  "LKDE5XSX4883Z", // Marcos
-  "LN6B1JHPX8JY5"  // Village Inn
+  "L1AZD3AZ40JZH", // Happy Days catalog location
+  "LKDE5XSX4883Z", // Marcos catalog location
+  "LN6B1JHPX8JY5"  // Village Inn catalog location
 ]);
 
 export async function handleSquareRestaurantConnector(request, env) {
@@ -558,7 +562,7 @@ async function handleRestaurantSquareWebhook(request, env, url) {
   const customerPhone = recipient?.phone_number || "";
   const locationId = order.location_id || payment.location_id || "";
 
-  if (!isLcsDeliveryLocationEnabled(locationId, env)) {
+  if (!isLcsDeliveryPilotEnabled(merchantId, locationId, env)) {
     await rememberRestaurantWebhook(
       env,
       eventId,
@@ -925,18 +929,32 @@ function normalizeCateringChoice(value) {
   return ["yes", "no", "planned"].includes(normalized) ? normalized : "unknown";
 }
 
-function isLcsDeliveryLocationEnabled(locationId, env) {
-  const configuredIds = String(env.LCS_DELIVERY_LOCATION_IDS || "")
+function isLcsDeliveryPilotEnabled(merchantId, locationId, env) {
+  const configuredMerchantIds = String(env.LCS_DELIVERY_MERCHANT_IDS || "")
     .split(",")
     .map(value => value.trim())
     .filter(Boolean);
 
-  const enabledIds =
-    configuredIds.length > 0
-      ? new Set(configuredIds)
+  const enabledMerchantIds =
+    configuredMerchantIds.length > 0
+      ? new Set(configuredMerchantIds)
+      : DEFAULT_LCS_DELIVERY_MERCHANT_IDS;
+
+  if (enabledMerchantIds.has(String(merchantId || "").trim())) {
+    return true;
+  }
+
+  const configuredLocationIds = String(env.LCS_DELIVERY_LOCATION_IDS || "")
+    .split(",")
+    .map(value => value.trim())
+    .filter(Boolean);
+
+  const enabledLocationIds =
+    configuredLocationIds.length > 0
+      ? new Set(configuredLocationIds)
       : DEFAULT_LCS_DELIVERY_LOCATION_IDS;
 
-  return enabledIds.has(String(locationId || "").trim());
+  return enabledLocationIds.has(String(locationId || "").trim());
 }
 
 function getDeliveryFulfillment(order) {
