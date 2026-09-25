@@ -107,6 +107,19 @@
     .step div { line-height: 1.45; }
     .step small { display: block; color: var(--muted); margin-top: 3px; }
     .pilot { margin-top: 18px; font-size: .9rem; color: var(--muted); }
+    .success-box {
+      display: none;
+      margin-bottom: 24px;
+      padding: 22px;
+      border: 1px solid #b7e4cc;
+      border-radius: 20px;
+      background: #f0fff7;
+      color: #135f3d;
+      box-shadow: 0 14px 34px rgba(24,121,78,.12);
+    }
+    .success-box.show { display: block; }
+    .success-box h2 { margin: 0 0 8px; }
+    .success-box p { margin: 6px 0 0; line-height: 1.55; }
     @media (max-width: 780px) {
       .shell { width: min(100% - 20px, 680px); padding-top: 18px; }
       .topbar { align-items: flex-start; }
@@ -133,6 +146,12 @@
       src="/assets/courier-eats-onboarding-banner.png"
       alt="Courier Eats — Lewiston Courier Service"
     >
+
+    <div id="successBox" class="success-box" role="status">
+      <h2>Square connected successfully</h2>
+      <p id="successText">Your restaurant is connected to Courier Eats.</p>
+      <p><strong>Pickup stays with your restaurant.</strong> Next, confirm your Square delivery setting uses your own courier workflow so eligible delivery orders can be handed to Lewiston Courier Service.</p>
+    </div>
 
     <section class="hero">
       <article class="card">
@@ -234,6 +253,17 @@
         slugMap[pathSlug] ||
         ""
       ).trim();
+      const connected = params.get("connected") === "1";
+
+      if (connected) {
+        const successBox = document.getElementById("successBox");
+        const successText = document.getElementById("successText");
+        successBox.classList.add("show");
+        if (restaurant) {
+          successText.textContent = restaurant + " is connected to Courier Eats.";
+        }
+        successBox.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
 
       if (restaurant) {
         input.value = restaurant;
