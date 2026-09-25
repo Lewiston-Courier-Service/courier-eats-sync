@@ -2,7 +2,8 @@ const SQUARE_VERSION = "2026-08-19";
 
 const DEFAULT_LCS_DELIVERY_LOCATION_IDS = new Set([
   "L1AZD3AZ40JZH", // Happy Days
-  "LKDE5XSX4883Z"  // Marcos
+  "LKDE5XSX4883Z", // Marcos
+  "LN6B1JHPX8JY5"  // Village Inn
 ]);
 
 export async function handleSquareRestaurantConnector(request, env) {
