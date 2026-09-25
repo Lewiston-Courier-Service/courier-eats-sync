@@ -17,7 +17,10 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    if (request.method === "GET" && url.pathname === "/join") {
+    if (
+      request.method === "GET" &&
+      (url.pathname === "/join" || url.pathname.startsWith("/join/"))
+    ) {
       const onboardingUrl = new URL("/join.html", url.origin);
       onboardingUrl.search = url.search;
       return env.ASSETS.fetch(new Request(onboardingUrl.toString(), request));
