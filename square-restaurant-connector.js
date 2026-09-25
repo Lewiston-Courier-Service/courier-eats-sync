@@ -70,16 +70,17 @@ async function startSquareOAuth(url, env) {
   }
 
   const restaurantName = String(url.searchParams.get("restaurant") || "").trim();
+  const catering = normalizeCateringChoice(url.searchParams.get("catering"));
   const state = crypto.randomUUID();
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
 
   await env.DISPATCH_DB
     .prepare(
       `INSERT INTO square_oauth_states
-        (state, restaurant_name, expires_at)
-       VALUES (?, ?, ?)`
+        (state, restaurant_name, catering, expires_at)
+       VALUES (?, ?, ?, ?)`
     )
-    .bind(state, restaurantName || null, expiresAt)
+    .bind(state, restaurantName || null, catering, expiresAt)
     .run();
 
   const scope = [
@@ -136,7 +137,7 @@ async function finishSquareOAuth(url, env) {
 
   const savedState = await env.DISPATCH_DB
     .prepare(
-      `SELECT state, restaurant_name, expires_at
+      `SELECT state, restaurant_name, catering, expires_at
        FROM square_oauth_states
        WHERE state = ?`
     )
@@ -220,6 +221,7 @@ async function finishSquareOAuth(url, env) {
         (
           merchant_id,
           restaurant_name,
+          catering,
           access_token_enc,
           refresh_token_enc,
           expires_at,
@@ -228,9 +230,10 @@ async function finishSquareOAuth(url, env) {
           auto_dispatch_delivery,
           updated_at
         )
-       VALUES (?, ?, ?, ?, ?, ?, 'ACTIVE', 1, CURRENT_TIMESTAMP)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'ACTIVE', 1, CURRENT_TIMESTAMP)
        ON CONFLICT(merchant_id) DO UPDATE SET
          restaurant_name = excluded.restaurant_name,
+         catering = excluded.catering,
          access_token_enc = excluded.access_token_enc,
          refresh_token_enc = excluded.refresh_token_enc,
          expires_at = excluded.expires_at,
@@ -241,6 +244,7 @@ async function finishSquareOAuth(url, env) {
     .bind(
       merchantId,
       restaurantName || null,
+      savedState.catering || "unknown",
       accessTokenEncrypted,
       refreshTokenEncrypted,
       tokenData.expires_at || null,
@@ -273,6 +277,7 @@ async function squareConnectorStatus(request, env) {
       `SELECT
          merchant_id AS merchantId,
          restaurant_name AS restaurantName,
+         catering,
          expires_at AS expiresAt,
          scopes,
          status,
@@ -839,6 +844,11 @@ function squareOAuthHeaders(accessToken) {
     "Square-Version": SQUARE_VERSION,
     "Content-Type": "application/json"
   };
+}
+
+function normalizeCateringChoice(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return ["yes", "no", "planned"].includes(normalized) ? normalized : "unknown";
 }
 
 function isLcsDeliveryLocationEnabled(locationId, env) {
