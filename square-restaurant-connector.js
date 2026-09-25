@@ -1,5 +1,10 @@
 const SQUARE_VERSION = "2026-08-19";
 
+const DEFAULT_LCS_DELIVERY_LOCATION_IDS = new Set([
+  "L1AZD3AZ40JZH", // Happy Days
+  "LKDE5XSX4883Z"  // Marcos
+]);
+
 export async function handleSquareRestaurantConnector(request, env) {
   const url = new URL(request.url);
 
@@ -474,6 +479,23 @@ async function handleRestaurantSquareWebhook(request, env, url) {
   const customerPhone = recipient?.phone_number || "";
   const locationId = order.location_id || payment.location_id || "";
 
+  if (!isLcsDeliveryLocationEnabled(locationId, env)) {
+    await rememberRestaurantWebhook(
+      env,
+      eventId,
+      merchantId,
+      eventType,
+      orderId,
+      "IGNORED_LOCATION_NOT_ENABLED"
+    );
+    return connectorJson({
+      received: true,
+      ignored: true,
+      reason: "restaurant location is not enabled for LCS delivery",
+      locationId
+    });
+  }
+
   let restaurantName = connection.restaurant_name || "";
   let pickupAddress = "";
 
@@ -817,6 +839,20 @@ function squareOAuthHeaders(accessToken) {
     "Square-Version": SQUARE_VERSION,
     "Content-Type": "application/json"
   };
+}
+
+function isLcsDeliveryLocationEnabled(locationId, env) {
+  const configuredIds = String(env.LCS_DELIVERY_LOCATION_IDS || "")
+    .split(",")
+    .map(value => value.trim())
+    .filter(Boolean);
+
+  const enabledIds =
+    configuredIds.length > 0
+      ? new Set(configuredIds)
+      : DEFAULT_LCS_DELIVERY_LOCATION_IDS;
+
+  return enabledIds.has(String(locationId || "").trim());
 }
 
 function getDeliveryFulfillment(order) {
