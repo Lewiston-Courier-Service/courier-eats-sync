@@ -255,13 +255,10 @@ async function finishSquareOAuth(url, env) {
 
   await deleteOAuthState(env, state);
 
-  return connectorJson({
-    connected: true,
-    provider: "square",
-    merchantId,
-    restaurantName,
-    autoDispatchDelivery: true
-  });
+  const successUrl = new URL("https://couriereats.com/join/success");
+  successUrl.searchParams.set("connected", "1");
+  successUrl.searchParams.set("restaurant", restaurantName || "Restaurant");
+  return Response.redirect(successUrl.toString(), 302);
 }
 
 async function squareConnectorStatus(request, env) {
