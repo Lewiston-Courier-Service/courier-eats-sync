@@ -33,6 +33,15 @@
     .brand img { width: 64px; height: 64px; object-fit: contain; }
     .brand small { display: block; font-weight: 600; color: var(--muted); margin-top: 3px; }
     .home-link { text-decoration: none; color: var(--muted); font-weight: 700; }
+    .onboarding-banner {
+      width: 100%;
+      display: block;
+      margin: 0 0 28px;
+      border-radius: 24px;
+      box-shadow: 0 20px 48px rgba(34,55,86,.16);
+      object-fit: cover;
+      aspect-ratio: 2.5 / 1;
+    }
     .hero {
       display: grid;
       grid-template-columns: 1.12fr .88fr;
@@ -118,6 +127,12 @@
       </div>
       <a class="home-link" href="/">Back to Courier Eats</a>
     </header>
+
+    <img
+      class="onboarding-banner"
+      src="/assets/courier-eats-onboarding-banner.png"
+      alt="Courier Eats — Lewiston Courier Service"
+    >
 
     <section class="hero">
       <article class="card">
