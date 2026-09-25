@@ -127,6 +127,25 @@
           Connect your restaurant's Square account to Courier Eats so eligible delivery orders can be handed to Lewiston Courier Service while your normal restaurant pickup workflow stays in place.
         </p>
 
+        <div class="flow" aria-label="Courier Eats restaurant benefits">
+          <div class="flow-row pickup">
+            <strong>0% COMMISSION</strong>
+            <span>Keep 100% of your menu sales. Courier Eats does not take a percentage of your food sales.</span>
+          </div>
+          <div class="flow-row delivery">
+            <strong>PLATFORM</strong>
+            <span>Get listed on the Courier Eats platform with ordering and delivery access designed for local restaurants.</span>
+          </div>
+          <div class="flow-row pickup">
+            <strong>CASH APP</strong>
+            <span>Use Cash App as an additional customer payment or business-payment option where appropriate for your restaurant workflow.</span>
+          </div>
+          <div class="flow-row delivery">
+            <strong>SOCIAL MEDIA</strong>
+            <span>Courier Eats can help feature participating restaurants across social media and local promotional channels.</span>
+          </div>
+        </div>
+
         <div class="flow">
           <div class="flow-row pickup">
             <strong>PICKUP</strong>
@@ -162,11 +181,20 @@
         <form id="connectForm">
           <label for="restaurantName">Restaurant name</label>
           <input id="restaurantName" name="restaurant" autocomplete="organization" placeholder="Example: Happy Days" required>
+
+          <label for="catering">Is catering part of your menu?</label>
+          <select id="catering" name="catering" required style="width:100%;border:1px solid #cfd7e3;border-radius:14px;padding:14px 15px;font:inherit;background:white;color:var(--ink);">
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="planned">Not yet, but we plan to offer catering</option>
+          </select>
+
           <button class="connect-button" type="submit">Connect Square</button>
         </form>
 
         <div class="notice">
-          You stay in control of your Square account. Connecting Courier Eats does not automatically change Pickup. Square will show the permissions requested before you approve access.
+          <strong>Restaurant-first model:</strong> keep 100% of your menu sales with 0% Courier Eats commission. You stay in control of your Square account, Pickup remains unchanged, and Square will show the permissions requested before you approve access.
         </div>
 
         <p class="pilot" id="pilotNote"></p>
@@ -199,7 +227,16 @@
       document.getElementById("connectForm").addEventListener("submit", event => {
         event.preventDefault();
         const name = input.value.trim();
-        if (!name) return;
+        const catering = document.getElementById("catering").value;
+        if (!name || !catering) return;
+
+        try {
+          sessionStorage.setItem("courierEatsRestaurantOnboarding", JSON.stringify({
+            restaurant: name,
+            catering
+          }));
+        } catch {}
+
         const next = "/api/connect/square/start?restaurant=" + encodeURIComponent(name);
         window.location.assign(next);
       });
