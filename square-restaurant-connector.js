@@ -13,6 +13,7 @@ export async function handleSquareRestaurantConnector(request, env) {
     "/api/connect/square/start",
     "/api/connect/square/callback",
     "/api/connect/square/status",
+    "/api/connect/square/locations",
     "/api/webhooks/square-restaurants"
   ]);
 
@@ -38,6 +39,10 @@ export async function handleSquareRestaurantConnector(request, env) {
 
     if (url.pathname === "/api/connect/square/status" && request.method === "GET") {
       return await squareConnectorStatus(request, env);
+    }
+
+    if (url.pathname === "/api/connect/square/locations" && request.method === "GET") {
+      return await squareConnectorLocations(request, env, url);
     }
 
     if (
@@ -292,6 +297,77 @@ async function squareConnectorStatus(request, env) {
     enabled: env.SQUARE_RESTAURANT_CONNECTOR_ENABLED === "true",
     count: result.results?.length || 0,
     restaurants: result.results || []
+  });
+}
+
+async function squareConnectorLocations(request, env, url) {
+  if (!env.DISPATCH_DB) {
+    return connectorJson({ error: "Dispatch database is not bound" }, 500);
+  }
+
+  if (!isAdminRequest(request, env)) {
+    return connectorJson({ error: "Unauthorized" }, 401);
+  }
+
+  const merchantId = String(url.searchParams.get("merchant") || "").trim();
+  if (!merchantId) {
+    return connectorJson({ error: "Missing merchant query parameter" }, 400);
+  }
+
+  const connection = await env.DISPATCH_DB
+    .prepare(
+      `SELECT *
+       FROM square_restaurant_connections
+       WHERE merchant_id = ?
+         AND status = 'ACTIVE'
+       LIMIT 1`
+    )
+    .bind(merchantId)
+    .first();
+
+  if (!connection) {
+    return connectorJson({ error: "Active restaurant connection not found" }, 404);
+  }
+
+  const accessToken = await getUsableRestaurantAccessToken(connection, env);
+  const squareResponse = await fetch("https://connect.squareup.com/v2/locations", {
+    method: "GET",
+    headers: squareOAuthHeaders(accessToken)
+  });
+  const squareData = await safeConnectorJson(squareResponse);
+
+  if (!squareResponse.ok) {
+    return connectorJson(
+      {
+        error: "Unable to fetch connected Square locations",
+        squareStatus: squareResponse.status
+      },
+      502
+    );
+  }
+
+  const locations = Array.isArray(squareData.locations)
+    ? squareData.locations.map(location => ({
+        id: location.id,
+        name: location.name || "",
+        status: location.status || "",
+        address: location.address
+          ? {
+              addressLine1: location.address.address_line_1 || "",
+              locality: location.address.locality || "",
+              administrativeDistrictLevel1:
+                location.address.administrative_district_level_1 || "",
+              postalCode: location.address.postal_code || ""
+            }
+          : null
+      }))
+    : [];
+
+  return connectorJson({
+    merchantId,
+    restaurantName: connection.restaurant_name || "",
+    count: locations.length,
+    locations
   });
 }
 
