@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Join Courier Eats | Restaurant Square Connection</title>
+  <meta name="description" content="Connect your restaurant's Square account to Courier Eats and Lewiston Courier Service delivery.">
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --ink: #172033;
+      --muted: #5d6678;
+      --line: #dde3ec;
+      --surface: rgba(255,255,255,.94);
+      --accent: #e95b2b;
+      --accent-dark: #b83f17;
+      --green: #18794e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255,190,99,.45), transparent 34rem),
+        linear-gradient(180deg, #dff3ff 0%, #f8fbff 42%, #fff6e8 100%);
+    }
+    a { color: inherit; }
+    .shell { width: min(1040px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 52px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
+    .brand { display: flex; align-items: center; gap: 14px; font-weight: 800; }
+    .brand img { width: 64px; height: 64px; object-fit: contain; }
+    .brand small { display: block; font-weight: 600; color: var(--muted); margin-top: 3px; }
+    .home-link { text-decoration: none; color: var(--muted); font-weight: 700; }
+    .onboarding-banner {
+      width: 100%;
+      display: block;
+      margin: 0 0 28px;
+      border-radius: 24px;
+      box-shadow: 0 20px 48px rgba(34,55,86,.16);
+      object-fit: cover;
+      aspect-ratio: 2.5 / 1;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.12fr .88fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,.78);
+      box-shadow: 0 24px 70px rgba(34,55,86,.14);
+      border-radius: 28px;
+      padding: clamp(24px, 5vw, 48px);
+      backdrop-filter: blur(14px);
+    }
+    .eyebrow { font-size: .78rem; letter-spacing: .12em; font-weight: 900; text-transform: uppercase; color: var(--accent-dark); }
+    h1 { font-size: clamp(2.25rem, 6vw, 4.7rem); line-height: .96; margin: 14px 0 18px; letter-spacing: -.045em; }
+    .lead { font-size: 1.1rem; line-height: 1.65; color: var(--muted); max-width: 60ch; }
+    .flow { display: grid; gap: 12px; margin: 28px 0 8px; }
+    .flow-row { display: grid; grid-template-columns: 92px 1fr; gap: 14px; padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
+    .flow-row strong { font-size: .83rem; letter-spacing: .05em; }
+    .flow-row.pickup strong { color: var(--green); }
+    .flow-row.delivery strong { color: var(--accent-dark); }
+    .flow-row span { color: var(--muted); line-height: 1.45; }
+    .connect-panel h2 { margin: 0 0 8px; font-size: 1.55rem; }
+    .connect-panel p { color: var(--muted); line-height: 1.55; }
+    label { display: block; font-weight: 800; margin: 22px 0 8px; }
+    input {
+      width: 100%;
+      border: 1px solid #cfd7e3;
+      border-radius: 14px;
+      padding: 14px 15px;
+      font: inherit;
+      background: white;
+      color: var(--ink);
+    }
+    input:focus { outline: 3px solid rgba(233,91,43,.16); border-color: var(--accent); }
+    .connect-button {
+      width: 100%;
+      margin-top: 16px;
+      border: 0;
+      border-radius: 16px;
+      padding: 16px 20px;
+      font: inherit;
+      font-weight: 900;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(233,91,43,.25);
+    }
+    .connect-button:hover { background: var(--accent-dark); }
+    .notice {
+      margin-top: 18px;
+      padding: 15px 16px;
+      border-radius: 15px;
+      background: #f7f9fc;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: .92rem;
+    }
+    .steps { margin-top: 22px; display: grid; gap: 12px; }
+    .step { display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: start; }
+    .step b { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #fff0ea; color: var(--accent-dark); }
+    .step div { line-height: 1.45; }
+    .step small { display: block; color: var(--muted); margin-top: 3px; }
+    .pilot { margin-top: 18px; font-size: .9rem; color: var(--muted); }
+    .success-box {
+      display: none;
+      margin-bottom: 24px;
+      padding: 22px;
+      border: 1px solid #b7e4cc;
+      border-radius: 20px;
+      background: #f0fff7;
+      color: #135f3d;
+      box-shadow: 0 14px 34px rgba(24,121,78,.12);
+    }
+    .success-box.show { display: block; }
+    .success-box h2 { margin: 0 0 8px; }
+    .success-box p { margin: 6px 0 0; line-height: 1.55; }
+    @media (max-width: 780px) {
+      .shell { width: min(100% - 20px, 680px); padding-top: 18px; }
+      .topbar { align-items: flex-start; }
+      .hero { grid-template-columns: 1fr; }
+      .card { border-radius: 22px; padding: 24px; }
+      .flow-row { grid-template-columns: 1fr; gap: 4px; }
+      .brand img { width: 52px; height: 52px; }
+      .home-link { font-size: .9rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="/assets/courier-eats-logo.webp" alt="Courier Eats">
+        <div>Courier Eats<small>by Lewiston Courier Service</small></div>
+      </div>
+      <a class="home-link" href="/">Back to Courier Eats</a>
+    </header>
+
+    <img
+      class="onboarding-banner"
+      src="/assets/courier-eats-onboarding-banner.png"
+      alt="Courier Eats — Lewiston Courier Service"
+    >
+
+    <div id="successBox" class="success-box" role="status">
+      <h2>Square connected successfully</h2>
+      <p id="successText">Your restaurant is connected to Courier Eats.</p>
+      <p><strong>Pickup stays with your restaurant.</strong> Next, confirm your Square delivery setting uses your own courier workflow so eligible delivery orders can be handed to Lewiston Courier Service.</p>
+    </div>
+
+    <section class="hero">
+      <article class="card">
+        <div class="eyebrow">Restaurant Partner Onboarding</div>
+        <h1>Keep Pickup. Add LCS Delivery.</h1>
+        <p class="lead">
+          Connect your restaurant's Square account to Courier Eats so eligible delivery orders can be handed to Lewiston Courier Service while your normal restaurant pickup workflow stays in place.
+        </p>
+
+        <div class="flow" aria-label="Courier Eats restaurant benefits">
+          <div class="flow-row pickup">
+            <strong>0% COMMISSION</strong>
+            <span>Keep 100% of your menu sales. Courier Eats does not take a percentage of your food sales. The first 30 days are free; after that, a monthly platform membership applies if you choose to continue.</span>
+          </div>
+          <div class="flow-row delivery">
+            <strong>PLATFORM</strong>
+            <span>Get listed on the Courier Eats platform with ordering and delivery access designed for local restaurants.</span>
+          </div>
+          <div class="flow-row pickup">
+            <strong>CASH APP</strong>
+            <span>Use Cash App as an additional customer payment or business-payment option where appropriate for your restaurant workflow.</span>
+          </div>
+          <div class="flow-row delivery">
+            <strong>SOCIAL MEDIA</strong>
+            <span>Courier Eats can help feature participating restaurants across social media and local promotional channels.</span>
+          </div>
+        </div>
+
+        <div class="flow">
+          <div class="flow-row pickup">
+            <strong>PICKUP</strong>
+            <span>Stays with your restaurant. Courier Eats does not create an LCS dispatch for pickup orders.</span>
+          </div>
+          <div class="flow-row delivery">
+            <strong>DELIVERY</strong>
+            <span>After delivery is configured for your own courier workflow, eligible Square delivery orders can be sent to Lewiston Courier Service for dispatch.</span>
+          </div>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <b>1</b>
+            <div><strong>Connect Square</strong><small>Sign in to the restaurant's Square account and review the permissions Square displays.</small></div>
+          </div>
+          <div class="step">
+            <b>2</b>
+            <div><strong>Keep Pickup enabled</strong><small>No change is required to the restaurant's normal pickup fulfillment.</small></div>
+          </div>
+          <div class="step">
+            <b>3</b>
+            <div><strong>Set Delivery to your own courier workflow</strong><small>Courier Eats/LCS can then receive eligible delivery orders for dispatch.</small></div>
+          </div>
+        </div>
+      </article>
+
+      <aside class="card connect-panel">
+        <div class="eyebrow">Connect Restaurant</div>
+        <h2 id="panelTitle">Join Courier Eats</h2>
+        <p>Enter the restaurant name exactly as you want it shown in Courier Eats, then continue to Square.</p>
+
+        <form id="connectForm">
+          <label for="restaurantName">Restaurant name</label>
+          <input id="restaurantName" name="restaurant" autocomplete="organization" placeholder="Example: Happy Days" required>
+
+          <label for="catering">Is catering part of your menu?</label>
+          <select id="catering" name="catering" required style="width:100%;border:1px solid #cfd7e3;border-radius:14px;padding:14px 15px;font:inherit;background:white;color:var(--ink);">
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="planned">Not yet, but we plan to offer catering</option>
+          </select>
+
+          <button class="connect-button" type="submit">Connect Square</button>
+        </form>
+
+        <div class="notice">
+          <strong>Restaurant-first model:</strong> 0% Courier Eats commission and a 30-day free trial. After the trial, a monthly platform membership applies only if the restaurant chooses to continue. Standard payment-processing charges and any separately agreed delivery/service fees are not commissions. You stay in control of your Square account, Pickup remains unchanged, and Square will show the permissions requested before you approve access.
+        </div>
+
+        <p class="pilot" id="pilotNote"></p>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const params = new URLSearchParams(window.location.search);
+      const input = document.getElementById("restaurantName");
+      const title = document.getElementById("panelTitle");
+      const note = document.getElementById("pilotNote");
+      const slugMap = {
+        "happy-days": "Happy Days",
+        "marcos": "Marcos",
+        "village-inn": "The Village Inn"
+      };
+      const pathSlug = window.location.pathname.split("/").filter(Boolean)[1] || "";
+      const restaurant = (
+        params.get("restaurant") ||
+        slugMap[pathSlug] ||
+        ""
+      ).trim();
+      const connected = params.get("connected") === "1";
+
+      if (connected) {
+        const successBox = document.getElementById("successBox");
+        const successText = document.getElementById("successText");
+        successBox.classList.add("show");
+        if (restaurant) {
+          successText.textContent = restaurant + " is connected to Courier Eats.";
+        }
+        successBox.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      if (restaurant) {
+        input.value = restaurant;
+        title.textContent = "Connect " + restaurant;
+      }
+
+      const pilots = {
+        "Happy Days": "Happy Days is enabled for the first LCS delivery pilot.",
+        "Marcos": "Marcos is enabled for the first LCS delivery pilot.",
+        "Village Inn": "Village Inn is enabled for the first LCS delivery pilot.",
+        "The Village Inn": "The Village Inn is enabled for the first LCS delivery pilot."
+      };
+
+      if (pilots[restaurant]) {
+        note.textContent = pilots[restaurant];
+      }
+
+      document.getElementById("connectForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const name = input.value.trim();
+        const catering = document.getElementById("catering").value;
+        if (!name || !catering) return;
+
+        try {
+          sessionStorage.setItem("courierEatsRestaurantOnboarding", JSON.stringify({
+            restaurant: name,
+            catering
+          }));
+        } catch {}
+
+        const next =
+          "/api/connect/square/start?restaurant=" +
+          encodeURIComponent(name) +
+          "&catering=" +
+          encodeURIComponent(catering);
+        window.location.assign(next);
+      });
+    })();
+  </script>
+</body>
+</html>

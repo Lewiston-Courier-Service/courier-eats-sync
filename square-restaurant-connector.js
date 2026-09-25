@@ -1,5 +1,15 @@
 const SQUARE_VERSION = "2026-08-19";
 
+const DEFAULT_LCS_DELIVERY_MERCHANT_IDS = new Set([
+  "MLTFTRA3HDH8E" // Happy Days Diner
+]);
+
+const DEFAULT_LCS_DELIVERY_LOCATION_IDS = new Set([
+  "L1AZD3AZ40JZH", // Happy Days catalog location
+  "LKDE5XSX4883Z", // Marcos catalog location
+  "LN6B1JHPX8JY5"  // Village Inn catalog location
+]);
+
 export async function handleSquareRestaurantConnector(request, env) {
   const url = new URL(request.url);
 
@@ -7,6 +17,7 @@ export async function handleSquareRestaurantConnector(request, env) {
     "/api/connect/square/start",
     "/api/connect/square/callback",
     "/api/connect/square/status",
+    "/api/connect/square/locations",
     "/api/webhooks/square-restaurants"
   ]);
 
@@ -32,6 +43,10 @@ export async function handleSquareRestaurantConnector(request, env) {
 
     if (url.pathname === "/api/connect/square/status" && request.method === "GET") {
       return await squareConnectorStatus(request, env);
+    }
+
+    if (url.pathname === "/api/connect/square/locations" && request.method === "GET") {
+      return await squareConnectorLocations(request, env, url);
     }
 
     if (
@@ -65,16 +80,17 @@ async function startSquareOAuth(url, env) {
   }
 
   const restaurantName = String(url.searchParams.get("restaurant") || "").trim();
+  const catering = normalizeCateringChoice(url.searchParams.get("catering"));
   const state = crypto.randomUUID();
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
 
   await env.DISPATCH_DB
     .prepare(
       `INSERT INTO square_oauth_states
-        (state, restaurant_name, expires_at)
-       VALUES (?, ?, ?)`
+        (state, restaurant_name, catering, expires_at)
+       VALUES (?, ?, ?, ?)`
     )
-    .bind(state, restaurantName || null, expiresAt)
+    .bind(state, restaurantName || null, catering, expiresAt)
     .run();
 
   const scope = [
@@ -131,7 +147,7 @@ async function finishSquareOAuth(url, env) {
 
   const savedState = await env.DISPATCH_DB
     .prepare(
-      `SELECT state, restaurant_name, expires_at
+      `SELECT state, restaurant_name, catering, expires_at
        FROM square_oauth_states
        WHERE state = ?`
     )
@@ -215,6 +231,7 @@ async function finishSquareOAuth(url, env) {
         (
           merchant_id,
           restaurant_name,
+          catering,
           access_token_enc,
           refresh_token_enc,
           expires_at,
@@ -223,9 +240,10 @@ async function finishSquareOAuth(url, env) {
           auto_dispatch_delivery,
           updated_at
         )
-       VALUES (?, ?, ?, ?, ?, ?, 'ACTIVE', 1, CURRENT_TIMESTAMP)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'ACTIVE', 1, CURRENT_TIMESTAMP)
        ON CONFLICT(merchant_id) DO UPDATE SET
          restaurant_name = excluded.restaurant_name,
+         catering = excluded.catering,
          access_token_enc = excluded.access_token_enc,
          refresh_token_enc = excluded.refresh_token_enc,
          expires_at = excluded.expires_at,
@@ -236,6 +254,7 @@ async function finishSquareOAuth(url, env) {
     .bind(
       merchantId,
       restaurantName || null,
+      savedState.catering || "unknown",
       accessTokenEncrypted,
       refreshTokenEncrypted,
       tokenData.expires_at || null,
@@ -245,13 +264,10 @@ async function finishSquareOAuth(url, env) {
 
   await deleteOAuthState(env, state);
 
-  return connectorJson({
-    connected: true,
-    provider: "square",
-    merchantId,
-    restaurantName,
-    autoDispatchDelivery: true
-  });
+  const successUrl = new URL("https://couriereats.com/join/success");
+  successUrl.searchParams.set("connected", "1");
+  successUrl.searchParams.set("restaurant", restaurantName || "Restaurant");
+  return Response.redirect(successUrl.toString(), 302);
 }
 
 async function squareConnectorStatus(request, env) {
@@ -268,6 +284,7 @@ async function squareConnectorStatus(request, env) {
       `SELECT
          merchant_id AS merchantId,
          restaurant_name AS restaurantName,
+         catering,
          expires_at AS expiresAt,
          scopes,
          status,
@@ -284,6 +301,77 @@ async function squareConnectorStatus(request, env) {
     enabled: env.SQUARE_RESTAURANT_CONNECTOR_ENABLED === "true",
     count: result.results?.length || 0,
     restaurants: result.results || []
+  });
+}
+
+async function squareConnectorLocations(request, env, url) {
+  if (!env.DISPATCH_DB) {
+    return connectorJson({ error: "Dispatch database is not bound" }, 500);
+  }
+
+  if (!isAdminRequest(request, env)) {
+    return connectorJson({ error: "Unauthorized" }, 401);
+  }
+
+  const merchantId = String(url.searchParams.get("merchant") || "").trim();
+  if (!merchantId) {
+    return connectorJson({ error: "Missing merchant query parameter" }, 400);
+  }
+
+  const connection = await env.DISPATCH_DB
+    .prepare(
+      `SELECT *
+       FROM square_restaurant_connections
+       WHERE merchant_id = ?
+         AND status = 'ACTIVE'
+       LIMIT 1`
+    )
+    .bind(merchantId)
+    .first();
+
+  if (!connection) {
+    return connectorJson({ error: "Active restaurant connection not found" }, 404);
+  }
+
+  const accessToken = await getUsableRestaurantAccessToken(connection, env);
+  const squareResponse = await fetch("https://connect.squareup.com/v2/locations", {
+    method: "GET",
+    headers: squareOAuthHeaders(accessToken)
+  });
+  const squareData = await safeConnectorJson(squareResponse);
+
+  if (!squareResponse.ok) {
+    return connectorJson(
+      {
+        error: "Unable to fetch connected Square locations",
+        squareStatus: squareResponse.status
+      },
+      502
+    );
+  }
+
+  const locations = Array.isArray(squareData.locations)
+    ? squareData.locations.map(location => ({
+        id: location.id,
+        name: location.name || "",
+        status: location.status || "",
+        address: location.address
+          ? {
+              addressLine1: location.address.address_line_1 || "",
+              locality: location.address.locality || "",
+              administrativeDistrictLevel1:
+                location.address.administrative_district_level_1 || "",
+              postalCode: location.address.postal_code || ""
+            }
+          : null
+      }))
+    : [];
+
+  return connectorJson({
+    merchantId,
+    restaurantName: connection.restaurant_name || "",
+    count: locations.length,
+    locations
   });
 }
 
@@ -473,6 +561,23 @@ async function handleRestaurantSquareWebhook(request, env, url) {
   const customerName = recipient?.display_name || "";
   const customerPhone = recipient?.phone_number || "";
   const locationId = order.location_id || payment.location_id || "";
+
+  if (!isLcsDeliveryPilotEnabled(merchantId, locationId, env)) {
+    await rememberRestaurantWebhook(
+      env,
+      eventId,
+      merchantId,
+      eventType,
+      orderId,
+      "IGNORED_LOCATION_NOT_ENABLED"
+    );
+    return connectorJson({
+      received: true,
+      ignored: true,
+      reason: "restaurant location is not enabled for LCS delivery",
+      locationId
+    });
+  }
 
   let restaurantName = connection.restaurant_name || "";
   let pickupAddress = "";
@@ -817,6 +922,39 @@ function squareOAuthHeaders(accessToken) {
     "Square-Version": SQUARE_VERSION,
     "Content-Type": "application/json"
   };
+}
+
+function normalizeCateringChoice(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return ["yes", "no", "planned"].includes(normalized) ? normalized : "unknown";
+}
+
+function isLcsDeliveryPilotEnabled(merchantId, locationId, env) {
+  const configuredMerchantIds = String(env.LCS_DELIVERY_MERCHANT_IDS || "")
+    .split(",")
+    .map(value => value.trim())
+    .filter(Boolean);
+
+  const enabledMerchantIds =
+    configuredMerchantIds.length > 0
+      ? new Set(configuredMerchantIds)
+      : DEFAULT_LCS_DELIVERY_MERCHANT_IDS;
+
+  if (enabledMerchantIds.has(String(merchantId || "").trim())) {
+    return true;
+  }
+
+  const configuredLocationIds = String(env.LCS_DELIVERY_LOCATION_IDS || "")
+    .split(",")
+    .map(value => value.trim())
+    .filter(Boolean);
+
+  const enabledLocationIds =
+    configuredLocationIds.length > 0
+      ? new Set(configuredLocationIds)
+      : DEFAULT_LCS_DELIVERY_LOCATION_IDS;
+
+  return enabledLocationIds.has(String(locationId || "").trim());
 }
 
 function getDeliveryFulfillment(order) {

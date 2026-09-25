@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/retail.css">
 </head>
 <body>
-  <header class="topbar">
+  <header class="topbar production-topbar">
     <div class="brand">
       <div class="logo">CE</div>
       <span>Courier Eats</span>
@@ -21,41 +21,55 @@
     Thank you. Your Courier Eats order has been submitted.
   </div>
 
-  <section class="hero">
-    <div class="hero-inner">
-      <h1>What can we pick up for you?</h1>
-      <p>Order from local restaurants or book a retail pickup from stores such as Walmart, Home Depot, Lowe's, Tractor Supply, and Target.</p>
+  <section class="hero production-front-hero" aria-label="Courier Eats Lewiston-Auburn">
+    <video
+      class="hero-background-video production-front-fallback"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      aria-hidden="true"
+    >
+      <source src="/courier-eats-background-loop.mp4" type="video/mp4">
+    </video>
 
-      <div class="service-switcher" role="tablist" aria-label="Courier Eats services">
-        <button id="restaurantServiceButton" class="service-button active" type="button">🍽️ Restaurants</button>
-        <button id="retailServiceButton" class="service-button" type="button">🛍️ Retail Pickup</button>
+    <img
+      class="production-front-art"
+      src="/courier-eats-front.webp"
+      alt="Courier Eats Lewiston-Auburn front page with local food, downtown skyline, courier scooter, and Lewiston Courier Service branding."
+      width="1672"
+      height="941"
+      decoding="async"
+      fetchpriority="high"
+      onerror="this.style.display='none'"
+    >
+
+    <div class="hero-inner production-front-controls">
+      <h1 class="visually-hidden">Courier Eats — Good Food. Delivered.</h1>
+      <p class="visually-hidden">Support local. Eat local. Courier Eats serves Lewiston-Auburn with Lewiston Courier Service.</p>
+
+      <div class="service-switcher production-nav-hotspots" role="tablist" aria-label="Courier Eats services">
+        <button id="restaurantServiceButton" class="service-button active production-hotspot production-hotspot-restaurants" type="button" aria-label="Restaurants">Restaurants</button>
+        <button id="retailServiceButton" class="service-button production-hotspot production-hotspot-grocery" type="button" aria-label="Grocery Pickup">Grocery Pickup</button>
       </div>
+
+      <a id="heroOrderNow" class="production-hotspot production-hotspot-order" href="#restaurantService" aria-label="Order Now">Order Now</a>
     </div>
   </section>
 
   <main class="main">
     <section id="restaurantService" class="service-panel active">
       <div class="section-heading">
-        <h2>Local Restaurants</h2>
-        <p>Search restaurants, choose a category, and open the restaurant's live Square menu.</p>
+        <h2>Restaurants</h2>
+        <p>Browse local restaurants and Order Direct restaurants together by Breakfast, Lunch, Dinner, Bakery, Pizza, or World Food.</p>
       </div>
 
       <div class="search-wrap restaurant-search-wrap">
-        <input id="restaurantSearch" type="search" placeholder="Search restaurants..." autocomplete="off">
+        <input id="restaurantSearch" type="search" placeholder="Search all restaurants..." autocomplete="off">
       </div>
 
-      <div class="categories">
-        <button class="category-button active" data-category="All">All</button>
-        <button class="category-button" data-category="Breakfast">Breakfast</button>
-        <button class="category-button" data-category="Lunch">Lunch</button>
-        <button class="category-button" data-category="Dinner">Dinner</button>
-        <button class="category-button" data-category="Bakery">Bakery</button>
-        <button class="category-button" data-category="Pizza">Pizza</button>
-        <button class="category-button" data-category="World Food">World Food</button>
-        <button class="category-button" data-category="Seafood">Seafood</button>
-      </div>
-
-      <div id="restaurantList">
+      <div id="restaurantList" class="unified-restaurant-list">
         <div class="message">Loading restaurants...</div>
       </div>
     </section>
@@ -168,6 +182,13 @@
 
       restaurantButton.addEventListener('click', () => showService('restaurants'));
       retailButton.addEventListener('click', () => showService('retail'));
+
+      const heroOrderNow = document.getElementById('heroOrderNow');
+      if (heroOrderNow) {
+        heroOrderNow.addEventListener('click', () => {
+          showService('restaurants');
+        });
+      }
 
       const storeButtons = document.querySelectorAll('.retail-store');
       const storeInput = document.getElementById('retailStore');

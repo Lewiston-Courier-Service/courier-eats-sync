@@ -11,9 +11,26 @@ import { handleDriverPod } from "./driver-pod.js";
 import { handleDriverApp } from "./driver-app.js";
 import { handleMarketplaceOrders } from "./marketplace-orders.js";
 import { handleSquarePaymentHardening } from "./square-payment-hardening.js";
+import { handleCorporateDeliveryLink } from "./corporate-delivery-link.js";
 
 export default {
   async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    if (
+      request.method === "GET" &&
+      (url.pathname === "/join" || url.pathname.startsWith("/join/"))
+    ) {
+      const onboardingUrl = new URL("/join.html", url.origin);
+      onboardingUrl.search = url.search;
+      return env.ASSETS.fetch(new Request(onboardingUrl.toString(), request));
+    }
+
+    const corporateDeliveryLinkResponse = await handleCorporateDeliveryLink(request, env, ctx);
+    if (corporateDeliveryLinkResponse) {
+      return corporateDeliveryLinkResponse;
+    }
+
     const sandboxWebhookResponse = await handleSquareSandboxWebhook(request, env, ctx);
     if (sandboxWebhookResponse) {
       return sandboxWebhookResponse;

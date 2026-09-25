@@ -6,11 +6,14 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "test": "node --test",
+    "sandbox:square-e2e": "node scripts/square-sandbox-e2e.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.0.0",
     "typescript": "^5.9.0",
-    "wrangler": "^4.68.0"
+    "wrangler": "^4.68.0",
+    "wrangler-sandbox": "npm:wrangler@4.113.0"
   }
 }

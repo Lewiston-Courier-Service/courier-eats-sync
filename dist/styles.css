@@ -63,27 +63,49 @@
 
     .hero {
       min-height: 430px;
-
-      background:
-        linear-gradient(
-          rgba(34, 40, 58, 0.82),
-          rgba(34, 40, 58, 0.82)
-        );
-
+      position: relative;
+      overflow: hidden;
+      background: #242424;
       color: white;
-
       padding: 65px 20px;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       text-align: center;
+      isolation: isolate;
+    }
+
+    .hero-background-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(18, 18, 18, 0.42);
+      z-index: -1;
+      pointer-events: none;
     }
 
     .hero-inner {
       width: 100%;
       max-width: 1000px;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-background-video {
+        display: none;
+      }
     }
 
     .hero h1 {
@@ -515,3 +537,1032 @@
         padding-right: 14px;
       }
     }
+
+
+/* Corporate Delivery-Link */
+.corporate-delivery-section {
+  margin-bottom: 28px;
+}
+
+.section-divider {
+  height: 1px;
+  margin: 28px 0;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.corporate-restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.corporate-restaurant-card {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 18px;
+  padding: 18px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+}
+
+.corporate-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.corporate-card-header h3 {
+  margin: 4px 0 6px;
+  font-size: 1.15rem;
+}
+
+.corporate-card-header p,
+.corporate-independent-note {
+  margin: 0;
+  color: #5b5b5b;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.corporate-brand {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.delivery-link-badge {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #f2f2f2;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.corporate-steps {
+  display: grid;
+  gap: 6px;
+  margin: 16px 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.corporate-actions {
+  display: grid;
+  gap: 9px;
+}
+
+.corporate-order-button,
+.corporate-delivery-toggle,
+.corporate-quote-button,
+.corporate-pay-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.corporate-order-button {
+  background: #111;
+  color: #fff;
+}
+
+.corporate-delivery-toggle,
+.corporate-quote-button,
+.corporate-pay-button {
+  background: #ffd43b;
+  color: #111;
+}
+
+.corporate-delivery-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.corporate-delivery-form[hidden] {
+  display: none;
+}
+
+.corporate-delivery-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.corporate-delivery-form input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 10px;
+  padding: 11px 12px;
+  font: inherit;
+}
+
+.corporate-form-wide,
+.corporate-quote-button,
+.corporate-delivery-message {
+  grid-column: 1 / -1;
+}
+
+.corporate-delivery-message {
+  display: grid;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.corporate-delivery-message.success {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(46, 160, 67, 0.1);
+}
+
+.corporate-delivery-message.error {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(190, 40, 40, 0.1);
+}
+
+.corporate-independent-note {
+  margin-top: 14px;
+}
+
+@media (max-width: 620px) {
+  .corporate-restaurant-grid,
+  .corporate-delivery-form {
+    grid-template-columns: 1fr;
+  }
+
+  .corporate-form-wide,
+  .corporate-quote-button,
+  .corporate-delivery-message {
+    grid-column: auto;
+  }
+
+  .corporate-card-header {
+    flex-direction: column;
+  }
+}
+
+.corporate-delivery-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  background: #e8e8e8;
+  color: #555;
+}
+
+
+/* Brand presentation for corporate restaurant cards */
+.corporate-restaurant-card {
+  position: relative;
+  overflow: hidden;
+  --brand-accent: #111;
+  --brand-accent-2: #ffd43b;
+  --brand-soft: #f5f5f5;
+}
+
+.corporate-brand-strip {
+  height: 7px;
+  margin: -18px -18px 16px;
+  background: linear-gradient(90deg, var(--brand-accent), var(--brand-accent-2));
+}
+
+.corporate-identity {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.corporate-logo-wrap {
+  flex: 0 0 58px;
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: var(--brand-soft);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.corporate-brand-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  display: block;
+}
+
+.corporate-brand-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: var(--brand-accent);
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.corporate-card-badges {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.independent-delivery-badge {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.corporate-restaurant-card .corporate-order-button {
+  background: var(--brand-accent);
+  color: #fff;
+}
+
+.corporate-restaurant-card .corporate-order-button:hover {
+  filter: brightness(0.92);
+}
+
+.corporate-restaurant-card .delivery-link-badge {
+  background: var(--brand-soft);
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Brand-inspired card accents. Logos are loaded as web icons from each brand domain. */
+.corporate-brand-popeyes {
+  --brand-accent: #f15a24;
+  --brand-accent-2: #f7a81b;
+  --brand-soft: #fff1e8;
+}
+
+.corporate-brand-mcdonalds {
+  --brand-accent: #da291c;
+  --brand-accent-2: #ffc72c;
+  --brand-soft: #fff4cc;
+}
+
+.corporate-brand-burger-king {
+  --brand-accent: #d62300;
+  --brand-accent-2: #f5ebdc;
+  --brand-soft: #fff3e9;
+}
+
+.corporate-brand-ihop {
+  --brand-accent: #005aa7;
+  --brand-accent-2: #ef3340;
+  --brand-soft: #eef7ff;
+}
+
+.corporate-brand-buffalo-wild-wings {
+  --brand-accent: #111111;
+  --brand-accent-2: #ffc600;
+  --brand-soft: #fff8d6;
+}
+
+.corporate-brand-olive-garden {
+  --brand-accent: #5b3a29;
+  --brand-accent-2: #8aa83b;
+  --brand-soft: #f3f6e9;
+}
+
+.corporate-brand-99-restaurants {
+  --brand-accent: #b31b34;
+  --brand-accent-2: #222222;
+  --brand-soft: #fbecef;
+}
+
+.corporate-brand-applebees {
+  --brand-accent: #a6192e;
+  --brand-accent-2: #5d8720;
+  --brand-soft: #f4f8ea;
+}
+
+.corporate-brand-longhorn {
+  --brand-accent: #7a1f2b;
+  --brand-accent-2: #111111;
+  --brand-soft: #f6ecee;
+}
+
+.corporate-brand-dennys {
+  --brand-accent: #d71920;
+  --brand-accent-2: #f2c230;
+  --brand-soft: #fff7d7;
+}
+
+.corporate-brand-kfc {
+  --brand-accent: #e4002b;
+  --brand-accent-2: #111111;
+  --brand-soft: #fff0f2;
+}
+
+@media (max-width: 620px) {
+  .corporate-card-header {
+    gap: 12px;
+  }
+
+  .corporate-card-badges {
+    justify-items: start;
+  }
+
+  .corporate-logo-wrap {
+    flex-basis: 52px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .corporate-brand-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+
+/* Corporate category organization */
+.corporate-category-list {
+  display: grid;
+  gap: 30px;
+}
+
+.corporate-category-group {
+  display: grid;
+  gap: 14px;
+}
+
+.corporate-category-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #111;
+}
+
+.corporate-category-heading h3 {
+  margin: 2px 0 0;
+  font-size: 1.45rem;
+}
+
+.corporate-category-kicker {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.corporate-category-count {
+  flex: 0 0 auto;
+  color: #666;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.restaurant-category-badge {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: var(--brand-accent);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .corporate-category-heading {
+    align-items: flex-start;
+  }
+
+  .corporate-category-count {
+    padding-top: 4px;
+  }
+}
+
+
+/* Breakfast / Lunch / Dinner tabs */
+.corporate-meal-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.corporate-meal-tab {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
+  padding: 11px 18px;
+  background: #fff;
+  color: #111;
+  font-weight: 900;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+}
+
+.corporate-meal-tab.active,
+.corporate-meal-tab[aria-selected="true"] {
+  background: #ffd400;
+  border-color: #ffd400;
+}
+
+.corporate-meal-panel {
+  display: grid;
+  gap: 14px;
+}
+
+@media (max-width: 620px) {
+  .corporate-meal-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .corporate-meal-tab {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+
+/* Unified local + Order Direct restaurant meal tabs */
+#restaurantList.unified-restaurant-list {
+  display: block;
+  margin-top: 24px;
+}
+
+.restaurant-meal-tabs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 620px;
+  margin: 0 auto 24px;
+}
+
+.restaurant-meal-tab {
+  min-height: 48px;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  border-radius: 14px;
+  padding: 11px 16px;
+  background: #fff;
+  color: #111;
+  font-weight: 900;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.restaurant-meal-tab.active,
+.restaurant-meal-tab[aria-selected="true"] {
+  background: #ffd400;
+  border-color: #ffd400;
+}
+
+.unified-meal-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 11px;
+  border-bottom: 2px solid #111;
+}
+
+.unified-meal-summary h3 {
+  margin: 2px 0 0;
+  font-size: 1.55rem;
+}
+
+.restaurant-source-group {
+  margin-top: 26px;
+}
+
+.restaurant-source-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.restaurant-source-heading h4 {
+  margin: 2px 0 0;
+  font-size: 1.15rem;
+}
+
+.restaurant-source-heading > span {
+  color: #666;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.restaurant-source-kicker {
+  display: block;
+  color: #666;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.local-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.local-restaurant-badge,
+.local-meal-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.local-restaurant-badge {
+  background: #111;
+  color: #fff;
+}
+
+.local-meal-badge {
+  background: #fff4bd;
+  color: #111;
+}
+
+.local-restaurant-card {
+  height: fit-content;
+}
+
+@media (max-width: 900px) {
+  .restaurant-meal-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .restaurant-meal-tabs {
+    gap: 7px;
+  }
+
+  .restaurant-meal-tab {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .unified-meal-summary,
+  .restaurant-source-heading {
+    align-items: flex-start;
+  }
+}
+
+
+/* Local restaurant external online-order buttons */
+.local-order-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.local-online-order {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 11px 14px;
+  background: #111;
+  color: #fff;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.local-online-order:hover {
+  filter: brightness(0.92);
+}
+
+.local-online-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: #dff6dd;
+  color: #145a20;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+
+/* Local restaurant logo + brand treatment */
+.local-restaurant-card {
+  position: relative;
+  overflow: hidden;
+  --local-accent: #111;
+  --local-accent-2: #ffd400;
+  --local-soft: #f4f4f4;
+}
+
+.local-brand-strip {
+  height: 7px;
+  background: linear-gradient(90deg, var(--local-accent), var(--local-accent-2));
+}
+
+.local-card-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.local-logo-wrap {
+  flex: 0 0 62px;
+  width: 62px;
+  height: 62px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--local-soft);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.local-brand-logo {
+  width: 46px;
+  height: 46px;
+  display: block;
+  object-fit: contain;
+}
+
+.local-brand-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: var(--local-accent);
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-align: center;
+  padding: 6px;
+}
+
+.local-card-title {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.local-restaurant-card .restaurant-name {
+  margin-top: 0;
+}
+
+.local-restaurant-card .view-menu {
+  background: var(--local-accent-2);
+  color: #111;
+}
+
+.local-restaurant-card .local-online-order {
+  background: var(--local-accent);
+  color: #fff;
+}
+
+.local-restaurant-card .local-restaurant-badge {
+  background: var(--local-accent);
+  color: #fff;
+}
+
+.local-restaurant-card .local-meal-badge {
+  background: var(--local-soft);
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 620px) {
+  .local-logo-wrap {
+    flex-basis: 54px;
+    width: 54px;
+    height: 54px;
+  }
+
+  .local-brand-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+
+/* Breakfast / Lunch / Dinner menu backgrounds */
+#restaurantService {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 28px;
+}
+
+#restaurantService::before,
+#restaurantService::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+#restaurantService::before {
+  z-index: -2;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#restaurantService::after {
+  z-index: -1;
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(1px);
+}
+
+#restaurantService[data-menu-background="breakfast"]::before {
+  background-image: url("/breakfast-bg.webp");
+  opacity: 1;
+}
+
+#restaurantService[data-menu-background="lunch"]::before {
+  background-image: url("/lunch-bg.webp");
+  opacity: 1;
+}
+
+#restaurantService[data-menu-background="dinner"]::before {
+  background-image: url("/dinner-bg.webp");
+  opacity: 1;
+}
+
+#restaurantService[data-menu-background]::after {
+  opacity: 1;
+}
+
+#restaurantService[data-menu-background] > .section-heading,
+#restaurantService[data-menu-background] > .restaurant-search-wrap,
+#restaurantService[data-menu-background] .restaurant-meal-tabs,
+#restaurantService[data-menu-background] .unified-meal-summary,
+#restaurantService[data-menu-background] .restaurant-source-heading {
+  position: relative;
+  z-index: 1;
+}
+
+#restaurantService[data-menu-background] > .section-heading {
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 16px;
+  padding: 13px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(5px);
+}
+
+#restaurantService[data-menu-background] > .section-heading p {
+  margin-bottom: 0;
+  color: #444;
+}
+
+#restaurantService[data-menu-background] > .restaurant-search-wrap {
+  padding: 6px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(5px);
+}
+
+#restaurantService[data-menu-background] .restaurant-meal-tabs {
+  padding: 9px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(5px);
+}
+
+#restaurantService[data-menu-background] .unified-meal-summary,
+#restaurantService[data-menu-background] .restaurant-source-heading {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
+  backdrop-filter: blur(5px);
+}
+
+#restaurantService[data-menu-background] .unified-meal-summary {
+  border-bottom: 0;
+}
+
+@media (max-width: 620px) {
+  #restaurantService {
+    margin-inline: -8px;
+    padding: 20px 12px;
+    border-radius: 18px;
+  }
+}
+
+
+/* Production Courier Eats front-page artwork */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.production-front-hero {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 1672 / 941;
+  padding: 0;
+  overflow: hidden;
+  background: #111;
+  color: #111;
+  text-align: initial;
+  isolation: isolate;
+}
+
+.production-front-hero::after {
+  display: none;
+}
+
+.production-front-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.production-front-controls {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  max-width: none;
+  pointer-events: none;
+}
+
+.production-nav-hotspots {
+  position: absolute;
+  inset: 0;
+  display: block;
+  margin: 0;
+  pointer-events: none;
+}
+
+.production-hotspot {
+  position: absolute;
+  z-index: 4;
+  display: block;
+  border: 0;
+  border-radius: 10px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  box-shadow: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.production-hotspot:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.production-hotspot:focus-visible {
+  outline: 3px solid #e60012;
+  outline-offset: 2px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.production-hotspot-restaurants {
+  top: 1.2%;
+  left: 34.4%;
+  width: 8.8%;
+  height: 5.6%;
+}
+
+.production-hotspot-grocery {
+  top: 1.2%;
+  left: 43.0%;
+  width: 10.4%;
+  height: 5.6%;
+}
+
+.production-hotspot-order {
+  top: 1.0%;
+  left: 75.0%;
+  width: 14.0%;
+  height: 6.2%;
+  text-decoration: none;
+}
+
+@media (max-width: 720px) {
+  .production-front-hero {
+    aspect-ratio: auto;
+    padding: 0 0 14px;
+    background: #111;
+  }
+
+  .production-front-art {
+    position: relative;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .production-front-controls {
+    position: relative;
+    inset: auto;
+    padding: 10px 12px 0;
+    background: #111;
+  }
+
+  .production-nav-hotspots {
+    position: relative;
+    inset: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    pointer-events: auto;
+  }
+
+  .production-hotspot-restaurants,
+  .production-hotspot-grocery {
+    position: relative;
+    inset: auto;
+    width: auto;
+    height: auto;
+    min-height: 46px;
+    border-radius: 12px;
+    background: #fff;
+    color: #111;
+    font-size: 0.92rem;
+    line-height: 1.1;
+    font-weight: 900;
+  }
+
+  .production-hotspot-restaurants::after {
+    content: "Restaurants";
+  }
+
+  .production-hotspot-grocery::after {
+    content: "Grocery Pickup";
+  }
+
+  .production-hotspot-order {
+    display: none;
+  }
+}
+
+
+.production-topbar {
+  display: none;
+}
+
+
+.production-front-hero .production-front-fallback {
+  z-index: 0;
+}
+
+.production-front-art {
+  z-index: 1;
+}
