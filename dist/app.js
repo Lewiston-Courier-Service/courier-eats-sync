@@ -1,3 +1,32 @@
+const BREAKFAST_CARD_META = {
+  "happy days diner": { background:"#C73A3A", text:"#FFFFFF", accent:"#F7D8A8", accentText:"#222222", bird:"Black-capped Chickadee", birdGlyph:"🐦" },
+  "rolly's diner": { background:"#295A9F", text:"#FFFFFF", accent:"#E6EEF8", accentText:"#1A1A1A", bird:"Blue Jay", birdGlyph:"🐦" },
+  "fran's restaurant": { background:"#B63C3C", text:"#FFFFFF", accent:"#F4E7D3", accentText:"#222222", bird:"Northern Cardinal", birdGlyph:"🐦" },
+  "roy's all steak hamburgers": { background:"#7B1E1E", text:"#FFFFFF", accent:"#D9B45B", accentText:"#1A1A1A", bird:"Bald Eagle", birdGlyph:"🦅" },
+  "station grill restaurant": { background:"#3A3A3A", text:"#FFFFFF", accent:"#C84141", accentText:"#FFFFFF", bird:"Herring Gull", birdGlyph:"🐦" },
+  "kristi's cafe": { background:"#7A5A3A", text:"#FFFFFF", accent:"#F4E2C6", accentText:"#222222", bird:"American Goldfinch", birdGlyph:"🐦" },
+  "dubois cafe": { background:"#6E2F3B", text:"#FFFFFF", accent:"#E7D8D8", accentText:"#222222", bird:"Mourning Dove", birdGlyph:"🕊️" },
+  "forage market": { background:"#4C6A47", text:"#FFFFFF", accent:"#D9C9A2", accentText:"#222222", bird:"Black-capped Chickadee", birdGlyph:"🐦" },
+  "governor's restaurant & bakery": { background:"#244A86", text:"#FFFFFF", accent:"#F1F3F8", accentText:"#1A1A1A", bird:"Common Loon", birdGlyph:"🐦" },
+  "the italian bakery": { background:"#B22222", text:"#FFFFFF", accent:"#2E8B57", accentText:"#FFFFFF", bird:"Northern Cardinal", birdGlyph:"🐦" },
+  "the cupcakery cafe & bake shop": { background:"#D97BAA", text:"#FFFFFF", accent:"#FFF0F6", accentText:"#7A2A4A", bird:"American Goldfinch", birdGlyph:"🐦" },
+  "georgio's pizza & donut shop": { background:"#B3261E", text:"#FFFFFF", accent:"#F0C541", accentText:"#222222", bird:"Blue Jay", birdGlyph:"🐦" }
+};
+
+function normalizeRestaurantKey(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function restaurantInitials(name) {
+  return String(name || "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .map(part => part[0])
+    .join("")
+    .toUpperCase();
+}
+
 let restaurants = [];
 let selectedCategory = "All";
 let cart = [];
@@ -74,17 +103,33 @@ document
 .value
 .trim()
 .toLowerCase();
+
 const filtered =
 restaurants.filter(
 restaurant => {
-return String(
+const nameMatch =
+String(
 restaurant.name || ""
 )
 .toLowerCase()
 .includes(search);
+
+const categoryMatch =
+selectedCategory === "All" ||
+(
+Array.isArray(restaurant.categories) &&
+restaurant.categories.some(category =>
+String(category).toLowerCase() ===
+selectedCategory.toLowerCase()
+)
+);
+
+return nameMatch && categoryMatch;
 }
 );
+
 list.innerHTML = "";
+
 if (
 filtered.length === 0
 ) {
@@ -95,6 +140,7 @@ No restaurants found.
 `;
 return;
 }
+
 filtered.forEach(
 restaurant => {
 const card =
@@ -103,6 +149,39 @@ document.createElement(
 );
 card.className =
 "restaurant-card";
+
+const meta =
+BREAKFAST_CARD_META[
+normalizeRestaurantKey(
+restaurant.name
+)
+] || null;
+
+if (
+selectedCategory === "Breakfast" &&
+meta
+) {
+card.classList.add(
+"breakfast-card"
+);
+card.style.setProperty(
+"--card-bg",
+meta.background
+);
+card.style.setProperty(
+"--card-text",
+meta.text
+);
+card.style.setProperty(
+"--card-accent",
+meta.accent
+);
+card.style.setProperty(
+"--card-accent-text",
+meta.accentText
+);
+}
+
 const locationText =
 [
 restaurant.city,
@@ -110,8 +189,112 @@ restaurant.state
 ]
 .filter(Boolean)
 .join(", ");
+
+const categories =
+Array.isArray(
+restaurant.categories
+)
+? restaurant.categories
+: [];
+
+const categoryTags =
+categories
+.map(category =>
+`<span class="restaurant-tag">${escapeHTML(category)}</span>`
+)
+.join("");
+
+const logoMarkup =
+restaurant.logoUrl
+? `
+<img
+class="restaurant-logo-image"
+src="${escapeHTML(restaurant.logoUrl)}"
+alt="${escapeHTML(restaurant.name)} logo"
+onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+/>
+<div class="restaurant-logo-fallback" style="display:none">
+${escapeHTML(restaurantInitials(restaurant.name))}
+</div>
+`
+: `
+<div class="restaurant-logo-fallback">
+${escapeHTML(restaurantInitials(restaurant.name))}
+</div>
+`;
+
+const birdMarkup =
+meta
+? `
+<div
+class="card-bird"
+title="${escapeHTML(meta.bird)}"
+aria-label="${escapeHTML(meta.bird)}"
+>
+<span aria-hidden="true">${meta.birdGlyph}</span>
+</div>
+`
+: "";
+
+const externalOrder =
+!restaurant.checkoutEnabled &&
+restaurant.orderUrl;
+
+const primaryButton =
+restaurant.locationId
+? `
+<button
+class="view-menu"
+type="button"
+>
+View Menu
+</button>
+`
+: restaurant.menuUrl
+? `
+<a
+class="view-menu restaurant-link"
+href="${escapeHTML(restaurant.menuUrl)}"
+target="_blank"
+rel="noopener noreferrer"
+>
+View Menu
+</a>
+`
+: "";
+
+const orderButton =
+externalOrder
+? `
+<a
+class="order-now restaurant-link"
+href="${escapeHTML(restaurant.orderUrl)}"
+target="_blank"
+rel="noopener noreferrer"
+>
+Order Now
+</a>
+`
+: (
+!restaurant.locationId &&
+restaurant.phone
+? `
+<a
+class="order-now restaurant-link"
+href="tel:${escapeHTML(restaurant.phone)}"
+>
+Call to Order
+</a>
+`
+: ""
+);
+
 card.innerHTML = `
+${birdMarkup}
 <div class="restaurant-top">
+<div class="restaurant-logo-wrap">
+${logoMarkup}
+</div>
 <h3 class="restaurant-name">
 ${escapeHTML(
 restaurant.name
@@ -122,34 +305,88 @@ ${escapeHTML(
 locationText
 )}
 </div>
-<button
-class="view-menu"
-type="button"
->
-View Menu
-</button>
+<div class="restaurant-tags">
+${categoryTags}
+</div>
+<div class="restaurant-actions">
+${primaryButton}
+${orderButton}
+</div>
 </div>
 <div
 class="restaurant-menu"
 ></div>
 `;
+
 const button =
 card.querySelector(
-".view-menu"
+"button.view-menu"
 );
+
+if (button) {
 button.addEventListener(
 "click",
 () => {
+card.classList.add("selected");
 loadMenu(
 restaurant,
 button
 );
 }
 );
+}
+
+card.addEventListener(
+"mouseenter",
+() => card.classList.add("bird-visible")
+);
+
+card.addEventListener(
+"mouseleave",
+() => {
+if (!card.classList.contains("selected")) {
+card.classList.remove("bird-visible");
+}
+}
+);
+
+card.addEventListener(
+"click",
+event => {
+if (
+event.target.closest(
+"a, button, .restaurant-menu"
+)
+) {
+return;
+}
+document
+.querySelectorAll(
+".restaurant-card.selected"
+)
+.forEach(other => {
+if (other !== card) {
+other.classList.remove(
+"selected",
+"bird-visible"
+);
+}
+});
+card.classList.toggle(
+"selected"
+);
+card.classList.toggle(
+"bird-visible",
+card.classList.contains("selected")
+);
+}
+);
+
 list.appendChild(card);
 }
 );
 }
+
 async function loadMenu(
 restaurant,
 button
@@ -802,6 +1039,17 @@ button
 selectedCategory =
 button.dataset
 .category;
+
+const restaurantService =
+document.getElementById(
+"restaurantService"
+);
+restaurantService.classList.toggle(
+"breakfast-mode",
+selectedCategory === "Breakfast"
+);
+
+renderRestaurants();
 document
 .querySelectorAll(
 ".restaurant-menu"
