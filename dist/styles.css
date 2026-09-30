@@ -720,8 +720,65 @@
 }
 
 .breakfast-card .restaurant-menu {
-  background: rgba(255,255,255,0.96);
-  color: #111;
+  background: var(--card-bg);
+  color: var(--card-text);
+  border-top: 1px solid rgba(255,255,255,0.24);
+}
+
+.breakfast-card .menu-item {
+  border-top-color: rgba(255,255,255,0.22);
+}
+
+.breakfast-card .menu-item:first-child {
+  border-top: 0;
+}
+
+.breakfast-card .menu-item-name,
+.breakfast-card .variation-price,
+.breakfast-card .variation-info {
+  color: var(--card-text);
+}
+
+.breakfast-card .menu-description {
+  color: var(--card-text);
+  opacity: 0.84;
+}
+
+.breakfast-card .menu-category {
+  background: rgba(255,255,255,0.18);
+  color: var(--card-text);
+  border: 1px solid rgba(255,255,255,0.24);
+}
+
+.breakfast-card .variation-row {
+  border-top-color: rgba(255,255,255,0.18);
+}
+
+.breakfast-card .add-cart {
+  background: var(--card-accent);
+  color: var(--card-accent-text);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.14);
+}
+
+.breakfast-card .message {
+  background: rgba(255,255,255,0.14);
+  color: var(--card-text);
+  border: 1px solid rgba(255,255,255,0.20);
+}
+
+.breakfast-card .restaurant-menu[style*="block"] {
+  animation: breakfastMenuOpen 220ms ease-out;
+}
+
+@keyframes breakfastMenuOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
