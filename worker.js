@@ -1,3 +1,181 @@
+const BREAKFAST_RESTAURANTS = [
+  {
+    id: "happy-days-diner",
+    name: "Happy Days Diner",
+    categories: ["Breakfast", "Lunch"],
+    address: "67 Mill St",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-783-1800",
+    menuUrl: "https://www.grubhub.com/restaurant/happy-days-diner-67-mill-st-auburn/6213000",
+    orderUrl: "https://www.grubhub.com/restaurant/happy-days-diner-67-mill-st-auburn/6213000",
+    orderingMode: "EXTERNAL",
+    checkoutEnabled: false
+  },
+  {
+    id: "rollys-diner",
+    name: "Rolly's Diner",
+    categories: ["Breakfast", "Lunch"],
+    address: "87 Mill St",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-753-0171",
+    menuUrl: "https://www.rollysnewauburn.com/",
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "frans-restaurant",
+    name: "Fran's Restaurant",
+    categories: ["Breakfast", "Lunch"],
+    address: "1485 Lisbon St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: null,
+    menuUrl: "https://www.allmenus.com/me/lewiston/747499-frans-restaurant/menu/",
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "roys-all-steak-hamburgers",
+    name: "Roy's All Steak Hamburgers",
+    categories: ["Breakfast", "Lunch"],
+    address: "5 Washington St",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-783-4304",
+    menuUrl: "https://menusinla.com/restaurants/roys-all-steak-hamburgers",
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "station-grill",
+    name: "Station Grill Restaurant",
+    categories: ["Breakfast", "Lunch", "Dinner"],
+    address: "103 Lincoln St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-333-5062",
+    menuUrl: "https://www.stationgrillrestaurant.com/breakfast-menu-the-station-grill-restaurant",
+    orderUrl: "https://stationgrill.hrpos.heartland.us/menu",
+    orderingMode: "EXTERNAL",
+    checkoutEnabled: false
+  },
+  {
+    id: "kristis-cafe",
+    name: "Kristi's Cafe",
+    categories: ["Breakfast", "Lunch"],
+    address: "767 Minot Ave",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-241-7460",
+    menuUrl: "https://kristiscafe.com/breakfast-menu/",
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "dubois-cafe",
+    name: "Dubois Cafe",
+    categories: ["Breakfast", "Lunch"],
+    address: "906 Sabattus St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: null,
+    menuUrl: "https://www.ubereats.com/store/dubois-cafe/4UIhO4HES62bO_vjrW1jsQ",
+    orderUrl: "https://www.ubereats.com/store/dubois-cafe/4UIhO4HES62bO_vjrW1jsQ",
+    orderingMode: "EXTERNAL",
+    checkoutEnabled: false
+  },
+  {
+    id: "forage-market-lewiston",
+    name: "Forage Market",
+    categories: ["Breakfast", "Lunch", "Bakery"],
+    address: "180 Lisbon St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-333-6840",
+    menuUrl: "https://www.foragemarket.com/the-market",
+    orderUrl: "https://order.toasttab.com/online/foragelewiston",
+    orderingMode: "EXTERNAL",
+    checkoutEnabled: false
+  },
+  {
+    id: "governors-lewiston",
+    name: "Governor's Restaurant & Bakery",
+    categories: ["Breakfast", "Lunch", "Dinner", "Bakery", "Catering"],
+    address: "1185 Lisbon St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-753-0173",
+    menuUrl: "https://www.governorsrestaurant.com/menus/",
+    orderUrl: "https://www.governorsrestaurant.com/order/",
+    orderingMode: "EXTERNAL",
+    checkoutEnabled: false
+  },
+  {
+    id: "italian-bakery-lewiston",
+    name: "The Italian Bakery",
+    categories: ["Breakfast", "Lunch", "Bakery", "Catering"],
+    address: "225 Bartlett St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-782-8312",
+    menuUrl: "https://theitalianbakeryme.com/breakfast/",
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "cupcakery-lewiston",
+    name: "The Cupcakery Cafe & Bake Shop",
+    categories: ["Breakfast", "Lunch", "Bakery", "Catering"],
+    address: "56 Sabattus St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-784-2253",
+    menuUrl: "https://www.thecupcakery.org/menu",
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "georgios-pizza-donut-shop",
+    name: "Georgio's Pizza & Donut Shop",
+    categories: ["Breakfast", "Lunch", "Dinner", "Pizza", "Bakery"],
+    address: "740 Minot Ave",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-783-2981",
+    menuUrl: "https://georgiosauburn.com/menu/",
+    orderUrl: "https://www.georgiospizzadonutshopmenu.com/",
+    orderingMode: "EXTERNAL",
+    checkoutEnabled: false
+  }
+];
+
+function normalizeRestaurantName(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -11,19 +189,9 @@ export default {
 
     try {
       if (url.pathname === "/api/restaurants") {
-        const response = await fetch(
-          "https://connect.squareup.com/v2/locations",
-          {
-            method: "GET",
-            headers: squareHeaders(env)
-          }
-        );
-
-        const data = await safeJson(response);
-
-        if (!response.ok) {
-          return json(data, response.status);
-        }
+        const requestedCategory = String(
+          url.searchParams.get("category") || ""
+        ).trim();
 
         const excludedNames = [
           "DumpIt4Me",
@@ -37,24 +205,85 @@ export default {
           "Wil_Smith"
         ].map(name => name.toLowerCase());
 
-        const restaurants = (data.locations || [])
-          .filter(location => location.status === "ACTIVE")
-          .filter(location => {
-            const name = String(location.name || "").trim().toLowerCase();
-            return name && !excludedNames.includes(name);
-          })
-          .map(location => ({
-            name: location.name || "",
-            locationId: location.id,
-            city: location.address?.locality || "",
-            state: location.address?.administrative_district_level_1 || "",
-            postalCode: location.address?.postal_code || "",
-            menuUrl: `/api/menu?location=${encodeURIComponent(location.id)}`
-          }))
-          .sort((a, b) => a.name.localeCompare(b.name));
+        const byName = new Map(
+          BREAKFAST_RESTAURANTS.map(restaurant => [
+            normalizeRestaurantName(restaurant.name),
+            { ...restaurant, locationId: null }
+          ])
+        );
+
+        if (env.SQUARE_ACCESS_TOKEN) {
+          const response = await fetch(
+            "https://connect.squareup.com/v2/locations",
+            {
+              method: "GET",
+              headers: squareHeaders(env)
+            }
+          );
+
+          const data = await safeJson(response);
+
+          if (response.ok) {
+            for (const location of data.locations || []) {
+              if (location.status !== "ACTIVE") {
+                continue;
+              }
+
+              const name = String(location.name || "").trim();
+              if (!name || excludedNames.includes(name.toLowerCase())) {
+                continue;
+              }
+
+              const key = normalizeRestaurantName(name);
+              const directoryRestaurant = byName.get(key);
+
+              byName.set(key, {
+                ...(directoryRestaurant || {
+                  id: key.replace(/\s+/g, "-"),
+                  name,
+                  categories: []
+                }),
+                name,
+                locationId: location.id,
+                city: location.address?.locality || directoryRestaurant?.city || "",
+                state:
+                  location.address?.administrative_district_level_1 ||
+                  directoryRestaurant?.state ||
+                  "",
+                postalCode:
+                  location.address?.postal_code ||
+                  directoryRestaurant?.postalCode ||
+                  "",
+                menuUrl: `/api/menu?location=${encodeURIComponent(location.id)}`,
+                orderUrl: null,
+                orderingMode: "SQUARE",
+                checkoutEnabled: true
+              });
+            }
+          } else {
+            console.warn(
+              "Unable to load Square locations for restaurant directory",
+              response.status
+            );
+          }
+        }
+
+        let restaurants = [...byName.values()];
+
+        if (requestedCategory) {
+          const wanted = requestedCategory.toLowerCase();
+          restaurants = restaurants.filter(restaurant =>
+            (restaurant.categories || []).some(
+              category => String(category).toLowerCase() === wanted
+            )
+          );
+        }
+
+        restaurants.sort((a, b) => a.name.localeCompare(b.name));
 
         return json({
           service: "Courier Eats",
+          category: requestedCategory || null,
           count: restaurants.length,
           restaurants
         });
