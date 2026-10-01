@@ -1,0 +1,117 @@
+{
+  "restaurantId": "italian-bakery-lewiston",
+  "restaurantName": "The Italian Bakery",
+  "ownershipType": "LOCAL",
+  "source": {
+    "type": "OFFICIAL_WEBSITE",
+    "url": "https://theitalianbakeryme.com/breakfast/",
+    "verifiedOn": "2026-09-30"
+  },
+  "square": {
+    "targetLocationId": null,
+    "categoryName": "Breakfast"
+  },
+  "importRules": {
+    "currency": "USD",
+    "skipItemsWithoutVerifiedPrice": true,
+    "overwriteExisting": false
+  },
+  "items": [
+    {
+      "name": "Breakfast Sandwich - English Muffin Bread",
+      "priceCents": 550,
+      "description": "Ham, sausage, bacon or veggie with egg and cheese."
+    },
+    {
+      "name": "Breakfast Sandwich - Croissant or Bagel",
+      "priceCents": 650,
+      "description": "Ham, sausage, bacon or veggie with egg and cheese."
+    },
+    {
+      "name": "Toasted Bagel",
+      "priceCents": 200
+    },
+    {
+      "name": "Toasted Bagel with Cream Cheese",
+      "priceCents": 350
+    },
+    {
+      "name": "Breakfast Wrap",
+      "priceCents": 800,
+      "description": "2 eggs, cheese, bacon and ham."
+    },
+    {
+      "name": "Breakfast Sub - Small",
+      "priceCents": 799
+    },
+    {
+      "name": "Breakfast Sub - Large",
+      "priceCents": 999
+    },
+    {
+      "name": "Breakfast Pizza - Egg & Cheese 7 inch",
+      "priceCents": 600
+    },
+    {
+      "name": "Breakfast Pizza - Egg & Cheese 10 inch",
+      "priceCents": 800
+    },
+    {
+      "name": "Breakfast Pizza - Egg & Cheese 14 inch",
+      "priceCents": 1400
+    },
+    {
+      "name": "Breakfast Pizza - One Topping 7 inch",
+      "priceCents": 700
+    },
+    {
+      "name": "Breakfast Pizza - One Topping 10 inch",
+      "priceCents": 900
+    },
+    {
+      "name": "Breakfast Pizza - One Topping 14 inch",
+      "priceCents": 1600
+    },
+    {
+      "name": "Breakfast Pizza - Two Topping 7 inch",
+      "priceCents": 800
+    },
+    {
+      "name": "Breakfast Pizza - Two Topping 10 inch",
+      "priceCents": 1100
+    },
+    {
+      "name": "Breakfast Pizza - Two Topping 14 inch",
+      "priceCents": 1700
+    },
+    {
+      "name": "Breakfast Pizza - Loaded 7 inch",
+      "priceCents": 999
+    },
+    {
+      "name": "Breakfast Pizza - Loaded 10 inch",
+      "priceCents": 1399
+    },
+    {
+      "name": "Breakfast Pizza - Loaded 14 inch",
+      "priceCents": 1999
+    },
+    {
+      "name": "Breakfast Pastry Platter - Small",
+      "priceCents": 2499
+    },
+    {
+      "name": "Breakfast Pastry Platter - Large",
+      "priceCents": 4499
+    },
+    {
+      "name": "Box of Coffee To Go",
+      "priceCents": 1999,
+      "description": "Includes cups and condiments."
+    }
+  ],
+  "notes": [
+    "Items lacking a verified current item-level price are excluded.",
+    "Do not apply to production until the target Square location is confirmed."
+  ]
+}
