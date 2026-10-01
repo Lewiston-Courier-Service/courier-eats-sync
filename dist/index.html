@@ -26,9 +26,12 @@
       <h1>What can we pick up for you?</h1>
       <p>Order from local restaurants or book a retail pickup from stores such as Walmart, Home Depot, Lowe's, Tractor Supply, and Target.</p>
 
-      <div id="weatherStatus" class="weather-status" aria-live="polite">
-        <span class="weather-now">Lewiston–Auburn weather loading…</span>
-        <span class="weather-sun"></span>
+      <div class="hero-weather-row">
+        <div id="weatherStatus" class="weather-status" aria-live="polite">
+          <span class="weather-now">Lewiston–Auburn weather loading…</span>
+          <span class="weather-sun"></span>
+        </div>
+        <div class="scenery-bell" title="Deep bell rings when a Courier Eats task completes" aria-label="Task-completion bell">🔔</div>
       </div>
 
       <div class="service-switcher" role="tablist" aria-label="Courier Eats services">
@@ -154,6 +157,77 @@
     <p>Restaurant ordering and retail pickup delivery by Lewiston Courier Service.</p>
   </footer>
 
+  <script>
+    (() => {
+      let audioContext = null;
+      let pendingBell = false;
+
+      function ensureAudio() {
+        try {
+          if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          if (audioContext.state === 'suspended') {
+            audioContext.resume();
+          }
+          if (pendingBell && audioContext.state === 'running') {
+            pendingBell = false;
+            ringDeepBell();
+          }
+        } catch (error) {
+          console.warn('Bell audio unavailable:', error);
+        }
+      }
+
+      function ringDeepBell() {
+        try {
+          ensureAudio();
+          if (!audioContext || audioContext.state !== 'running') {
+            pendingBell = true;
+            return;
+          }
+
+          const now = audioContext.currentTime;
+          const master = audioContext.createGain();
+          master.gain.setValueAtTime(0.0001, now);
+          master.gain.exponentialRampToValueAtTime(0.42, now + 0.025);
+          master.gain.exponentialRampToValueAtTime(0.0001, now + 4.8);
+          master.connect(audioContext.destination);
+
+          [
+            [110, 0.95],
+            [165, 0.42],
+            [220, 0.24],
+            [275, 0.12]
+          ].forEach(([frequency, level]) => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(frequency, now);
+            osc.frequency.exponentialRampToValueAtTime(frequency * 0.992, now + 4.5);
+            gain.gain.setValueAtTime(level, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 4.5);
+            osc.connect(gain);
+            gain.connect(master);
+            osc.start(now);
+            osc.stop(now + 4.9);
+          });
+
+          document.querySelector('.scenery-bell')?.classList.add('ringing');
+          setTimeout(() => document.querySelector('.scenery-bell')?.classList.remove('ringing'), 900);
+        } catch (error) {
+          console.warn('Unable to ring bell:', error);
+        }
+      }
+
+      window.ringCourierTaskBell = ringDeepBell;
+      window.addEventListener('couriereats:task-complete', ringDeepBell);
+
+      ['pointerdown', 'keydown', 'touchstart'].forEach(type => {
+        window.addEventListener(type, ensureAudio, { once: true, passive: true });
+      });
+    })();
+  </script>
   <script src="/app.js"></script>
   <script>
     (() => {
@@ -214,6 +288,7 @@
           }
           message.textContent = `Pickup request received. Dispatch #${data.dispatchOrderId || ''}`;
           message.className = 'retail-message success';
+          window.dispatchEvent(new CustomEvent('couriereats:task-complete'));
           form.reset();
           storeInput.value = 'Walmart';
           storeButtons.forEach(button => button.classList.toggle('active', button.dataset.store === 'Walmart'));
