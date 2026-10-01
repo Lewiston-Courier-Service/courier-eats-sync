@@ -166,6 +166,20 @@ const BREAKFAST_RESTAURANTS = [
     orderUrl: "https://www.georgiospizzadonutshopmenu.com/",
     orderingMode: "EXTERNAL",
     checkoutEnabled: false
+  },
+  {
+    id: "nutty-netties-cafe",
+    name: "Nutty Nettie's Café",
+    categories: ["Breakfast", "Lunch", "Bakery"],
+    address: "34 Court St",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-440-7951",
+    menuUrl: "https://order.online/en/store/nutty-netties-22974187",
+    orderUrl: "https://order.online/en/store/nutty-netties-22974187",
+    orderingMode: "EXTERNAL",
+    checkoutEnabled: false
   }
 ];
 
