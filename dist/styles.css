@@ -923,3 +923,45 @@
     transition: none;
   }
 }
+
+
+/* Deep scenery bell for task completion */
+.hero-weather-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.scenery-bell {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(20,28,42,.38);
+  border: 1px solid rgba(255,255,255,.38);
+  backdrop-filter: blur(8px);
+  font-size: 22px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.28));
+  transform-origin: 50% 0;
+}
+
+.scenery-bell.ringing {
+  animation: courierBellSwing 900ms ease-out;
+}
+
+@keyframes courierBellSwing {
+  0% { transform: rotate(0deg); }
+  18% { transform: rotate(16deg); }
+  36% { transform: rotate(-13deg); }
+  54% { transform: rotate(9deg); }
+  72% { transform: rotate(-6deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenery-bell.ringing { animation: none; }
+}
