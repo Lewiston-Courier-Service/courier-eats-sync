@@ -73,10 +73,11 @@
 
       background:
         linear-gradient(
-          rgba(34, 40, 58, 0.14),
-          rgba(34, 40, 58, 0.22)
-        ),
-        url("/assets/breakfast-lewiston-auburn.webp") center 46% / cover no-repeat;
+          180deg,
+          rgba(107, 168, 222, 0.26) 0%,
+          rgba(173, 211, 240, 0.20) 48%,
+          rgba(244, 220, 179, 0.18) 100%
+        );
 
       color: white;
 
@@ -1046,4 +1047,15 @@
 
 .hero[data-weather="clear"]::before {
   opacity: .28;
+}
+
+
+/* Breakfast artwork is used only while the Breakfast category is selected. */
+.hero.breakfast-selected {
+  background:
+    linear-gradient(
+      rgba(34, 40, 58, 0.12),
+      rgba(34, 40, 58, 0.20)
+    ),
+    url("/assets/breakfast-lewiston-auburn.webp") center 46% / cover no-repeat;
 }
