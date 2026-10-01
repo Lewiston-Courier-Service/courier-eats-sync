@@ -26,6 +26,11 @@
       <h1>What can we pick up for you?</h1>
       <p>Order from local restaurants or book a retail pickup from stores such as Walmart, Home Depot, Lowe's, Tractor Supply, and Target.</p>
 
+      <div id="weatherStatus" class="weather-status" aria-live="polite">
+        <span class="weather-now">Lewiston–Auburn weather loading…</span>
+        <span class="weather-sun"></span>
+      </div>
+
       <div class="service-switcher" role="tablist" aria-label="Courier Eats services">
         <button id="restaurantServiceButton" class="service-button active" type="button">🍽️ Restaurants</button>
         <button id="retailServiceButton" class="service-button" type="button">🛍️ Retail Pickup</button>
@@ -222,5 +227,141 @@
       });
     })();
   </script>
+
+  <script>
+    (() => {
+      const hero = document.querySelector('.hero');
+      const status = document.getElementById('weatherStatus');
+      if (!hero || !status) return;
+
+      const LAT = 44.1004;
+      const LON = -70.2148;
+      const WEATHER_URL =
+        'https://api.open-meteo.com/v1/forecast' +
+        '?latitude=' + LAT +
+        '&longitude=' + LON +
+        '&current=temperature_2m,weather_code,is_day' +
+        '&daily=sunrise,sunset' +
+        '&temperature_unit=fahrenheit' +
+        '&timezone=America%2FNew_York' +
+        '&forecast_days=1';
+
+      const labels = {
+        0: 'Clear',
+        1: 'Mostly clear',
+        2: 'Partly cloudy',
+        3: 'Cloudy',
+        45: 'Fog',
+        48: 'Fog',
+        51: 'Light drizzle',
+        53: 'Drizzle',
+        55: 'Heavy drizzle',
+        56: 'Freezing drizzle',
+        57: 'Freezing drizzle',
+        61: 'Light rain',
+        63: 'Rain',
+        65: 'Heavy rain',
+        66: 'Freezing rain',
+        67: 'Freezing rain',
+        71: 'Light snow',
+        73: 'Snow',
+        75: 'Heavy snow',
+        77: 'Snow grains',
+        80: 'Rain showers',
+        81: 'Rain showers',
+        82: 'Heavy showers',
+        85: 'Snow showers',
+        86: 'Heavy snow showers',
+        95: 'Thunderstorm',
+        96: 'Thunderstorm',
+        99: 'Thunderstorm'
+      };
+
+      const minutesOf = value => {
+        const time = String(value || '').split('T')[1] || '';
+        const [h, m] = time.split(':').map(Number);
+        return Number.isFinite(h) && Number.isFinite(m) ? h * 60 + m : null;
+      };
+
+      const clock = value => {
+        const mins = minutesOf(value);
+        if (mins == null) return '';
+        const h24 = Math.floor(mins / 60);
+        const m = mins % 60;
+        const suffix = h24 >= 12 ? 'PM' : 'AM';
+        const h12 = h24 % 12 || 12;
+        return h12 + ':' + String(m).padStart(2, '0') + ' ' + suffix;
+      };
+
+      const conditionClass = code => {
+        if ([0, 1].includes(code)) return 'clear';
+        if ([2, 3].includes(code)) return 'clouds';
+        if ([45, 48].includes(code)) return 'fog';
+        if ([71, 73, 75, 77, 85, 86].includes(code)) return 'snow';
+        if ([95, 96, 99].includes(code)) return 'storm';
+        if ([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return 'rain';
+        return 'clear';
+      };
+
+      async function refreshWeather() {
+        try {
+          const response = await fetch(WEATHER_URL, { cache: 'no-store' });
+          if (!response.ok) throw new Error('Weather unavailable');
+          const data = await response.json();
+
+          const current = data.current || {};
+          const sunrise = data.daily?.sunrise?.[0];
+          const sunset = data.daily?.sunset?.[0];
+          const nowMin = minutesOf(current.time);
+          const sunriseMin = minutesOf(sunrise);
+          const sunsetMin = minutesOf(sunset);
+
+          let phase = current.is_day ? 'day' : 'night';
+          if (nowMin != null && sunriseMin != null && Math.abs(nowMin - sunriseMin) <= 45) {
+            phase = 'sunrise';
+          } else if (nowMin != null && sunsetMin != null && Math.abs(nowMin - sunsetMin) <= 45) {
+            phase = 'sunset';
+          }
+
+          const condition = conditionClass(Number(current.weather_code));
+          hero.dataset.weather = condition;
+          hero.dataset.phase = phase;
+
+          let progress = 0.5;
+          if (
+            nowMin != null &&
+            sunriseMin != null &&
+            sunsetMin != null &&
+            sunsetMin > sunriseMin
+          ) {
+            progress = Math.min(1, Math.max(0, (nowMin - sunriseMin) / (sunsetMin - sunriseMin)));
+          }
+
+          const x = 10 + progress * 80;
+          const arc = Math.sin(progress * Math.PI);
+          const y = 76 - arc * 56;
+          hero.style.setProperty('--sun-x', x.toFixed(1) + '%');
+          hero.style.setProperty('--sun-y', y.toFixed(1) + '%');
+
+          const temp = Math.round(Number(current.temperature_2m));
+          const label = labels[Number(current.weather_code)] || 'Current conditions';
+          status.querySelector('.weather-now').textContent =
+            'Lewiston–Auburn · ' + temp + '°F · ' + label;
+          status.querySelector('.weather-sun').textContent =
+            'Sunrise ' + clock(sunrise) + ' · Sunset ' + clock(sunset);
+        } catch (error) {
+          console.warn('Courier Eats weather background fallback:', error);
+          hero.dataset.phase = 'day';
+          hero.dataset.weather = 'clear';
+          status.querySelector('.weather-now').textContent = 'Lewiston–Auburn';
+          status.querySelector('.weather-sun').textContent = '';
+        }
+      }
+
+      refreshWeather();
+      setInterval(refreshWeather, 10 * 60 * 1000);
+    })();
+  </script>
+
 </body>
 </html>
