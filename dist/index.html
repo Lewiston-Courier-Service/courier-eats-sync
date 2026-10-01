@@ -10,38 +10,37 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand app-brand">
-      <img class="brand-scooter" src="/assets/courier-scooter.webp" alt="" aria-hidden="true">
-      <div class="brand-copy">
-        <strong>CourierEats</strong>
-        <span>by Lewiston Courier Service</span>
-      </div>
+    <div class="brand">
+      <div class="logo">CE</div>
+      <span>Courier Eats</span>
     </div>
-    <button id="cartTopButton" class="top-cart-button" type="button" aria-label="Open cart">🛒 <span>0</span></button>
+    <div class="topbar-note">Powered by Lewiston Courier Service</div>
   </header>
 
   <div id="orderComplete" class="order-complete">
     Thank you. Your Courier Eats order has been submitted.
   </div>
 
-  <nav class="app-category-strip" aria-label="Courier Eats categories">
-    <button class="category-button active" data-category="All" type="button"><span>🍽️</span>All</button>
-    <button class="category-button" data-category="Breakfast" type="button"><span>🥞</span>Breakfast</button>
-    <button class="category-button" data-category="Lunch" type="button"><span>🍔</span>Lunch</button>
-    <button class="category-button" data-category="Dinner" type="button"><span>🥩</span>Dinner</button>
-    <button class="category-button" data-category="Pizza" type="button"><span>🍕</span>Pizza</button>
-    <button class="category-button" data-category="Bakery" type="button"><span>🥐</span>Bakery</button>
-    <button class="category-button" data-category="World Food" type="button"><span>🌎</span>World Food</button>
-    <button class="category-button" data-category="Food Trucks" type="button"><span>🚚</span>Food Trucks</button>
-    <button class="category-button" data-category="Convenience Stores" type="button"><span>🏪</span>Convenience</button>
-    <button id="retailServiceButton" class="service-button app-retail-button" type="button"><span>🛍️</span>Retail Pickup</button>
-  </nav>
-
-  <section class="hero app-hero">
+  <section class="hero">
+    <div class="sky-balloon balloon-east" aria-hidden="true">🎈</div>
+    <div class="sky-balloon balloon-west" aria-hidden="true">🎈</div>
+    <div class="sky-balloon balloon-east balloon-small" aria-hidden="true">🎈</div>
     <div class="hero-inner">
-      <h1>Courier Eats</h1>
-      <p>Local restaurant ordering and pickup delivery across Lewiston–Auburn.</p>
-      <button id="restaurantServiceButton" class="service-button active app-order-button" type="button">Browse Restaurants</button>
+      <h1>What can we pick up for you?</h1>
+      <p>Order from local restaurants or book a retail pickup from stores such as Walmart, Home Depot, Lowe's, Tractor Supply, and Target.</p>
+
+      <div class="hero-weather-row">
+        <div id="weatherStatus" class="weather-status" aria-live="polite">
+          <span class="weather-now">Lewiston–Auburn weather loading…</span>
+          <span class="weather-sun"></span>
+        </div>
+        <div class="scenery-bell" title="Deep bell rings when a Courier Eats task completes" aria-label="Task-completion bell">🔔</div>
+      </div>
+
+      <div class="service-switcher" role="tablist" aria-label="Courier Eats services">
+        <button id="restaurantServiceButton" class="service-button active" type="button">🍽️ Restaurants</button>
+        <button id="retailServiceButton" class="service-button" type="button">🛍️ Retail Pickup</button>
+      </div>
     </div>
   </section>
 
@@ -54,6 +53,20 @@
 
       <div class="search-wrap restaurant-search-wrap">
         <input id="restaurantSearch" type="search" placeholder="Search restaurants..." autocomplete="off">
+      </div>
+
+      <div class="categories">
+        <button class="category-button active" data-category="All">All</button>
+        <button class="category-button" data-category="Breakfast">Breakfast</button>
+        <button class="category-button" data-category="Lunch">Lunch</button>
+        <button class="category-button" data-category="Dinner">Dinner</button>
+        <button class="category-button" data-category="Bakery">Bakery</button>
+        <button class="category-button" data-category="Pizza">Pizza</button>
+        <button class="category-button" data-category="World Food">World Food</button>
+        <button class="category-button" data-category="Seafood">Seafood</button>
+        <button class="category-button" data-category="Food Trucks">Food Trucks</button>
+        <button class="category-button" data-category="Convenience Stores">Convenience Stores</button>
+        <button class="category-button" data-category="Catering">Catering</button>
       </div>
 
       <div id="restaurantList">
@@ -147,6 +160,77 @@
     <p>Restaurant ordering and retail pickup delivery by Lewiston Courier Service.</p>
   </footer>
 
+  <script>
+    (() => {
+      let audioContext = null;
+      let pendingBell = false;
+
+      function ensureAudio() {
+        try {
+          if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          if (audioContext.state === 'suspended') {
+            audioContext.resume();
+          }
+          if (pendingBell && audioContext.state === 'running') {
+            pendingBell = false;
+            ringDeepBell();
+          }
+        } catch (error) {
+          console.warn('Bell audio unavailable:', error);
+        }
+      }
+
+      function ringDeepBell() {
+        try {
+          ensureAudio();
+          if (!audioContext || audioContext.state !== 'running') {
+            pendingBell = true;
+            return;
+          }
+
+          const now = audioContext.currentTime;
+          const master = audioContext.createGain();
+          master.gain.setValueAtTime(0.0001, now);
+          master.gain.exponentialRampToValueAtTime(0.42, now + 0.025);
+          master.gain.exponentialRampToValueAtTime(0.0001, now + 4.8);
+          master.connect(audioContext.destination);
+
+          [
+            [110, 0.95],
+            [165, 0.42],
+            [220, 0.24],
+            [275, 0.12]
+          ].forEach(([frequency, level]) => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(frequency, now);
+            osc.frequency.exponentialRampToValueAtTime(frequency * 0.992, now + 4.5);
+            gain.gain.setValueAtTime(level, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 4.5);
+            osc.connect(gain);
+            gain.connect(master);
+            osc.start(now);
+            osc.stop(now + 4.9);
+          });
+
+          document.querySelector('.scenery-bell')?.classList.add('ringing');
+          setTimeout(() => document.querySelector('.scenery-bell')?.classList.remove('ringing'), 900);
+        } catch (error) {
+          console.warn('Unable to ring bell:', error);
+        }
+      }
+
+      window.ringCourierTaskBell = ringDeepBell;
+      window.addEventListener('couriereats:task-complete', ringDeepBell);
+
+      ['pointerdown', 'keydown', 'touchstart'].forEach(type => {
+        window.addEventListener(type, ensureAudio, { once: true, passive: true });
+      });
+    })();
+  </script>
   <script src="/app.js"></script>
   <script>
     (() => {
@@ -155,7 +239,6 @@
       const restaurantPanel = document.getElementById('restaurantService');
       const retailPanel = document.getElementById('retailService');
       const cartButton = document.getElementById('cartButton');
-      const cartTopButton = document.getElementById('cartTopButton');
 
       function showService(service) {
         const restaurants = service === 'restaurants';
@@ -166,15 +249,10 @@
         restaurantButton.classList.toggle('active', restaurants);
         retailButton.classList.toggle('active', !restaurants);
         cartButton.style.display = restaurants ? '' : 'none';
-        if (cartTopButton) cartTopButton.style.display = restaurants ? '' : 'none';
       }
 
-      restaurantButton.addEventListener('click', () => {
-        showService('restaurants');
-        restaurantPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+      restaurantButton.addEventListener('click', () => showService('restaurants'));
       retailButton.addEventListener('click', () => showService('retail'));
-      if (cartTopButton) cartTopButton.addEventListener('click', () => cartButton.click());
 
       const storeButtons = document.querySelectorAll('.retail-store');
       const storeInput = document.getElementById('retailStore');
@@ -213,6 +291,7 @@
           }
           message.textContent = `Pickup request received. Dispatch #${data.dispatchOrderId || ''}`;
           message.className = 'retail-message success';
+          window.dispatchEvent(new CustomEvent('couriereats:task-complete'));
           form.reset();
           storeInput.value = 'Walmart';
           storeButtons.forEach(button => button.classList.toggle('active', button.dataset.store === 'Walmart'));
@@ -226,5 +305,172 @@
       });
     })();
   </script>
+
+  <script>
+    (() => {
+      const hero = document.querySelector('.hero');
+      const status = document.getElementById('weatherStatus');
+      if (!hero || !status) return;
+
+      const LAT = 44.1004;
+      const LON = -70.2148;
+      const WEATHER_URL =
+        'https://api.open-meteo.com/v1/forecast' +
+        '?latitude=' + LAT +
+        '&longitude=' + LON +
+        '&current=temperature_2m,weather_code,is_day' +
+        '&daily=sunrise,sunset' +
+        '&temperature_unit=fahrenheit' +
+        '&timezone=America%2FNew_York' +
+        '&past_days=1' +
+        '&forecast_days=2';
+
+      const labels = {
+        0: 'Clear',
+        1: 'Mostly clear',
+        2: 'Partly cloudy',
+        3: 'Cloudy',
+        45: 'Fog',
+        48: 'Fog',
+        51: 'Light drizzle',
+        53: 'Drizzle',
+        55: 'Heavy drizzle',
+        56: 'Freezing drizzle',
+        57: 'Freezing drizzle',
+        61: 'Light rain',
+        63: 'Rain',
+        65: 'Heavy rain',
+        66: 'Freezing rain',
+        67: 'Freezing rain',
+        71: 'Light snow',
+        73: 'Snow',
+        75: 'Heavy snow',
+        77: 'Snow grains',
+        80: 'Rain showers',
+        81: 'Rain showers',
+        82: 'Heavy showers',
+        85: 'Snow showers',
+        86: 'Heavy snow showers',
+        95: 'Thunderstorm',
+        96: 'Thunderstorm',
+        99: 'Thunderstorm'
+      };
+
+      const minutesOf = value => {
+        const time = String(value || '').split('T')[1] || '';
+        const [h, m] = time.split(':').map(Number);
+        return Number.isFinite(h) && Number.isFinite(m) ? h * 60 + m : null;
+      };
+
+      const clock = value => {
+        const mins = minutesOf(value);
+        if (mins == null) return '';
+        const h24 = Math.floor(mins / 60);
+        const m = mins % 60;
+        const suffix = h24 >= 12 ? 'PM' : 'AM';
+        const h12 = h24 % 12 || 12;
+        return h12 + ':' + String(m).padStart(2, '0') + ' ' + suffix;
+      };
+
+      const conditionClass = code => {
+        if ([0, 1].includes(code)) return 'clear';
+        if ([2, 3].includes(code)) return 'clouds';
+        if ([45, 48].includes(code)) return 'fog';
+        if ([71, 73, 75, 77, 85, 86].includes(code)) return 'snow';
+        if ([95, 96, 99].includes(code)) return 'storm';
+        if ([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return 'rain';
+        return 'clear';
+      };
+
+      async function refreshWeather() {
+        try {
+          const response = await fetch(WEATHER_URL, { cache: 'no-store' });
+          if (!response.ok) throw new Error('Weather unavailable');
+          const data = await response.json();
+
+          const current = data.current || {};
+          const sunriseYesterday = data.daily?.sunrise?.[0];
+          const sunrise = data.daily?.sunrise?.[1];
+          const sunriseTomorrow = data.daily?.sunrise?.[2];
+          const sunsetYesterday = data.daily?.sunset?.[0];
+          const sunset = data.daily?.sunset?.[1];
+          const nowMin = minutesOf(current.time);
+          const sunriseMin = minutesOf(sunrise);
+          const sunsetMin = minutesOf(sunset);
+          const sunriseTomorrowMin = minutesOf(sunriseTomorrow);
+          const sunsetYesterdayMin = minutesOf(sunsetYesterday);
+
+          let phase = current.is_day ? 'day' : 'night';
+          if (nowMin != null && sunriseMin != null && Math.abs(nowMin - sunriseMin) <= 45) {
+            phase = 'sunrise';
+          } else if (nowMin != null && sunsetMin != null && Math.abs(nowMin - sunsetMin) <= 45) {
+            phase = 'sunset';
+          }
+
+          const condition = conditionClass(Number(current.weather_code));
+          hero.dataset.weather = condition;
+          hero.dataset.phase = phase;
+
+          let progress = 0.5;
+          if (
+            nowMin != null &&
+            sunriseMin != null &&
+            sunsetMin != null &&
+            sunsetMin > sunriseMin
+          ) {
+            progress = Math.min(1, Math.max(0, (nowMin - sunriseMin) / (sunsetMin - sunriseMin)));
+          }
+
+          const sunX = 8 + progress * 84;
+          const sunArc = Math.sin(progress * Math.PI);
+          const sunY = 82 - sunArc * 62;
+          hero.style.setProperty('--sun-x', sunX.toFixed(1) + '%');
+          hero.style.setProperty('--sun-y', sunY.toFixed(1) + '%');
+
+          let moonProgress = 0.5;
+          if (!current.is_day && nowMin != null) {
+            if (
+              sunsetMin != null &&
+              sunriseTomorrowMin != null &&
+              nowMin >= sunsetMin
+            ) {
+              const nightLength = (1440 - sunsetMin) + sunriseTomorrowMin;
+              moonProgress = (nowMin - sunsetMin) / nightLength;
+            } else if (
+              sunsetYesterdayMin != null &&
+              sunriseMin != null &&
+              nowMin < sunriseMin
+            ) {
+              const nightLength = (1440 - sunsetYesterdayMin) + sunriseMin;
+              moonProgress = ((1440 - sunsetYesterdayMin) + nowMin) / nightLength;
+            }
+          }
+          moonProgress = Math.min(1, Math.max(0, moonProgress));
+          const moonX = 8 + moonProgress * 84;
+          const moonArc = Math.sin(moonProgress * Math.PI);
+          const moonY = 82 - moonArc * 62;
+          hero.style.setProperty('--moon-x', moonX.toFixed(1) + '%');
+          hero.style.setProperty('--moon-y', moonY.toFixed(1) + '%');
+
+          const temp = Math.round(Number(current.temperature_2m));
+          const label = labels[Number(current.weather_code)] || 'Current conditions';
+          status.querySelector('.weather-now').textContent =
+            'Lewiston–Auburn · ' + temp + '°F · ' + label;
+          status.querySelector('.weather-sun').textContent =
+            'Sunrise ' + clock(sunrise) + ' · Sunset ' + clock(sunset);
+        } catch (error) {
+          console.warn('Courier Eats weather background fallback:', error);
+          hero.dataset.phase = 'day';
+          hero.dataset.weather = 'clear';
+          status.querySelector('.weather-now').textContent = 'Lewiston–Auburn';
+          status.querySelector('.weather-sun').textContent = '';
+        }
+      }
+
+      refreshWeather();
+      setInterval(refreshWeather, 10 * 60 * 1000);
+    })();
+  </script>
+
 </body>
 </html>

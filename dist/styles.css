@@ -62,13 +62,21 @@
     }
 
     .hero {
+      --sun-x: 50%;
+      --sun-y: 25%;
+      --moon-x: 50%;
+      --moon-y: 25%;
       min-height: 430px;
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
 
       background:
         linear-gradient(
-          rgba(34, 40, 58, 0.82),
-          rgba(34, 40, 58, 0.82)
-        );
+          rgba(34, 40, 58, 0.48),
+          rgba(34, 40, 58, 0.58)
+        ),
+        url("/assets/breakfast-lewiston-auburn.webp") center / cover no-repeat;
 
       color: white;
 
@@ -804,117 +812,221 @@
 }
 
 
-/* App-style Courier Eats shell */
-.topbar {
-  background: rgba(255, 248, 232, 0.96);
-  color: #24170e;
-  padding: 10px 18px;
-  box-shadow: 0 4px 18px rgba(72, 44, 20, 0.14);
+/* Real-time Lewiston–Auburn weather hero */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  transition: background 1.2s ease, opacity 1.2s ease;
 }
-.app-brand { gap: 12px; }
-.brand-scooter {
-  width: 74px;
-  height: 52px;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 12px;
+
+.hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: var(--sun-x);
+  top: var(--sun-y);
+  width: 84px;
+  height: 84px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255,244,164,.98) 0 38%, rgba(255,205,72,.72) 52%, rgba(255,205,72,0) 72%);
+  filter: drop-shadow(0 0 28px rgba(255,205,72,.65));
+  transition: left 2s ease, top 2s ease, opacity 1.2s ease, background 1.2s ease;
 }
-.brand-copy {
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
+
+.hero[data-phase="sunrise"]::before {
+  background: linear-gradient(180deg, rgba(255,166,92,.34), rgba(255,214,153,.24), rgba(46,63,90,.20));
 }
-.brand-copy strong {
-  font-size: clamp(24px, 4vw, 38px);
-  font-family: Georgia, "Times New Roman", serif;
-  font-style: italic;
-  color: #a82418;
+
+.hero[data-phase="sunset"]::before {
+  background: linear-gradient(180deg, rgba(118,64,128,.34), rgba(244,118,76,.34), rgba(18,30,56,.34));
 }
-.brand-copy span {
-  margin-top: 5px;
-  font-size: 12px;
-  font-weight: 800;
-  color: #24170e;
+
+.hero[data-phase="night"]::before {
+  background: linear-gradient(180deg, rgba(8,18,42,.64), rgba(21,37,70,.72));
 }
-.top-cart-button {
-  border: 0;
-  background: transparent;
-  font-size: 24px;
-  font-weight: 900;
+
+.hero[data-phase="night"]::after {
+  left: var(--moon-x);
+  top: var(--moon-y);
+  width: 70px;
+  height: 70px;
+  opacity: .92;
+  background: radial-gradient(circle at 40% 40%, #fffef2 0 48%, #d8def2 55%, rgba(216,222,242,0) 70%);
+  filter: drop-shadow(0 0 24px rgba(218,226,255,.52));
 }
-.top-cart-button span {
+
+.hero[data-weather="clouds"]::before {
+  box-shadow: inset 0 0 0 9999px rgba(120,130,145,.18);
+}
+
+.hero[data-weather="fog"]::before {
+  box-shadow: inset 0 0 0 9999px rgba(220,224,226,.28);
+}
+
+.hero[data-weather="rain"]::before {
+  background:
+    repeating-linear-gradient(105deg, rgba(255,255,255,0) 0 16px, rgba(190,210,230,.16) 17px 19px),
+    linear-gradient(180deg, rgba(47,63,82,.42), rgba(60,73,90,.52));
+  animation: weatherRain 1.1s linear infinite;
+}
+
+.hero[data-weather="snow"]::before {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255,255,255,.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 42% 35%, rgba(255,255,255,.72) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 15%, rgba(255,255,255,.78) 0 2px, transparent 3px),
+    radial-gradient(circle at 63% 70%, rgba(255,255,255,.72) 0 2px, transparent 3px),
+    linear-gradient(180deg, rgba(200,215,232,.24), rgba(238,245,252,.28));
+  background-size: 180px 180px, 230px 230px, 270px 270px, 320px 320px, auto;
+  animation: weatherSnow 8s linear infinite;
+}
+
+.hero[data-weather="storm"]::before {
+  background: linear-gradient(180deg, rgba(26,32,52,.62), rgba(39,48,68,.70));
+}
+
+.weather-status {
   display: inline-flex;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 14px;
+  margin: 0 auto 20px;
+  padding: 9px 14px;
+  border: 1px solid rgba(255,255,255,.38);
+  border-radius: 999px;
+  background: rgba(20,28,42,.38);
+  backdrop-filter: blur(8px);
+  font-size: 14px;
+  font-weight: 800;
+  text-shadow: 0 1px 3px rgba(0,0,0,.45);
+}
+
+.weather-sun {
+  opacity: .9;
+}
+
+@keyframes weatherRain {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 60px 100px, 0 0; }
+}
+
+@keyframes weatherSnow {
+  from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+  to { background-position: 15px 180px, -20px 230px, 25px 270px, -12px 320px, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before,
+  .hero::after {
+    animation: none !important;
+    transition: none;
+  }
+}
+
+
+/* Deep scenery bell for task completion */
+.hero-weather-row {
+  display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  background: #e1261c;
-  color: white;
-  font-size: 12px;
-  vertical-align: top;
+  gap: 10px;
+  flex-wrap: wrap;
 }
-.app-category-strip {
-  position: sticky;
-  top: 72px;
-  z-index: 90;
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 10px 14px;
-  background: rgba(255, 248, 232, 0.95);
-  box-shadow: 0 3px 14px rgba(72, 44, 20, 0.10);
-  scrollbar-width: thin;
+
+.scenery-bell {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(20,28,42,.38);
+  border: 1px solid rgba(255,255,255,.38);
+  backdrop-filter: blur(8px);
+  font-size: 22px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.28));
+  transform-origin: 50% 0;
 }
-.app-category-strip .category-button,
-.app-category-strip .service-button {
-  flex: 0 0 auto;
-  min-width: 88px;
-  border: 1px solid rgba(84, 54, 28, 0.12);
-  border-radius: 13px;
-  padding: 9px 12px;
-  background: rgba(255,255,255,0.9);
-  color: #24170e;
-  font-weight: 900;
-  box-shadow: 0 3px 8px rgba(72, 44, 20, 0.08);
+
+.scenery-bell.ringing {
+  animation: courierBellSwing 900ms ease-out;
 }
-.app-category-strip .category-button span,
-.app-category-strip .service-button span {
-  display: block;
-  font-size: 24px;
-  margin-bottom: 3px;
+
+@keyframes courierBellSwing {
+  0% { transform: rotate(0deg); }
+  18% { transform: rotate(16deg); }
+  36% { transform: rotate(-13deg); }
+  54% { transform: rotate(9deg); }
+  72% { transform: rotate(-6deg); }
+  100% { transform: rotate(0deg); }
 }
-.app-category-strip .category-button.active {
-  background: #c62820;
-  color: white;
+
+@media (prefers-reduced-motion: reduce) {
+  .scenery-bell.ringing { animation: none; }
 }
-.app-hero {
-  min-height: 230px;
-  background:
-    linear-gradient(rgba(255,248,232,.78), rgba(255,248,232,.86)),
-    url("/assets/breakfast-lewiston-auburn.webp") center 42% / cover no-repeat;
-  color: #4a2815;
-  padding: 38px 20px;
+
+
+/* Real-time sky motion: balloons travel in both directions */
+.sky-balloon {
+  position: absolute;
+  z-index: 0;
+  top: 17%;
+  font-size: 42px;
+  line-height: 1;
+  opacity: .82;
+  pointer-events: none;
+  filter: drop-shadow(0 5px 6px rgba(0,0,0,.22));
+  will-change: transform;
 }
-.app-hero h1 {
-  font-family: Georgia, "Times New Roman", serif;
-  font-style: italic;
-  color: #9b3a1b;
+
+.balloon-east {
+  left: -80px;
+  animation: balloonEast 46s linear infinite;
 }
-.app-hero p { color: #4a2815; }
-.app-order-button {
-  border: 0;
-  border-radius: 999px;
-  padding: 13px 22px;
-  background: #c62820;
-  color: white;
-  font-weight: 900;
+
+.balloon-west {
+  right: -80px;
+  top: 31%;
+  animation: balloonWest 58s linear infinite;
 }
-@media (max-width: 700px) {
-  .topbar { padding: 8px 10px; }
-  .brand-scooter { width: 58px; height: 42px; }
-  .brand-copy span { font-size: 10px; }
-  .app-category-strip { top: 58px; }
-  .app-hero { min-height: 190px; padding: 28px 14px; }
+
+.balloon-small {
+  top: 48%;
+  font-size: 30px;
+  opacity: .65;
+  animation-duration: 72s;
+  animation-delay: -24s;
+}
+
+.hero[data-phase="night"] .sky-balloon {
+  opacity: .26;
+  filter: brightness(.65) drop-shadow(0 4px 5px rgba(0,0,0,.35));
+}
+
+@keyframes balloonEast {
+  0% { transform: translateX(0) translateY(0) rotate(-2deg); }
+  25% { transform: translateX(28vw) translateY(-10px) rotate(2deg); }
+  50% { transform: translateX(56vw) translateY(5px) rotate(-1deg); }
+  75% { transform: translateX(84vw) translateY(-8px) rotate(2deg); }
+  100% { transform: translateX(calc(100vw + 160px)) translateY(0) rotate(-2deg); }
+}
+
+@keyframes balloonWest {
+  0% { transform: translateX(0) translateY(0) rotate(2deg); }
+  25% { transform: translateX(-28vw) translateY(8px) rotate(-2deg); }
+  50% { transform: translateX(-56vw) translateY(-5px) rotate(1deg); }
+  75% { transform: translateX(-84vw) translateY(9px) rotate(-2deg); }
+  100% { transform: translateX(calc(-100vw - 160px)) translateY(0) rotate(2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky-balloon {
+    animation: none !important;
+    display: none;
+  }
 }
