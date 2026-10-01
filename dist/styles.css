@@ -64,6 +64,8 @@
     .hero {
       --sun-x: 50%;
       --sun-y: 25%;
+      --moon-x: 50%;
+      --moon-y: 25%;
       min-height: 430px;
       position: relative;
       isolation: isolate;
@@ -849,6 +851,8 @@
 }
 
 .hero[data-phase="night"]::after {
+  left: var(--moon-x);
+  top: var(--moon-y);
   width: 70px;
   height: 70px;
   opacity: .92;
@@ -964,4 +968,65 @@
 
 @media (prefers-reduced-motion: reduce) {
   .scenery-bell.ringing { animation: none; }
+}
+
+
+/* Real-time sky motion: balloons travel in both directions */
+.sky-balloon {
+  position: absolute;
+  z-index: 0;
+  top: 17%;
+  font-size: 42px;
+  line-height: 1;
+  opacity: .82;
+  pointer-events: none;
+  filter: drop-shadow(0 5px 6px rgba(0,0,0,.22));
+  will-change: transform;
+}
+
+.balloon-east {
+  left: -80px;
+  animation: balloonEast 46s linear infinite;
+}
+
+.balloon-west {
+  right: -80px;
+  top: 31%;
+  animation: balloonWest 58s linear infinite;
+}
+
+.balloon-small {
+  top: 48%;
+  font-size: 30px;
+  opacity: .65;
+  animation-duration: 72s;
+  animation-delay: -24s;
+}
+
+.hero[data-phase="night"] .sky-balloon {
+  opacity: .26;
+  filter: brightness(.65) drop-shadow(0 4px 5px rgba(0,0,0,.35));
+}
+
+@keyframes balloonEast {
+  0% { transform: translateX(0) translateY(0) rotate(-2deg); }
+  25% { transform: translateX(28vw) translateY(-10px) rotate(2deg); }
+  50% { transform: translateX(56vw) translateY(5px) rotate(-1deg); }
+  75% { transform: translateX(84vw) translateY(-8px) rotate(2deg); }
+  100% { transform: translateX(calc(100vw + 160px)) translateY(0) rotate(-2deg); }
+}
+
+@keyframes balloonWest {
+  0% { transform: translateX(0) translateY(0) rotate(2deg); }
+  25% { transform: translateX(-28vw) translateY(8px) rotate(-2deg); }
+  50% { transform: translateX(-56vw) translateY(-5px) rotate(1deg); }
+  75% { transform: translateX(-84vw) translateY(9px) rotate(-2deg); }
+  100% { transform: translateX(calc(-100vw - 160px)) translateY(0) rotate(2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky-balloon {
+    animation: none !important;
+    display: none;
+  }
 }
