@@ -1100,6 +1100,11 @@ document
 )
 .style.display =
 "block";
+window.dispatchEvent(
+new CustomEvent(
+"couriereats:task-complete"
+)
+);
 }
 loadRestaurants();
 updateCartUI();
