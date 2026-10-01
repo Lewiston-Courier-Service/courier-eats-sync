@@ -10,26 +10,38 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">
-      <div class="logo">CE</div>
-      <span>Courier Eats</span>
+    <div class="brand app-brand">
+      <img class="brand-scooter" src="/assets/courier-scooter.webp" alt="" aria-hidden="true">
+      <div class="brand-copy">
+        <strong>CourierEats</strong>
+        <span>by Lewiston Courier Service</span>
+      </div>
     </div>
-    <div class="topbar-note">Powered by Lewiston Courier Service</div>
+    <button id="cartTopButton" class="top-cart-button" type="button" aria-label="Open cart">🛒 <span>0</span></button>
   </header>
 
   <div id="orderComplete" class="order-complete">
     Thank you. Your Courier Eats order has been submitted.
   </div>
 
-  <section class="hero">
-    <div class="hero-inner">
-      <h1>What can we pick up for you?</h1>
-      <p>Order from local restaurants or book a retail pickup from stores such as Walmart, Home Depot, Lowe's, Tractor Supply, and Target.</p>
+  <nav class="app-category-strip" aria-label="Courier Eats categories">
+    <button class="category-button active" data-category="All" type="button"><span>🍽️</span>All</button>
+    <button class="category-button" data-category="Breakfast" type="button"><span>🥞</span>Breakfast</button>
+    <button class="category-button" data-category="Lunch" type="button"><span>🍔</span>Lunch</button>
+    <button class="category-button" data-category="Dinner" type="button"><span>🥩</span>Dinner</button>
+    <button class="category-button" data-category="Pizza" type="button"><span>🍕</span>Pizza</button>
+    <button class="category-button" data-category="Bakery" type="button"><span>🥐</span>Bakery</button>
+    <button class="category-button" data-category="World Food" type="button"><span>🌎</span>World Food</button>
+    <button class="category-button" data-category="Food Trucks" type="button"><span>🚚</span>Food Trucks</button>
+    <button class="category-button" data-category="Convenience Stores" type="button"><span>🏪</span>Convenience</button>
+    <button id="retailServiceButton" class="service-button app-retail-button" type="button"><span>🛍️</span>Retail Pickup</button>
+  </nav>
 
-      <div class="service-switcher" role="tablist" aria-label="Courier Eats services">
-        <button id="restaurantServiceButton" class="service-button active" type="button">🍽️ Restaurants</button>
-        <button id="retailServiceButton" class="service-button" type="button">🛍️ Retail Pickup</button>
-      </div>
+  <section class="hero app-hero">
+    <div class="hero-inner">
+      <h1>Courier Eats</h1>
+      <p>Local restaurant ordering and pickup delivery across Lewiston–Auburn.</p>
+      <button id="restaurantServiceButton" class="service-button active app-order-button" type="button">Browse Restaurants</button>
     </div>
   </section>
 
@@ -42,20 +54,6 @@
 
       <div class="search-wrap restaurant-search-wrap">
         <input id="restaurantSearch" type="search" placeholder="Search restaurants..." autocomplete="off">
-      </div>
-
-      <div class="categories">
-        <button class="category-button active" data-category="All">All</button>
-        <button class="category-button" data-category="Breakfast">Breakfast</button>
-        <button class="category-button" data-category="Lunch">Lunch</button>
-        <button class="category-button" data-category="Dinner">Dinner</button>
-        <button class="category-button" data-category="Bakery">Bakery</button>
-        <button class="category-button" data-category="Pizza">Pizza</button>
-        <button class="category-button" data-category="World Food">World Food</button>
-        <button class="category-button" data-category="Seafood">Seafood</button>
-        <button class="category-button" data-category="Food Trucks">Food Trucks</button>
-        <button class="category-button" data-category="Convenience Stores">Convenience Stores</button>
-        <button class="category-button" data-category="Catering">Catering</button>
       </div>
 
       <div id="restaurantList">
@@ -157,6 +155,7 @@
       const restaurantPanel = document.getElementById('restaurantService');
       const retailPanel = document.getElementById('retailService');
       const cartButton = document.getElementById('cartButton');
+      const cartTopButton = document.getElementById('cartTopButton');
 
       function showService(service) {
         const restaurants = service === 'restaurants';
@@ -167,10 +166,15 @@
         restaurantButton.classList.toggle('active', restaurants);
         retailButton.classList.toggle('active', !restaurants);
         cartButton.style.display = restaurants ? '' : 'none';
+        if (cartTopButton) cartTopButton.style.display = restaurants ? '' : 'none';
       }
 
-      restaurantButton.addEventListener('click', () => showService('restaurants'));
+      restaurantButton.addEventListener('click', () => {
+        showService('restaurants');
+        restaurantPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
       retailButton.addEventListener('click', () => showService('retail'));
+      if (cartTopButton) cartTopButton.addEventListener('click', () => cartButton.click());
 
       const storeButtons = document.querySelectorAll('.retail-store');
       const storeInput = document.getElementById('retailStore');
