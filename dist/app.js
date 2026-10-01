@@ -1014,6 +1014,14 @@ restaurantService.classList.toggle(
 "breakfast-mode",
 selectedCategory === "Breakfast"
 );
+document
+.querySelector(
+".hero"
+)
+?.classList.toggle(
+"breakfast-selected",
+selectedCategory === "Breakfast"
+);
 
 renderRestaurants();
 if (selectedCategory !== "All") {
