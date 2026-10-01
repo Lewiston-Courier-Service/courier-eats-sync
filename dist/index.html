@@ -22,6 +22,9 @@
   </div>
 
   <section class="hero">
+    <div class="sky-balloon balloon-east" aria-hidden="true">🎈</div>
+    <div class="sky-balloon balloon-west" aria-hidden="true">🎈</div>
+    <div class="sky-balloon balloon-east balloon-small" aria-hidden="true">🎈</div>
     <div class="hero-inner">
       <h1>What can we pick up for you?</h1>
       <p>Order from local restaurants or book a retail pickup from stores such as Walmart, Home Depot, Lowe's, Tractor Supply, and Target.</p>
@@ -319,7 +322,8 @@
         '&daily=sunrise,sunset' +
         '&temperature_unit=fahrenheit' +
         '&timezone=America%2FNew_York' +
-        '&forecast_days=1';
+        '&past_days=1' +
+        '&forecast_days=2';
 
       const labels = {
         0: 'Clear',
@@ -385,11 +389,16 @@
           const data = await response.json();
 
           const current = data.current || {};
-          const sunrise = data.daily?.sunrise?.[0];
-          const sunset = data.daily?.sunset?.[0];
+          const sunriseYesterday = data.daily?.sunrise?.[0];
+          const sunrise = data.daily?.sunrise?.[1];
+          const sunriseTomorrow = data.daily?.sunrise?.[2];
+          const sunsetYesterday = data.daily?.sunset?.[0];
+          const sunset = data.daily?.sunset?.[1];
           const nowMin = minutesOf(current.time);
           const sunriseMin = minutesOf(sunrise);
           const sunsetMin = minutesOf(sunset);
+          const sunriseTomorrowMin = minutesOf(sunriseTomorrow);
+          const sunsetYesterdayMin = minutesOf(sunsetYesterday);
 
           let phase = current.is_day ? 'day' : 'night';
           if (nowMin != null && sunriseMin != null && Math.abs(nowMin - sunriseMin) <= 45) {
@@ -412,11 +421,36 @@
             progress = Math.min(1, Math.max(0, (nowMin - sunriseMin) / (sunsetMin - sunriseMin)));
           }
 
-          const x = 10 + progress * 80;
-          const arc = Math.sin(progress * Math.PI);
-          const y = 76 - arc * 56;
-          hero.style.setProperty('--sun-x', x.toFixed(1) + '%');
-          hero.style.setProperty('--sun-y', y.toFixed(1) + '%');
+          const sunX = 8 + progress * 84;
+          const sunArc = Math.sin(progress * Math.PI);
+          const sunY = 82 - sunArc * 62;
+          hero.style.setProperty('--sun-x', sunX.toFixed(1) + '%');
+          hero.style.setProperty('--sun-y', sunY.toFixed(1) + '%');
+
+          let moonProgress = 0.5;
+          if (!current.is_day && nowMin != null) {
+            if (
+              sunsetMin != null &&
+              sunriseTomorrowMin != null &&
+              nowMin >= sunsetMin
+            ) {
+              const nightLength = (1440 - sunsetMin) + sunriseTomorrowMin;
+              moonProgress = (nowMin - sunsetMin) / nightLength;
+            } else if (
+              sunsetYesterdayMin != null &&
+              sunriseMin != null &&
+              nowMin < sunriseMin
+            ) {
+              const nightLength = (1440 - sunsetYesterdayMin) + sunriseMin;
+              moonProgress = ((1440 - sunsetYesterdayMin) + nowMin) / nightLength;
+            }
+          }
+          moonProgress = Math.min(1, Math.max(0, moonProgress));
+          const moonX = 8 + moonProgress * 84;
+          const moonArc = Math.sin(moonProgress * Math.PI);
+          const moonY = 82 - moonArc * 62;
+          hero.style.setProperty('--moon-x', moonX.toFixed(1) + '%');
+          hero.style.setProperty('--moon-y', moonY.toFixed(1) + '%');
 
           const temp = Math.round(Number(current.temperature_2m));
           const label = labels[Number(current.weather_code)] || 'Current conditions';
