@@ -918,3 +918,30 @@
   .app-category-strip { top: 58px; }
   .app-hero { min-height: 190px; padding: 28px 14px; }
 }
+
+
+/* Transparent top header + daily punch-line */
+.topbar {
+  background: rgba(255, 248, 232, 0.12);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  border-bottom: 1px solid rgba(255,255,255,0.28);
+  box-shadow: 0 4px 18px rgba(45, 24, 12, 0.10);
+}
+.daily-slogan {
+  margin-top: 5px;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7f1d13;
+  line-height: 1.05;
+}
+@media (max-width: 700px) {
+  .daily-slogan {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    max-width: 190px;
+  }
+}

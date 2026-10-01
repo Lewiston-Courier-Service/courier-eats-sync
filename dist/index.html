@@ -14,7 +14,7 @@
       <img class="brand-scooter" src="/assets/courier-scooter.webp" alt="" aria-hidden="true">
       <div class="brand-copy">
         <strong>CourierEats</strong>
-        <span>by Lewiston Courier Service</span>
+        <span id="dailySlogan" class="daily-slogan">HUNGER DOESN’T WAIT. NEITHER DO WE.</span>
       </div>
     </div>
     <button id="cartTopButton" class="top-cart-button" type="button" aria-label="Open cart">🛒 <span>0</span></button>
@@ -148,6 +148,25 @@
   </footer>
 
   <script src="/app.js"></script>
+  <script>
+    (() => {
+      const slogans = [
+        "CRUSH THE CRAVING.",
+        "HUNGER DOESN’T WAIT. NEITHER DO WE.",
+        "STOP SCROLLING. START EATING.",
+        "ORDER BOLD. EAT LOUD.",
+        "FEED THE HUNGER. OWN THE DAY.",
+        "NO DELAYS. JUST DINNER.",
+        "GET FED. GET MOVING."
+      ];
+      const start = new Date(new Date().getFullYear(), 0, 0);
+      const today = new Date();
+      const dayOfYear = Math.floor((today - start) / 86400000);
+      const slogan = slogans[dayOfYear % slogans.length];
+      const target = document.getElementById("dailySlogan");
+      if (target) target.textContent = slogan;
+    })();
+  </script>
   <script>
     (() => {
       const restaurantButton = document.getElementById('restaurantServiceButton');
