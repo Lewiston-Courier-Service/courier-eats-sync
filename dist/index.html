@@ -111,32 +111,92 @@
   </section>
 
   <main class="main">
-    <section id="restaurantService" class="service-panel active">
-      <div class="section-heading">
-        <h2>Local Restaurants</h2>
-        <p>Search restaurants, choose a category, and open the restaurant's live Square menu.</p>
+    <section id="restaurantService" class="service-panel active ordering-home" aria-label="Courier Eats ordering">
+      <div class="ordering-hero-card">
+        <div class="ordering-copy">
+          <span class="ordering-kicker">CEATS · COURIER EATS</span>
+          <h2>COURIER <em>EATS</em></h2>
+          <h3>YOUR FAVORITES. DELIVERED.</h3>
+          <p>Order from local restaurants, grocery stores, convenience stores, and catering. Fast delivery or convenient pickup.</p>
+          <div class="ordering-actions">
+            <button class="ordering-primary" type="button" data-order-action="browse">🍴 Browse All</button>
+            <button class="ordering-secondary" type="button" data-order-action="track">📍 Track My Order</button>
+          </div>
+        </div>
+
+        <div class="ordering-food-scene" aria-hidden="true">
+          <div class="food-bag">C<span>EATS</span><small>COURIER EATS</small></div>
+          <div class="food-icon burger">🍔</div>
+          <div class="food-icon fries">🍟</div>
+          <div class="food-icon pizza">🍕</div>
+          <div class="food-icon bowl">🥗</div>
+        </div>
       </div>
 
-      <div class="search-wrap restaurant-search-wrap">
-        <input id="restaurantSearch" type="search" placeholder="Search restaurants..." autocomplete="off">
+      <div class="ordering-category-header">
+        <span></span><h3>EXPLORE CATEGORIES</h3><span></span>
       </div>
 
-      <div class="categories">
-        <button class="category-button active" data-category="All">All</button>
-        <button class="category-button breakfast-category-button" data-category="Breakfast">Breakfast <span class="breakfast-hours-label" aria-hidden="true"></span></button>
-        <button class="category-button" data-category="Lunch">Lunch</button>
-        <button class="category-button" data-category="Dinner">Dinner</button>
-        <button class="category-button" data-category="Bakery">Bakery</button>
-        <button class="category-button" data-category="Pizza">Pizza</button>
-        <button class="category-button" data-category="World Food">World Food</button>
-        <button class="category-button" data-category="Seafood">Seafood</button>
-        <button class="category-button" data-category="Food Trucks">Food Trucks</button>
-        <button class="category-button" data-category="Convenience Stores">Convenience Stores</button>
-        <button class="category-button" data-category="Catering">Catering</button>
+      <div class="ordering-category-grid">
+        <button class="ordering-category-card" type="button" data-order-category="All">
+          <span class="ordering-category-art">🍽️</span><strong>Restaurants</strong><small>Local favorites delivered</small>
+        </button>
+        <button class="ordering-category-card" type="button" data-order-category="Bakery">
+          <span class="ordering-category-art">🧁</span><strong>Bakery</strong><small>Fresh baked goods</small>
+        </button>
+        <button class="ordering-category-card" type="button" data-order-category="Breakfast">
+          <span class="ordering-category-art">🍳</span><strong>Breakfast</strong><small>Start your day right</small>
+        </button>
+        <button class="ordering-category-card" type="button" data-order-category="Lunch">
+          <span class="ordering-category-art">🥪</span><strong>Lunch</strong><small>Quick &amp; tasty options</small>
+        </button>
+        <button class="ordering-category-card" type="button" data-order-category="Dinner">
+          <span class="ordering-category-art">🍲</span><strong>Dinner</strong><small>Casual to fine dining</small>
+        </button>
+        <button class="ordering-category-card" type="button" data-order-category="Pizza">
+          <span class="ordering-category-art">🍕</span><strong>Pizza</strong><small>Hot &amp; fresh delivered</small>
+        </button>
+        <button class="ordering-category-card" type="button" data-order-category="World Food">
+          <span class="ordering-category-art">🌎</span><strong>World Food</strong><small>Flavors from around the world</small>
+        </button>
+        <button class="ordering-category-card" type="button" data-order-category="Seafood">
+          <span class="ordering-category-art">🦐</span><strong>Seafood</strong><small>Local &amp; coastal favorites</small>
+        </button>
+        <button class="ordering-category-card" type="button" data-order-category="Grocery Stores">
+          <span class="ordering-category-art">🛒</span><strong>Grocery Stores</strong><small>Walmart, Hannaford, Shaw's &amp; more</small>
+        </button>
+        <button class="ordering-category-card" type="button" data-order-category="Convenience Stores">
+          <span class="ordering-category-art">🏪</span><strong>Convenience Stores</strong><small>Quick essentials &amp; local stores</small>
+        </button>
+        <button class="ordering-category-card" type="button" data-order-category="Catering">
+          <span class="ordering-category-art">👥</span><strong>Catering</strong><small>Events, offices &amp; parties</small>
+        </button>
       </div>
 
-      <div id="restaurantList">
-        <div class="message">Loading restaurants...</div>
+      <div class="ordering-feature-strip">
+        <div><span>🛵</span><strong>Fast Delivery</strong><small>Quick &amp; reliable</small></div>
+        <div><span>🏪</span><strong>Local Businesses</strong><small>Support our community</small></div>
+        <div><span>🛡️</span><strong>Secure Ordering</strong><small>Safe &amp; secure checkout</small></div>
+        <div><span>🎧</span><strong>Customer Support</strong><small>We're here to help</small></div>
+      </div>
+
+      <!-- Keep restaurant API hooks available for existing ordering logic without showing the old directory UI. -->
+      <div class="legacy-restaurant-hooks" hidden>
+        <input id="restaurantSearch" type="search" value="">
+        <div class="categories">
+          <button class="category-button active" data-category="All" type="button">All</button>
+          <button class="category-button breakfast-category-button" data-category="Breakfast" type="button">Breakfast <span class="breakfast-hours-label"></span></button>
+          <button class="category-button" data-category="Lunch" type="button">Lunch</button>
+          <button class="category-button" data-category="Dinner" type="button">Dinner</button>
+          <button class="category-button" data-category="Bakery" type="button">Bakery</button>
+          <button class="category-button" data-category="Pizza" type="button">Pizza</button>
+          <button class="category-button" data-category="World Food" type="button">World Food</button>
+          <button class="category-button" data-category="Seafood" type="button">Seafood</button>
+          <button class="category-button" data-category="Food Trucks" type="button">Food Trucks</button>
+          <button class="category-button" data-category="Convenience Stores" type="button">Convenience Stores</button>
+          <button class="category-button" data-category="Catering" type="button">Catering</button>
+        </div>
+        <div id="restaurantList"></div>
       </div>
     </section>
 
