@@ -1895,3 +1895,41 @@
     border-bottom: 1px solid #e0d4c6;
   }
 }
+
+
+/* Widen the Courier Eats ordering screen on desktop */
+.ordering-home {
+  position: relative;
+  left: 50%;
+  width: min(1680px, calc(100vw - 24px));
+  max-width: none;
+  transform: translateX(-50%);
+}
+
+.ordering-category-grid {
+  grid-template-columns: repeat(11, minmax(118px, 1fr));
+}
+
+@media (min-width: 1200px) {
+  .ordering-hero-card {
+    min-height: 430px;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  }
+
+  .ordering-copy {
+    padding-left: clamp(44px, 5vw, 86px);
+    padding-right: clamp(32px, 4vw, 70px);
+  }
+
+  .ordering-category-grid {
+    padding-left: 22px;
+    padding-right: 22px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 700px) {
+  .ordering-home {
+    width: calc(100vw - 16px);
+  }
+}
