@@ -173,6 +173,65 @@
         </button>
       </div>
 
+      <section id="retailCatalogs" class="retail-catalogs" aria-label="Grocery and convenience ordering">
+        <div class="retail-catalog-heading">
+          <h3>GROCERY &amp; CONVENIENCE ORDERING</h3>
+          <p>Shop each retailer's official online catalog, then choose LCS Pickup when you want Lewiston Courier Service to collect the order.</p>
+        </div>
+
+        <div class="retail-catalog-grid">
+          <article class="retail-catalog-card" data-catalog-kind="grocery">
+            <div class="retail-catalog-icon">🛒</div>
+            <h4>Walmart</h4>
+            <p>Groceries, household items, and general merchandise.</p>
+            <div class="retail-catalog-actions">
+              <a href="https://www.walmart.com/" target="_blank" rel="noopener noreferrer">Shop Catalog</a>
+              <button class="retail-catalog-pickup" type="button" data-pickup-store="Walmart">LCS Pickup</button>
+            </div>
+          </article>
+
+          <article class="retail-catalog-card" data-catalog-kind="grocery">
+            <div class="retail-catalog-icon">🥬</div>
+            <h4>Hannaford</h4>
+            <p>Online grocery shopping with pickup and delivery options.</p>
+            <div class="retail-catalog-actions">
+              <a href="https://www.hannaford.com/" target="_blank" rel="noopener noreferrer">Shop Catalog</a>
+              <button class="retail-catalog-pickup" type="button" data-pickup-store="Hannaford">LCS Pickup</button>
+            </div>
+          </article>
+
+          <article class="retail-catalog-card" data-catalog-kind="grocery">
+            <div class="retail-catalog-icon">🧺</div>
+            <h4>Shaw's</h4>
+            <p>Grocery ordering with DriveUp &amp; Go pickup and delivery.</p>
+            <div class="retail-catalog-actions">
+              <a href="https://www.shaws.com/" target="_blank" rel="noopener noreferrer">Shop Catalog</a>
+              <button class="retail-catalog-pickup" type="button" data-pickup-store="Shaw's">LCS Pickup</button>
+            </div>
+          </article>
+
+          <article class="retail-catalog-card" data-catalog-kind="convenience">
+            <div class="retail-catalog-icon">⛽</div>
+            <h4>Cumberland Farms</h4>
+            <p>Browse Cumberland Farms food and beverage items, then request LCS pickup.</p>
+            <div class="retail-catalog-actions">
+              <a href="https://www.cumberlandfarms.com/cstores/food-beverage/" target="_blank" rel="noopener noreferrer">Browse Food &amp; Beverage</a>
+              <button class="retail-catalog-pickup" type="button" data-pickup-store="Cumberland Farms">LCS Pickup</button>
+            </div>
+          </article>
+
+          <article class="retail-catalog-card" data-catalog-kind="convenience">
+            <div class="retail-catalog-icon">🏪</div>
+            <h4>7-Eleven</h4>
+            <p>Order eligible products through 7NOW for delivery or pickup.</p>
+            <div class="retail-catalog-actions">
+              <a href="https://www.7-eleven.com/7now-app" target="_blank" rel="noopener noreferrer">Order with 7NOW</a>
+              <button class="retail-catalog-pickup" type="button" data-pickup-store="7-Eleven">LCS Pickup</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <div class="ordering-feature-strip">
         <div><span>🛵</span><strong>Fast Delivery</strong><small>Quick &amp; reliable</small></div>
         <div><span>🏪</span><strong>Local Businesses</strong><small>Support our community</small></div>
@@ -208,6 +267,10 @@
 
       <div class="retail-store-grid" aria-label="Available retail pickup stores">
         <button class="retail-store active" data-store="Walmart" type="button">🛒 <strong>Walmart</strong></button>
+        <button class="retail-store" data-store="Hannaford" type="button">🥬 <strong>Hannaford</strong></button>
+        <button class="retail-store" data-store="Shaw's" type="button">🧺 <strong>Shaw's</strong></button>
+        <button class="retail-store" data-store="Cumberland Farms" type="button">⛽ <strong>Cumberland Farms</strong></button>
+        <button class="retail-store" data-store="7-Eleven" type="button">🏪 <strong>7-Eleven</strong></button>
         <button class="retail-store" data-store="Home Depot" type="button">🧰 <strong>Home Depot</strong></button>
         <button class="retail-store" data-store="Lowe's" type="button">🏠 <strong>Lowe's</strong></button>
         <button class="retail-store" data-store="Tractor Supply" type="button">🚜 <strong>Tractor Supply</strong></button>
@@ -387,6 +450,31 @@
           storeButtons.forEach(other => other.classList.remove('active'));
           button.classList.add('active');
           storeInput.value = button.dataset.store || '';
+        });
+      });
+
+      document.querySelectorAll('.retail-catalog-pickup').forEach(button => {
+        button.addEventListener('click', () => {
+          const store = button.dataset.pickupStore || '';
+          showService('retail');
+          storeInput.value = store;
+          storeButtons.forEach(other => {
+            other.classList.toggle('active', other.dataset.store === store);
+          });
+          const locationInput = document.querySelector('#retailPickupForm input[name="storeLocation"]');
+          if (locationInput && !locationInput.value) {
+            locationInput.placeholder = 'Enter the ' + store + ' pickup location';
+          }
+          document.getElementById('retailService')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      document.querySelectorAll('.ordering-category-card').forEach(button => {
+        button.addEventListener('click', () => {
+          const category = button.dataset.orderCategory;
+          if (category === 'Grocery Stores' || category === 'Convenience Stores') {
+            document.getElementById('retailCatalogs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         });
       });
 
