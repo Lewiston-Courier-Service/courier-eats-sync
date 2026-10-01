@@ -30,6 +30,47 @@ function restaurantInitials(name) {
 let restaurants = [];
 let selectedCategory = "All";
 let cart = [];
+
+function breakfastIsOpen() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(new Date());
+
+  const hour = Number(parts.find(part => part.type === "hour")?.value || 0);
+  const minute = Number(parts.find(part => part.type === "minute")?.value || 0);
+  const now = hour * 60 + minute;
+  return now >= 6 * 60 && now < 11 * 60;
+}
+
+function updateBreakfastAvailability() {
+  const open = breakfastIsOpen();
+  const button = document.querySelector('.category-button[data-category="Breakfast"]');
+  if (!button) return;
+
+  button.disabled = !open;
+  button.classList.toggle("closed", !open);
+  button.setAttribute("aria-disabled", String(!open));
+  button.title = open
+    ? "Breakfast available now"
+    : "Breakfast available 6:00 AM–11:00 AM Eastern";
+
+  const label = button.querySelector(".breakfast-hours-label");
+  if (label) {
+    label.textContent = open ? "Open" : "Closed";
+  }
+
+  if (!open && selectedCategory === "Breakfast") {
+    selectedCategory = "All";
+    button.classList.remove("active");
+    document.querySelector('.category-button[data-category="All"]')?.classList.add("active");
+    document.getElementById("restaurantService")?.classList.remove("breakfast-mode");
+    document.querySelector(".hero")?.classList.remove("breakfast-selected");
+    renderRestaurants();
+  }
+}
 let cartLocationId = null;
 let cartRestaurantName = "";
 function escapeHTML(value) {
@@ -984,6 +1025,13 @@ button => {
 button.addEventListener(
 "click",
 () => {
+if (
+button.dataset.category === "Breakfast" &&
+!breakfastIsOpen()
+) {
+updateBreakfastAvailability();
+return;
+}
 document
 .querySelectorAll(
 ".category-button"
@@ -1012,6 +1060,14 @@ document.getElementById(
 );
 restaurantService.classList.toggle(
 "breakfast-mode",
+selectedCategory === "Breakfast"
+);
+document
+.querySelector(
+".hero"
+)
+?.classList.toggle(
+"breakfast-selected",
 selectedCategory === "Breakfast"
 );
 
@@ -1108,3 +1164,5 @@ new CustomEvent(
 }
 loadRestaurants();
 updateCartUI();
+updateBreakfastAvailability();
+setInterval(updateBreakfastAvailability, 60 * 1000);

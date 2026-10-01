@@ -73,10 +73,11 @@
 
       background:
         linear-gradient(
-          rgba(34, 40, 58, 0.14),
-          rgba(34, 40, 58, 0.22)
-        ),
-        url("/assets/breakfast-lewiston-auburn.webp") center 46% / cover no-repeat;
+          180deg,
+          rgba(107, 168, 222, 0.26) 0%,
+          rgba(173, 211, 240, 0.20) 48%,
+          rgba(244, 220, 179, 0.18) 100%
+        );
 
       color: white;
 
@@ -1046,4 +1047,118 @@
 
 .hero[data-weather="clear"]::before {
   opacity: .28;
+}
+
+
+/* Breakfast artwork is used only while the Breakfast category is selected. */
+.hero.breakfast-selected {
+  background:
+    linear-gradient(
+      rgba(34, 40, 58, 0.12),
+      rgba(34, 40, 58, 0.20)
+    ),
+    url("/assets/breakfast-lewiston-auburn.webp") center 46% / cover no-repeat;
+}
+
+
+.breakfast-category-button .breakfast-hours-label {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 900;
+  opacity: .82;
+}
+
+.category-button.closed {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+
+/* Courier Eats hero title + rotating daily slogan */
+.courier-eats-title,
+.daily-slogan {
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  text-shadow: 0 3px 12px rgba(0,0,0,.35);
+}
+
+.courier-eats-title {
+  font-size: clamp(52px, 9vw, 96px) !important;
+  margin-bottom: 10px !important;
+}
+
+.daily-slogan {
+  margin: 0 auto 22px !important;
+  max-width: 900px !important;
+  font-size: clamp(20px, 3.2vw, 34px) !important;
+  line-height: 1.05 !important;
+  color: #fff3bf;
+}
+
+.hero-bell-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+/* Time + weather now live below the scenery */
+.time-weather-strip {
+  background: #171717;
+  color: white;
+  border-top: 1px solid rgba(255,255,255,.12);
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+
+.time-weather-inner {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: grid;
+  grid-template-columns: minmax(180px, .8fr) minmax(260px, 1.2fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.live-time-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.time-weather-label {
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: #ffd400;
+}
+
+#liveLocalTime {
+  font-size: clamp(26px, 4vw, 40px);
+  line-height: 1;
+}
+
+.live-local-date {
+  color: #cfcfcf;
+  font-weight: 700;
+}
+
+.below-scenery-weather {
+  margin: 0;
+  justify-self: end;
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.18);
+}
+
+@media (max-width: 700px) {
+  .time-weather-inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .below-scenery-weather {
+    justify-self: center;
+  }
 }

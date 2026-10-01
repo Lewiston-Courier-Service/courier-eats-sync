@@ -26,20 +26,30 @@
     <div class="sky-balloon balloon-west" aria-hidden="true">🎈</div>
     <div class="sky-balloon balloon-east balloon-small" aria-hidden="true">🎈</div>
     <div class="hero-inner">
-      <h1>What can we pick up for you?</h1>
-      <p>Order from local restaurants or book a retail pickup from stores such as Walmart, Home Depot, Lowe's, Tractor Supply, and Target.</p>
+      <h1 class="courier-eats-title">Courier Eats</h1>
+      <p id="dailySlogan" class="daily-slogan">HUNGER DOESN’T WAIT. NEITHER DO WE.</p>
 
-      <div class="hero-weather-row">
-        <div id="weatherStatus" class="weather-status" aria-live="polite">
-          <span class="weather-now">Lewiston–Auburn weather loading…</span>
-          <span class="weather-sun"></span>
-        </div>
+      <div class="hero-bell-row">
         <div class="scenery-bell" title="Deep bell rings when a Courier Eats task completes" aria-label="Task-completion bell">🔔</div>
       </div>
 
       <div class="service-switcher" role="tablist" aria-label="Courier Eats services">
         <button id="restaurantServiceButton" class="service-button active" type="button">🍽️ Restaurants</button>
         <button id="retailServiceButton" class="service-button" type="button">🛍️ Retail Pickup</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="time-weather-strip" aria-label="Lewiston–Auburn time and weather">
+    <div class="time-weather-inner">
+      <div class="live-time-block">
+        <span class="time-weather-label">Lewiston–Auburn</span>
+        <strong id="liveLocalTime">--:-- --</strong>
+        <span id="liveLocalDate" class="live-local-date"></span>
+      </div>
+      <div id="weatherStatus" class="weather-status below-scenery-weather" aria-live="polite">
+        <span class="weather-now">Lewiston–Auburn weather loading…</span>
+        <span class="weather-sun"></span>
       </div>
     </div>
   </section>
@@ -57,7 +67,7 @@
 
       <div class="categories">
         <button class="category-button active" data-category="All">All</button>
-        <button class="category-button" data-category="Breakfast">Breakfast</button>
+        <button class="category-button breakfast-category-button" data-category="Breakfast">Breakfast <span class="breakfast-hours-label" aria-hidden="true"></span></button>
         <button class="category-button" data-category="Lunch">Lunch</button>
         <button class="category-button" data-category="Dinner">Dinner</button>
         <button class="category-button" data-category="Bakery">Bakery</button>
@@ -303,6 +313,56 @@
           submitButton.textContent = 'Request Retail Pickup';
         }
       });
+    })();
+  </script>
+
+  <script>
+    (() => {
+      const slogans = [
+        'HUNGER DOESN’T WAIT. NEITHER DO WE.',
+        'CRUSH THE CRAVING.',
+        'STOP SCROLLING. START EATING.',
+        'ORDER BOLD. EAT LOUD.',
+        'GET FED. GET MOVING.',
+        'HOT FOOD. FAST MOVES.',
+        'YOUR HUNGER. OUR RUN.'
+      ];
+
+      const nowInLewiston = () => new Date(
+        new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+      );
+
+      const slogan = document.getElementById('dailySlogan');
+      const now = nowInLewiston();
+      const start = new Date(now.getFullYear(), 0, 0);
+      const dayOfYear = Math.floor((now - start) / 86400000);
+      if (slogan) slogan.textContent = slogans[dayOfYear % slogans.length];
+
+      const timeEl = document.getElementById('liveLocalTime');
+      const dateEl = document.getElementById('liveLocalDate');
+
+      function updateLocalClock() {
+        const current = new Date();
+        if (timeEl) {
+          timeEl.textContent = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/New_York',
+            hour: 'numeric',
+            minute: '2-digit',
+            second: '2-digit'
+          }).format(current);
+        }
+        if (dateEl) {
+          dateEl.textContent = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/New_York',
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+          }).format(current);
+        }
+      }
+
+      updateLocalClock();
+      setInterval(updateLocalClock, 1000);
     })();
   </script>
 
