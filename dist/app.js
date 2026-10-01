@@ -447,48 +447,6 @@ data.items
 )
 ? data.items
 : [];
-if (
-selectedCategory !== "All"
-) {
-const category =
-selectedCategory
-.toLowerCase();
-items =
-items.filter(
-item => {
-const courierCategory =
-String(
-item.courierCategory ||
-""
-)
-.toLowerCase();
-const squareCategories =
-Array.isArray(
-item.squareCategories
-)
-? item.squareCategories
-.join(" ")
-.toLowerCase()
-: "";
-const name =
-String(
-item.name || ""
-)
-.toLowerCase();
-return (
-courierCategory.includes(
-category
-) ||
-squareCategories.includes(
-category
-) ||
-name.includes(
-category
-)
-);
-}
-);
-}
 menuBox.innerHTML = "";
 if (
 items.length === 0
@@ -884,6 +842,14 @@ document
 )
 .textContent =
 money(total);
+const topCount =
+document.querySelector(
+"#cartTopButton span"
+);
+if (topCount) {
+topCount.textContent =
+String(quantity);
+}
 }
 function changeQuantity(
 variationId,
@@ -1050,6 +1016,9 @@ selectedCategory === "Breakfast"
 );
 
 renderRestaurants();
+if (selectedCategory !== "All") {
+restaurantService?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 document
 .querySelectorAll(
 ".restaurant-menu"
