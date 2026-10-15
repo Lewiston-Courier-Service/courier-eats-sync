@@ -2018,3 +2018,19 @@
 #categoryRestaurantHeading {
   text-transform: uppercase;
 }
+
+
+.online-ordering {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 46px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.online-ordering:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
