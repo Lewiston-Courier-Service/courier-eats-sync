@@ -143,7 +143,7 @@
       </div>
 
       <div class="ordering-category-grid">
-        <button class="ordering-category-card" type="button" data-order-category="All">
+        <button class="ordering-category-card active" type="button" data-order-category="Restaurants">
           <span class="ordering-category-art">🍽️</span><strong>Restaurants</strong><small>Local favorites delivered</small>
         </button>
         <button class="ordering-category-card" type="button" data-order-category="Bakery">
@@ -260,8 +260,14 @@
           <button class="category-button" data-category="Convenience Stores" type="button">Convenience Stores</button>
           <button class="category-button" data-category="Catering" type="button">Catering</button>
         </div>
-        <div id="restaurantList"></div>
       </div>
+
+      <section id="categoryRestaurantResults" class="category-restaurant-results" aria-live="polite">
+        <div class="ordering-category-header">
+          <span></span><h3 id="categoryRestaurantHeading">Restaurants</h3><span></span>
+        </div>
+        <div id="restaurantList"></div>
+      </section>
     </section>
 
     <section id="retailService" class="service-panel" hidden>
