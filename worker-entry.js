@@ -1,5 +1,6 @@
 import baseWorker from "./worker.js";
 import { handleDoorDashAuth } from "./doordash-auth.js";
+import { handleShipdayAuth } from "./shipday-auth.js";
 import { handleSquareRestaurantConnector } from "./square-restaurant-connector.js";
 import { handleSquareMenuSync } from "./square-menu-sync.js";
 import { handleSquareSandboxWebhook } from "./square-sandbox-webhook.js";
@@ -27,6 +28,11 @@ export default {
     const doorDashAuthResponse = await handleDoorDashAuth(request, env);
     if (doorDashAuthResponse) {
       return doorDashAuthResponse;
+    }
+
+    const shipdayAuthResponse = await handleShipdayAuth(request, env);
+    if (shipdayAuthResponse) {
+      return shipdayAuthResponse;
     }
 
     const marketplaceResponse = await handleMarketplaceOrders(request, env, ctx);
