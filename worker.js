@@ -180,6 +180,48 @@ const BREAKFAST_RESTAURANTS = [
     orderUrl: "https://order.online/en/store/nutty-netties-22974187",
     orderingMode: "EXTERNAL",
     checkoutEnabled: false
+  },
+  {
+    id: "grants-bakery",
+    name: "Grant's Bakery",
+    categories: ["Bakery"],
+    address: "525 Sabattus St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-783-2226",
+    menuUrl: "https://grantsbakery.com/index.html",
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "bakery-barn-lewiston",
+    name: "The Bakery Barn",
+    categories: ["Bakery"],
+    address: "892 Lisbon St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: null,
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "marvelous-macarons-auburn",
+    name: "Marvelous Macarons",
+    categories: ["Bakery"],
+    address: "245 Center St Suite 10A",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: null,
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
   }
 ];
 
