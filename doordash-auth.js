@@ -1,6 +1,10 @@
 export async function handleDoorDashAuth(request, env) {
   const url = new URL(request.url);
 
+  if (url.pathname === "/api/marketplace/doordash/api-test") {
+    return handleDoorDashApiTest(request, env);
+  }
+
   if (url.pathname !== "/api/marketplace/doordash/auth-status") {
     return null;
   }
@@ -39,6 +43,76 @@ export async function handleDoorDashAuth(request, env) {
       jwtGenerated: false,
       error: String(error?.message || error)
     }, 500);
+  }
+}
+
+async function handleDoorDashApiTest(request, env) {
+  if (request.method !== "GET") {
+    return json({ error: "Method not allowed" }, 405);
+  }
+
+  if (String(env.DOORDASH_API_PROBE_ENABLED || "").toLowerCase() !== "true") {
+    return json({
+      service: "DoorDash Marketplace API Probe",
+      enabled: false,
+      message: "Probe is disabled"
+    }, 503);
+  }
+
+  try {
+    const jwt = await createDoorDashJwt(env);
+    const response = await fetch(
+      "https://openapi.doordash.com/marketplace/api/v1/stores/__courier_eats_auth_probe__/store_details",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          "auth-version": "v2",
+          "User-Agent": String(
+            env.DOORDASH_PROVIDER_USER_AGENT || "CourierEatsSandbox/1.0"
+          )
+        }
+      }
+    );
+
+    let providerMessage = null;
+    try {
+      const body = await response.json();
+      providerMessage =
+        body?.message ||
+        body?.error ||
+        body?.detail ||
+        body?.code ||
+        null;
+    } catch {
+      providerMessage = null;
+    }
+
+    return json({
+      service: "DoorDash Marketplace API Probe",
+      enabled: true,
+      doorDashStatus: response.status,
+      authenticated: response.status !== 401,
+      accessGranted: ![401, 403].includes(response.status),
+      interpretation:
+        response.status === 401
+          ? "DoorDash rejected the JWT"
+          : response.status === 403
+            ? "DoorDash accepted authentication but denied this resource"
+            : response.status === 404
+              ? "DoorDash accepted the request; the probe store does not exist"
+              : response.ok
+                ? "DoorDash accepted the request"
+                : "DoorDash returned a non-authentication response",
+      providerMessage
+    }, response.status >= 500 ? 502 : 200);
+  } catch (error) {
+    return json({
+      service: "DoorDash Marketplace API Probe",
+      enabled: true,
+      authenticated: false,
+      error: String(error?.message || error)
+    }, 502);
   }
 }
 
