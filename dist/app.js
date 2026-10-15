@@ -28,7 +28,7 @@ function restaurantInitials(name) {
 }
 
 let restaurants = [];
-let selectedCategory = "All";
+let selectedCategory = "Restaurants";
 let cart = [];
 
 function breakfastIsOpen() {
@@ -1016,6 +1016,51 @@ document
 "input",
 renderRestaurants
 );
+document
+.querySelectorAll(
+".ordering-category-card"
+)
+.forEach(
+button => {
+button.addEventListener(
+"click",
+() => {
+document
+.querySelectorAll(
+".ordering-category-card"
+)
+.forEach(otherButton => {
+otherButton.classList.remove("active");
+});
+button.classList.add("active");
+
+selectedCategory =
+button.dataset.orderCategory || "Restaurants";
+
+const heading =
+document.getElementById(
+"categoryRestaurantHeading"
+);
+if (heading) {
+heading.textContent =
+selectedCategory;
+}
+
+renderRestaurants();
+
+document
+.getElementById(
+"categoryRestaurantResults"
+)
+?.scrollIntoView({
+behavior: "smooth",
+block: "start"
+});
+}
+);
+}
+);
+
 document
 .querySelectorAll(
 ".category-button"
