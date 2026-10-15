@@ -222,7 +222,11 @@ export default {
         const byName = new Map(
           BREAKFAST_RESTAURANTS.map(restaurant => [
             normalizeRestaurantName(restaurant.name),
-            { ...restaurant, locationId: null }
+            {
+              ...restaurant,
+              categories: [...new Set([...(restaurant.categories || []), "Restaurants"])],
+              locationId: null
+            }
           ])
         );
 
@@ -255,9 +259,10 @@ export default {
                 ...(directoryRestaurant || {
                   id: key.replace(/\s+/g, "-"),
                   name,
-                  categories: []
+                  categories: ["Restaurants"]
                 }),
                 name,
+                categories: [...new Set([...(directoryRestaurant?.categories || []), "Restaurants"])],
                 locationId: location.id,
                 city: location.address?.locality || directoryRestaurant?.city || "",
                 state:
