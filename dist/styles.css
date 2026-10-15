@@ -2002,3 +2002,19 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.category-restaurant-results {
+  padding: 6px 16px 34px;
+  scroll-margin-top: 18px;
+}
+
+.ordering-category-card.active {
+  border-color: #ef6300;
+  box-shadow: 0 9px 20px rgba(239,99,0,.18);
+  outline: 3px solid rgba(239,99,0,.12);
+}
+
+#categoryRestaurantHeading {
+  text-transform: uppercase;
+}
