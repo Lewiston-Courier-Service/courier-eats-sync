@@ -216,7 +216,10 @@ export default {
           "Courier Eats",
           "C EATS",
           "C express",
-          "Wil_Smith"
+          "Wil_Smith",
+          "Wilbert A Smith",
+          "wilbert-a-smith",
+          "Wilbert_A_Smith"
         ].map(name => name.toLowerCase());
 
         const byName = new Map(
