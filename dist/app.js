@@ -277,58 +277,38 @@ aria-label="${escapeHTML(meta.bird)}"
 `
 : "";
 
-const externalOrder =
-!restaurant.checkoutEnabled &&
-restaurant.orderUrl;
-
-const primaryButton =
+const onlineOrderUrl =
+restaurant.orderUrl ||
+(
+restaurant.checkoutEnabled &&
 restaurant.locationId
-? `
-<button
-class="view-menu"
-type="button"
->
-View Menu
-</button>
-`
-: restaurant.menuUrl
-? `
-<a
-class="view-menu restaurant-link"
-href="${escapeHTML(restaurant.menuUrl)}"
-target="_blank"
-rel="noopener noreferrer"
->
-View Menu
-</a>
-`
-: "";
+? "https://ceats.square.site"
+: null
+);
 
 const orderButton =
-externalOrder
+onlineOrderUrl
 ? `
 <a
-class="order-now restaurant-link"
-href="${escapeHTML(restaurant.orderUrl)}"
+class="order-now restaurant-link online-ordering"
+href="${escapeHTML(onlineOrderUrl)}"
 target="_blank"
 rel="noopener noreferrer"
 >
-Order Now
+Online Ordering
 </a>
 `
-: (
-!restaurant.locationId &&
-restaurant.phone
-? `
-<a
-class="order-now restaurant-link"
-href="tel:${escapeHTML(restaurant.phone)}"
+: `
+<button
+class="order-now online-ordering"
+type="button"
+disabled
+aria-disabled="true"
+title="Online ordering is coming soon for this restaurant"
 >
-Call to Order
-</a>
-`
-: ""
-);
+Online Ordering Coming Soon
+</button>
+`;
 
 card.innerHTML = `
 ${birdMarkup}
@@ -350,32 +330,10 @@ locationText
 ${categoryTags}
 </div>
 <div class="restaurant-actions">
-${primaryButton}
 ${orderButton}
 </div>
 </div>
-<div
-class="restaurant-menu"
-></div>
 `;
-
-const button =
-card.querySelector(
-"button.view-menu"
-);
-
-if (button) {
-button.addEventListener(
-"click",
-() => {
-card.classList.add("selected");
-loadMenu(
-restaurant,
-button
-);
-}
-);
-}
 
 card.addEventListener(
 "mouseenter",
