@@ -2034,3 +2034,29 @@
   opacity: .55;
   cursor: not-allowed;
 }
+
+
+/* Keep the preferred Workers hero readable on phone-sized screens.
+   The hero already supplies the Courier Eats H1, so the sticky CE brand bar
+   duplicates it and pushes the live time/weather unnecessarily far down. */
+@media (max-width: 700px) {
+  .topbar {
+    display: none;
+  }
+
+  .hero {
+    min-height: 420px;
+    padding: 48px 12px 42px;
+  }
+
+  .courier-eats-title {
+    font-size: clamp(29px, 9vw, 52px) !important;
+    letter-spacing: 0 !important;
+    white-space: nowrap;
+  }
+
+  .daily-slogan {
+    font-size: clamp(17px, 4.4vw, 27px) !important;
+    line-height: 1.15 !important;
+  }
+}
