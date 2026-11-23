@@ -294,6 +294,189 @@ const BREAKFAST_RESTAURANTS = [
     orderingMode: "CALL_TO_ORDER",
     checkoutEnabled: false
   },
+  // Directory only: do not enable checkout before explicit restaurant onboarding.
+  {
+    id: "ms-claws-lobster-and-seafood",
+    name: "Ms Claws Lobster and Seafood",
+    categories: ["Seafood", "Lunch", "Dinner"],
+    address: "24 River Rd",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-312-4850",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "mother-india-lewiston",
+    name: "Mother India",
+    categories: ["World Food", "Lunch", "Dinner"],
+    address: "114 Lisbon St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-333-6777",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "bua-thai-sushi-lewiston",
+    name: "Bua Thai & Sushi",
+    categories: ["World Food", "Lunch", "Dinner"],
+    address: "703 Sabattus St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-376-4810",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "jeffs-jamaican-cuisine",
+    name: "Jeff's Jamaican Cuisine Food Trailer",
+    categories: ["World Food", "Lunch", "Dinner"],
+    address: "940 Lisbon St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-815-9506",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "el-pochos-mexican-grill",
+    name: "El Pocho's Mexican Grill",
+    categories: ["World Food", "Lunch", "Dinner"],
+    address: "97 Lisbon St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-333-3226",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "orchid-lewiston",
+    name: "Orchid Thai & Vietnamese",
+    categories: ["World Food", "Lunch", "Dinner"],
+    address: "29 Lisbon St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-753-0389",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "sea40-japanese-cuisine",
+    name: "Sea40 Japanese Cuisine",
+    categories: ["World Food", "Lunch", "Dinner"],
+    address: "40 East Ave",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: null,
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "cibo-pizza-auburn",
+    name: "Cibo Pizza",
+    categories: ["Pizza", "Lunch", "Dinner"],
+    address: "49 Spring St",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-440-7434",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "lewiston-house-of-pizza",
+    name: "Lewiston House of Pizza",
+    categories: ["Pizza", "Lunch", "Dinner"],
+    address: "95 Lincoln St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-786-2020",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "84-court-pizza",
+    name: "84 Court Pizza & Restaurant",
+    categories: ["Pizza", "Lunch", "Dinner"],
+    address: "84 Court St",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-376-4940",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "pats-pizza-auburn",
+    name: "Pat's Pizza",
+    categories: ["Pizza", "Lunch", "Dinner"],
+    address: "85 Center St",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-784-8221",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "angelos-pizzeria-lewiston",
+    name: "Angelo's Pizzeria Lewiston",
+    categories: ["Pizza", "Lunch", "Dinner"],
+    address: "365 Sabattus St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-241-3304",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "antigonis-pizza-lewiston",
+    name: "Antigoni's Pizza Lewiston",
+    categories: ["Pizza", "Lunch", "Dinner"],
+    address: "757 Main St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-330-4978",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
   {
     id: "marvelous-macarons-auburn",
     name: "Marvelous Macarons",
@@ -349,7 +532,9 @@ export default {
           "Wilbert_A_Smith",
           "Mr. Sea\u2019s",
           "Mr. Seas",
-          "Mr Seas"
+          "Mr Seas",
+          "George's Pizza",
+          "Georges Pizza"
         ].map(name => name.toLowerCase());
 
         const byName = new Map(
@@ -381,7 +566,7 @@ export default {
               }
 
               const name = String(location.name || "").trim();
-              if (!name || excludedNames.includes(name.toLowerCase()) || /^mr\.?\s*sea[\u2019\u0027]?s?\b/i.test(name)) {
+              if (!name || excludedNames.includes(name.toLowerCase()) || /^mr\.?\s*sea[\u2019\u0027]?s?\b/i.test(name) || /^(george s|georges) pizza(?:\b|$)/i.test(normalizeRestaurantName(name))) {
                 continue;
               }
 
