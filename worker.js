@@ -154,6 +154,20 @@ const BREAKFAST_RESTAURANTS = [
     checkoutEnabled: false
   },
   {
+    id: "thatchers-restaurant-auburn-mall",
+    name: "Thatcher's Restaurant & Pub",
+    categories: ["Lunch", "Dinner", "Seafood", "Pizza"],
+    address: "550 Center St, Auburn Mall",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-782-2135",
+    menuUrl: "https://menusinla.com/restaurants/thatchers-restaurant-pub/",
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
     id: "georgios-pizza-donut-shop",
     name: "Georgio's Pizza & Donut Shop",
     categories: ["Breakfast", "Lunch", "Dinner", "Pizza", "Bakery"],
