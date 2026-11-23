@@ -209,6 +209,91 @@ const BREAKFAST_RESTAURANTS = [
     orderingMode: "CALL_TO_ORDER",
     checkoutEnabled: false
   },
+  // Seafood directory listings. Square checkout remains disabled until onboarded.
+  {
+    id: "kps-place-auburn",
+    name: "KP's Place",
+    categories: ["Seafood", "Lunch", "Dinner"],
+    address: "245 Center St Unit 7",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-376-4295",
+    menuUrl: "https://kpsplacemaine.com/",
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "macs-downeast-seafood",
+    name: "Mac's Downeast Seafood",
+    categories: ["Seafood", "Lunch", "Dinner"],
+    address: "910 Minot Ave",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-777-5871",
+    menuUrl: "https://macsdowneastseafood.com/menu/",
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "always-fresh-larochelles-seafood",
+    name: "Always Fresh La Rochelle's",
+    categories: ["Seafood", "Lunch", "Dinner"],
+    address: "22 Mill St",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-782-3150",
+    menuUrl: "https://menusinla.com/restaurants/always-fresh-larochelles-seafood",
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "village-inn-auburn",
+    name: "The Village Inn",
+    categories: ["Seafood", "Lunch", "Dinner"],
+    address: "165 High St",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-782-7796",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "macs-grill-auburn",
+    name: "Mac's Grill",
+    categories: ["Seafood", "Lunch", "Dinner"],
+    address: "1052 Minot Ave",
+    city: "Auburn",
+    state: "ME",
+    postalCode: "04210",
+    phone: "207-783-6885",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
+  {
+    id: "fish-bones-grill",
+    name: "Fish Bones Grill",
+    categories: ["Seafood", "Lunch", "Dinner"],
+    address: "70 Lincoln St",
+    city: "Lewiston",
+    state: "ME",
+    postalCode: "04240",
+    phone: "207-333-3663",
+    menuUrl: null,
+    orderUrl: null,
+    orderingMode: "CALL_TO_ORDER",
+    checkoutEnabled: false
+  },
   {
     id: "marvelous-macarons-auburn",
     name: "Marvelous Macarons",
@@ -261,7 +346,10 @@ export default {
           "Wil_Smith",
           "Wilbert A Smith",
           "wilbert-a-smith",
-          "Wilbert_A_Smith"
+          "Wilbert_A_Smith",
+          "Mr. Sea\u2019s",
+          "Mr. Seas",
+          "Mr Seas"
         ].map(name => name.toLowerCase());
 
         const byName = new Map(
@@ -293,7 +381,7 @@ export default {
               }
 
               const name = String(location.name || "").trim();
-              if (!name || excludedNames.includes(name.toLowerCase())) {
+              if (!name || excludedNames.includes(name.toLowerCase()) || /^mr\.?\s*sea[\u2019\u0027]?s?\b/i.test(name)) {
                 continue;
               }
 
